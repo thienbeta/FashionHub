@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -10,7 +11,11 @@ import {
   User,
   LogIn,
   LogOut,
-  Home
+  Home,
+  Heart,
+  MessageCircle,
+  Package,
+  LayoutGrid
 } from "lucide-react";
 
 interface AppShellProps {
@@ -49,23 +54,76 @@ export const AppShell = ({ children }: AppShellProps) => {
                 </Link>
               </div>
 
+              {/* Main Navigation */}
+              <nav className="hidden md:flex items-center gap-6">
+                <Link to="/" className={cn(
+                  "text-gray-600 hover:text-crocus-600 transition-colors",
+                  location.pathname === "/" && "text-crocus-600 font-medium"
+                )}>
+                  Home
+                </Link>
+                <Link to="/products" className={cn(
+                  "text-gray-600 hover:text-crocus-600 transition-colors",
+                  location.pathname.startsWith("/products") && "text-crocus-600 font-medium"
+                )}>
+                  Products
+                </Link>
+                <Link to="/combos" className={cn(
+                  "text-gray-600 hover:text-crocus-600 transition-colors",
+                  location.pathname.startsWith("/combos") && "text-crocus-600 font-medium"
+                )}>
+                  Combos
+                </Link>
+                <Link to="/contact" className={cn(
+                  "text-gray-600 hover:text-crocus-600 transition-colors",
+                  location.pathname === "/contact" && "text-crocus-600 font-medium"
+                )}>
+                  Contact
+                </Link>
+              </nav>
+
               <div className="flex items-center gap-4">
-                {userRole === "user" && (
-                  <Link to="/user/cart" className="relative">
-                    <ShoppingCart className="h-5 w-5" />
-                    <span className="absolute -top-2 -right-2 bg-crocus-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      3
-                    </span>
-                  </Link>
+                {/* Mobile Menu Button */}
+                <Button variant="ghost" size="icon" className="block md:hidden">
+                  <Menu className="h-5 w-5" />
+                </Button>
+                
+                {/* User Icons */}
+                {(userRole === "user") && (
+                  <>
+                    <Link to="/favorites" className={cn(
+                      "relative hover:text-crocus-600 transition-colors",
+                      location.pathname === "/favorites" ? "text-crocus-600" : "text-gray-600"
+                    )}>
+                      <Heart className="h-5 w-5" />
+                    </Link>
+                    <Link to="/user/cart" className={cn(
+                      "relative hover:text-crocus-600 transition-colors",
+                      location.pathname === "/user/cart" ? "text-crocus-600" : "text-gray-600"
+                    )}>
+                      <ShoppingCart className="h-5 w-5" />
+                      <span className="absolute -top-2 -right-2 bg-crocus-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        3
+                      </span>
+                    </Link>
+                  </>
                 )}
                 
                 <Button variant="ghost" size="sm" onClick={cycleUserRole}>
                   {userRole === "guest" ? "Guest" : userRole === "user" ? "User" : userRole === "staff" ? "Staff" : "Admin"}
                 </Button>
                 
-                <Button variant="ghost" size="icon" className="relative">
-                  <User className="h-5 w-5" />
-                </Button>
+                {userRole === "guest" ? (
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/auth/login">
+                      <LogIn className="h-4 w-4 mr-2" /> Login
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button variant="ghost" size="icon" className="relative">
+                    <User className="h-5 w-5" />
+                  </Button>
+                )}
               </div>
             </div>
           </header>
@@ -80,7 +138,7 @@ export const AppShell = ({ children }: AppShellProps) => {
           {/* Footer */}
           <footer className="bg-gray-50 border-t border-gray-200 py-8">
             <div className="container mx-auto px-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
                   <h3 className="font-bold text-lg mb-4 text-crocus-700">CROCUS Fashion</h3>
                   <p className="text-gray-600">
@@ -88,17 +146,31 @@ export const AppShell = ({ children }: AppShellProps) => {
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg mb-4 text-crocus-700">Quick Links</h3>
+                  <h3 className="font-bold text-lg mb-4 text-crocus-700">Shop</h3>
                   <ul className="space-y-2">
-                    <li><Link to="/" className="text-gray-600 hover:text-crocus-500">Home</Link></li>
-                    <li><Link to="/about" className="text-gray-600 hover:text-crocus-500">About Us</Link></li>
-                    <li><Link to="/contact" className="text-gray-600 hover:text-crocus-500">Contact</Link></li>
-                    <li><Link to="/terms" className="text-gray-600 hover:text-crocus-500">Terms & Conditions</Link></li>
+                    <li><Link to="/products" className="text-gray-600 hover:text-crocus-500">Products</Link></li>
+                    <li><Link to="/combos" className="text-gray-600 hover:text-crocus-500">Combos</Link></li>
+                    <li><Link to="/products/new" className="text-gray-600 hover:text-crocus-500">New Arrivals</Link></li>
+                    <li><Link to="/favorites" className="text-gray-600 hover:text-crocus-500">Favorites</Link></li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg mb-4 text-crocus-700">Account</h3>
+                  <ul className="space-y-2">
+                    <li><Link to="/user/profile" className="text-gray-600 hover:text-crocus-500">My Profile</Link></li>
+                    <li><Link to="/user/orders" className="text-gray-600 hover:text-crocus-500">Order History</Link></li>
+                    <li><Link to="/user/cart" className="text-gray-600 hover:text-crocus-500">Shopping Cart</Link></li>
+                    <li><Link to="/auth/login" className="text-gray-600 hover:text-crocus-500">Login / Register</Link></li>
                   </ul>
                 </div>
                 <div>
                   <h3 className="font-bold text-lg mb-4 text-crocus-700">Connect With Us</h3>
-                  <div className="flex space-x-4">
+                  <ul className="space-y-2">
+                    <li><Link to="/contact" className="text-gray-600 hover:text-crocus-500">Contact Us</Link></li>
+                    <li><a href="#" className="text-gray-600 hover:text-crocus-500">About Us</a></li>
+                    <li><a href="#" className="text-gray-600 hover:text-crocus-500">Careers</a></li>
+                  </ul>
+                  <div className="flex space-x-4 mt-4">
                     <a href="#" className="text-gray-600 hover:text-crocus-500">
                       <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />

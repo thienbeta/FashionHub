@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +9,20 @@ import { AppShell } from "@/components/layout/AppShell";
 // Pages
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+
+// Product Pages
+import ProductList from "./pages/products/ProductList";
+import ProductDetail from "./pages/products/ProductDetail";
+
+// Combo Pages
+import CombosList from "./pages/combos/CombosList";
+import ComboDetail from "./pages/combos/ComboDetail";
+
+// Favorites Page
+import FavoritesList from "./pages/favorites/FavoritesList";
+
+// Contact Page
+import Contact from "./pages/contact/Contact";
 
 // Auth Pages
 import Login from "./pages/auth/Login";
@@ -42,6 +57,20 @@ const App = () => (
         <AppShell>
           <Routes>
             <Route path="/" element={<Index />} />
+            
+            {/* Product Routes */}
+            <Route path="/products" element={<ProductList />} />
+            <Route path="/products/:id" element={<ProductDetail />} />
+            
+            {/* Combo Routes */}
+            <Route path="/combos" element={<CombosList />} />
+            <Route path="/combos/:id" element={<ComboDetail />} />
+            
+            {/* Favorites */}
+            <Route path="/favorites" element={<FavoritesList />} />
+            
+            {/* Contact */}
+            <Route path="/contact" element={<Contact />} />
             
             {/* Auth Routes */}
             <Route path="/auth/login" element={<Login />} />
