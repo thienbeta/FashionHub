@@ -49,8 +49,8 @@ export const AppShell = ({ children }: AppShellProps) => {
                   <SidebarTrigger />
                 )}
                 <Link to="/" className="flex items-center gap-2">
-                  <span className="font-bold text-xl bg-gradient-to-r from-crocus-500 to-crocus-700 bg-clip-text text-transparent">CROCUS</span>
-                  <span className="hidden sm:inline-block font-light">Fashion</span>
+                  <span className="font-bold text-xl bg-gradient-to-r from-crocus-500 to-crocus-700 bg-clip-text text-transparent">Fashion Hub</span>
+                  <span className="hidden sm:inline-block font-light">Style & Elegance</span>
                 </Link>
               </div>
 
@@ -73,6 +73,12 @@ export const AppShell = ({ children }: AppShellProps) => {
                   location.pathname.startsWith("/combos") && "text-crocus-600 font-medium"
                 )}>
                   Combos
+                </Link>
+                <Link to="/blogs" className={cn(
+                  "text-gray-600 hover:text-crocus-600 transition-colors",
+                  location.pathname.startsWith("/blogs") && "text-crocus-600 font-medium"
+                )}>
+                  Blog
                 </Link>
                 <Link to="/contact" className={cn(
                   "text-gray-600 hover:text-crocus-600 transition-colors",

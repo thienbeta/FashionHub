@@ -18,6 +18,10 @@ import ProductDetail from "./pages/products/ProductDetail";
 import CombosList from "./pages/combos/CombosList";
 import ComboDetail from "./pages/combos/ComboDetail";
 
+// Blog Pages
+import BlogsList from "./pages/blogs/BlogsList";
+import BlogDetail from "./pages/blogs/BlogDetail";
+
 // Favorites Page
 import FavoritesList from "./pages/favorites/FavoritesList";
 
@@ -65,6 +69,10 @@ const App = () => (
             {/* Combo Routes */}
             <Route path="/combos" element={<CombosList />} />
             <Route path="/combos/:id" element={<ComboDetail />} />
+            
+            {/* Blog Routes */}
+            <Route path="/blogs" element={<BlogsList />} />
+            <Route path="/blogs/:id" element={<BlogDetail />} />
             
             {/* Favorites */}
             <Route path="/favorites" element={<FavoritesList />} />

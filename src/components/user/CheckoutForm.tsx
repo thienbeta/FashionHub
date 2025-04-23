@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, CreditCard, ChevronRight } from "lucide-react";
+import { Check, CreditCard, ChevronRight, RotateCcw, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,33 +9,70 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 // Mock data
 const cartItems = [
   {
     id: 1,
     name: "Crocus Cotton Tee",
+    image: "https://via.placeholder.com/80x80",
     price: 29.99,
     quantity: 1,
+    size: "M",
+    color: "Crocus Purple",
+    type: "product"
   },
   {
     id: 2,
     name: "Linen Blend Shirt",
+    image: "https://via.placeholder.com/80x80",
     price: 49.99,
     quantity: 2,
+    size: "L",
+    color: "White",
+    type: "product"
   },
   {
     id: 3,
     name: "Summer Dress",
+    image: "https://via.placeholder.com/80x80",
     price: 79.99,
     quantity: 1,
+    size: "S",
+    color: "Floral",
+    type: "product"
   },
+  {
+    id: 101,
+    name: "Essential Capsule Combo",
+    image: "https://via.placeholder.com/80x80",
+    additionalImages: [
+      "https://via.placeholder.com/40x40?text=1",
+      "https://via.placeholder.com/40x40?text=2",
+      "https://via.placeholder.com/40x40?text=3"
+    ],
+    price: 149.99,
+    quantity: 1,
+    description: "Crocus Purple blouse, neutral trousers, versatile blazer",
+    type: "combo"
+  }
 ];
 
+// Calculate subtotal
 const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 const shipping = 5.99;
 const tax = subtotal * 0.1; // 10% tax
-const total = subtotal + shipping + tax;
+
+// Available discount codes
+const discountCodes = [
+  { code: "WELCOME10", discount: 0.10 },
+  { code: "SUMMER25", discount: 0.25 },
+  { code: "FASHION15", discount: 0.15 },
+  { code: "CROCUS20", discount: 0.20 },
+  { code: "NEWYOU", discount: 0.30 }
+];
 
 export const CheckoutForm = () => {
   const [step, setStep] = useState<'shipping' | 'payment' | 'review' | 'confirmation'>('shipping');
@@ -49,6 +86,14 @@ export const CheckoutForm = () => {
   });
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [appliedDiscount, setAppliedDiscount] = useState<number>(0);
+  const [discountCode, setDiscountCode] = useState<string>("");
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [spinResult, setSpinResult] = useState<string | null>(null);
+  
+  // Calculate total with discount
+  const discountAmount = subtotal * appliedDiscount;
+  const total = subtotal + shipping + tax - discountAmount;
 
   const handleShippingInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -77,6 +122,42 @@ export const CheckoutForm = () => {
       setStep('confirmation');
       window.scrollTo(0, 0);
     }, 1500);
+  };
+
+  const handleApplyDiscountCode = () => {
+    const code = discountCodes.find(c => c.code === discountCode.toUpperCase());
+    
+    if (code) {
+      setAppliedDiscount(code.discount);
+      toast.success("Discount code applied successfully!", {
+        description: `${Math.round(code.discount * 100)}% discount has been applied to your order.`
+      });
+    } else {
+      toast.error("Invalid discount code", {
+        description: "Please check your code and try again."
+      });
+    }
+    
+    setDiscountCode("");
+  };
+  
+  const handleSpin = () => {
+    setIsSpinning(true);
+    
+    // Simulate spinning for 2 seconds
+    setTimeout(() => {
+      // Randomly select a discount code
+      const randomIndex = Math.floor(Math.random() * discountCodes.length);
+      const selectedCode = discountCodes[randomIndex];
+      setSpinResult(selectedCode.code);
+      setIsSpinning(false);
+      
+      // Auto-apply the discount after spinning
+      setAppliedDiscount(selectedCode.discount);
+      toast.success("You won a discount code!", {
+        description: `${selectedCode.code} (${Math.round(selectedCode.discount * 100)}% off) has been applied to your order.`
+      });
+    }, 2000);
   };
 
   return (
@@ -197,7 +278,7 @@ export const CheckoutForm = () => {
               </CardContent>
               <CardFooter className="flex justify-between">
                 <Button asChild variant="outline">
-                  <Link to="/cart">Back to Cart</Link>
+                  <Link to="/user/cart">Back to Cart</Link>
                 </Button>
                 <Button type="submit" form="shippingForm" className="bg-crocus-500 hover:bg-crocus-600">
                   Continue to Payment <ChevronRight className="ml-2 h-4 w-4" />
@@ -207,7 +288,7 @@ export const CheckoutForm = () => {
           </div>
           
           <div>
-            <Card>
+            <Card className="mb-6">
               <CardHeader>
                 <CardTitle>Order Summary</CardTitle>
               </CardHeader>
@@ -215,9 +296,19 @@ export const CheckoutForm = () => {
                 <ul className="space-y-3">
                   {cartItems.map((item) => (
                     <li key={item.id} className="flex justify-between">
-                      <div>
-                        <span className="font-medium">{item.name}</span>
-                        <span className="text-gray-500 text-sm ml-2">x{item.quantity}</span>
+                      <div className="flex gap-2">
+                        <img 
+                          src={item.image} 
+                          alt={item.name} 
+                          className="w-10 h-10 object-cover rounded"
+                        />
+                        <div>
+                          <span className="font-medium">{item.name}</span>
+                          <span className="text-gray-500 text-sm ml-2">x{item.quantity}</span>
+                          {item.type === "product" && (
+                            <p className="text-xs text-gray-500">{item.size} | {item.color}</p>
+                          )}
+                        </div>
                       </div>
                       <span>${(item.price * item.quantity).toFixed(2)}</span>
                     </li>
@@ -237,6 +328,12 @@ export const CheckoutForm = () => {
                     <span>Tax</span>
                     <span>${tax.toFixed(2)}</span>
                   </div>
+                  {appliedDiscount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Discount</span>
+                      <span>-${discountAmount.toFixed(2)}</span>
+                    </div>
+                  )}
                 </div>
                 <Separator />
                 <div className="flex justify-between font-medium text-lg">
@@ -245,6 +342,78 @@ export const CheckoutForm = () => {
                 </div>
               </CardContent>
             </Card>
+            
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="w-full mb-4">
+                  <Star className="w-4 h-4 mr-2 text-crocus-500" />
+                  Spin for a Discount
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle className="text-center">Lucky Spin Discount</DialogTitle>
+                  <DialogDescription className="text-center">
+                    Spin the wheel to win a discount code for your order!
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex flex-col items-center py-6">
+                  <div className="relative w-64 h-64 mb-6">
+                    {/* Simple representation of a spinning wheel */}
+                    <div 
+                      className={`w-full h-full rounded-full border-8 border-crocus-500 flex items-center justify-center transition-transform duration-1000 ${isSpinning ? 'animate-spin' : ''}`}
+                      style={{ 
+                        backgroundImage: "conic-gradient(#9b87f5, #7E69AB, #6E59A5, #9b87f5, #7E69AB, #6E59A5)",
+                        boxShadow: "0 0 15px rgba(155, 135, 245, 0.5)"
+                      }}
+                    >
+                      {!isSpinning && spinResult && (
+                        <div className="bg-white p-3 rounded-lg text-center z-10">
+                          <p className="font-bold text-crocus-700">{spinResult}</p>
+                          <p className="text-xs text-gray-500">Applied to your order</p>
+                        </div>
+                      )}
+                    </div>
+                    {/* Arrow pointer */}
+                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/3">
+                      <div className="w-0 h-0 border-left-8 border-right-8 border-top-8 border-transparent border-l-transparent border-r-transparent border-b-crocus-700"></div>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    onClick={handleSpin} 
+                    disabled={isSpinning || spinResult !== null}
+                    className="bg-crocus-500 hover:bg-crocus-600"
+                  >
+                    {isSpinning ? (
+                      <span className="flex items-center">
+                        <RotateCcw className="w-4 h-4 mr-2 animate-spin" />
+                        Spinning...
+                      </span>
+                    ) : spinResult ? (
+                      <span>Discount Applied!</span>
+                    ) : (
+                      <span>Spin the Wheel</span>
+                    )}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+            
+            <div className="flex gap-2">
+              <Input 
+                placeholder="Discount Code" 
+                value={discountCode}
+                onChange={(e) => setDiscountCode(e.target.value)}
+              />
+              <Button 
+                onClick={handleApplyDiscountCode}
+                variant="outline"
+                disabled={!discountCode}
+              >
+                Apply
+              </Button>
+            </div>
           </div>
         </div>
       )}
@@ -357,12 +526,19 @@ export const CheckoutForm = () => {
                 <CardTitle>Order Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ul className="space-y-3">
+                <ul className="space-y-3 max-h-60 overflow-y-auto">
                   {cartItems.map((item) => (
                     <li key={item.id} className="flex justify-between">
-                      <div>
-                        <span className="font-medium">{item.name}</span>
-                        <span className="text-gray-500 text-sm ml-2">x{item.quantity}</span>
+                      <div className="flex gap-2">
+                        <img 
+                          src={item.image} 
+                          alt={item.name} 
+                          className="w-10 h-10 object-cover rounded"
+                        />
+                        <div>
+                          <span className="font-medium">{item.name}</span>
+                          <span className="text-gray-500 text-sm ml-2">x{item.quantity}</span>
+                        </div>
                       </div>
                       <span>${(item.price * item.quantity).toFixed(2)}</span>
                     </li>
@@ -382,6 +558,12 @@ export const CheckoutForm = () => {
                     <span>Tax</span>
                     <span>${tax.toFixed(2)}</span>
                   </div>
+                  {appliedDiscount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Discount</span>
+                      <span>-${discountAmount.toFixed(2)}</span>
+                    </div>
+                  )}
                 </div>
                 <Separator />
                 <div className="flex justify-between font-medium text-lg">
@@ -403,6 +585,31 @@ export const CheckoutForm = () => {
                 <CardDescription>Please verify your information</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                <div>
+                  <h3 className="font-medium mb-2">Products</h3>
+                  <ul className="space-y-3 bg-gray-50 p-4 rounded-md">
+                    {cartItems.map((item) => (
+                      <li key={item.id} className="flex justify-between">
+                        <div className="flex gap-2">
+                          <img 
+                            src={item.image} 
+                            alt={item.name} 
+                            className="w-10 h-10 object-cover rounded"
+                          />
+                          <div>
+                            <span className="font-medium">{item.name}</span>
+                            <span className="text-gray-500 text-sm ml-2">x{item.quantity}</span>
+                            {item.type === "product" && (
+                              <p className="text-xs text-gray-500">{item.size} | {item.color}</p>
+                            )}
+                          </div>
+                        </div>
+                        <span>${(item.price * item.quantity).toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
                 <div>
                   <h3 className="font-medium mb-2">Shipping Information</h3>
                   <div className="bg-gray-50 p-4 rounded-md">
@@ -459,18 +666,6 @@ export const CheckoutForm = () => {
                 <CardTitle>Order Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ul className="space-y-3">
-                  {cartItems.map((item) => (
-                    <li key={item.id} className="flex justify-between">
-                      <div>
-                        <span className="font-medium">{item.name}</span>
-                        <span className="text-gray-500 text-sm ml-2">x{item.quantity}</span>
-                      </div>
-                      <span>${(item.price * item.quantity).toFixed(2)}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Separator />
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
@@ -484,6 +679,12 @@ export const CheckoutForm = () => {
                     <span>Tax</span>
                     <span>${tax.toFixed(2)}</span>
                   </div>
+                  {appliedDiscount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Discount</span>
+                      <span>-${discountAmount.toFixed(2)}</span>
+                    </div>
+                  )}
                 </div>
                 <Separator />
                 <div className="flex justify-between font-medium text-lg">
@@ -518,7 +719,7 @@ export const CheckoutForm = () => {
                   <Link to="/user/orders">View Order</Link>
                 </Button>
                 <Button asChild variant="outline">
-                  <Link to="/">Continue Shopping</Link>
+                  <Link to="/products">Continue Shopping</Link>
                 </Button>
               </div>
             </div>
