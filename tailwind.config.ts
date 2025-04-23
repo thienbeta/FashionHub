@@ -52,6 +52,18 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				crocus: {
+					50: '#f6f3ff',
+					100: '#ede7ff',
+					200: '#dbd2fe',
+					300: '#c2b0fc',
+					400: '#a98bf8',
+					500: '#9b87f5', /* Pantone 16-3115 Crocus */
+					600: '#7E69AB',
+					700: '#6E59A5',
+					800: '#5A4A85',
+					900: '#4A3C6E'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
