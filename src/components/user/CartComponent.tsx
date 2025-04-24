@@ -5,13 +5,14 @@ import { Minus, Plus, ShoppingBag, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 // Mock data for cart items
 const initialCartItems = [
   {
     id: 1,
     name: "Crocus Cotton Tee",
-    image: "https://via.placeholder.com/80x80",
+    image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
     price: 29.99,
     quantity: 1,
     size: "M",
@@ -21,7 +22,7 @@ const initialCartItems = [
   {
     id: 2,
     name: "Linen Blend Shirt",
-    image: "https://via.placeholder.com/80x80",
+    image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
     price: 49.99,
     quantity: 2,
     size: "L",
@@ -31,7 +32,7 @@ const initialCartItems = [
   {
     id: 3,
     name: "Summer Dress",
-    image: "https://via.placeholder.com/80x80",
+    image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
     price: 79.99,
     quantity: 1,
     size: "S",
@@ -41,11 +42,11 @@ const initialCartItems = [
   {
     id: 101,
     name: "Essential Capsule Combo",
-    image: "https://via.placeholder.com/80x80",
+    image: "https://images.unsplash.com/photo-1721322800607-8c38375eef04",
     additionalImages: [
-      "https://via.placeholder.com/80x80?text=Item1",
-      "https://via.placeholder.com/80x80?text=Item2",
-      "https://via.placeholder.com/80x80?text=Item3"
+      "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
+      "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
+      "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9"
     ],
     price: 149.99,
     quantity: 1,
@@ -55,10 +56,10 @@ const initialCartItems = [
   {
     id: 102,
     name: "Weekend Wanderer Combo",
-    image: "https://via.placeholder.com/80x80",
+    image: "https://images.unsplash.com/photo-1721322800607-8c38375eef04",
     additionalImages: [
-      "https://via.placeholder.com/80x80?text=Item1",
-      "https://via.placeholder.com/80x80?text=Item2"
+      "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
+      "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9"
     ],
     price: 129.99,
     quantity: 1,
@@ -130,13 +131,13 @@ export const CartComponent = () => {
                     <li key={item.id} className="p-4">
                       {item.type === "product" ? (
                         <div className="flex items-center gap-4">
-                          <div className="flex-shrink-0 w-20 h-20 bg-gray-100 rounded overflow-hidden">
+                          <AspectRatio ratio={1} className="w-24 h-24 overflow-hidden rounded-lg">
                             <img
                               src={item.image}
                               alt={item.name}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover hover:scale-105 transition-transform"
                             />
-                          </div>
+                          </AspectRatio>
                           <div className="flex-1">
                             <h3 className="font-medium">{item.name}</h3>
                             <p className="text-sm text-gray-500">
@@ -179,13 +180,13 @@ export const CartComponent = () => {
                       ) : (
                         <div>
                           <div className="flex items-center gap-4">
-                            <div className="flex-shrink-0 w-20 h-20 bg-gray-100 rounded overflow-hidden">
+                            <AspectRatio ratio={16/9} className="w-32 overflow-hidden rounded-lg">
                               <img
                                 src={item.image}
                                 alt={item.name}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover hover:scale-105 transition-transform"
                               />
-                            </div>
+                            </AspectRatio>
                             <div className="flex-1">
                               <h3 className="font-medium">{item.name}</h3>
                               <p className="text-sm text-gray-500">
@@ -227,17 +228,17 @@ export const CartComponent = () => {
                           </div>
                           {/* Combo items preview */}
                           {item.additionalImages && item.additionalImages.length > 0 && (
-                            <div className="mt-3 pl-24">
+                            <div className="mt-3 pl-36">
                               <p className="text-xs text-gray-500 mb-2">Included items:</p>
                               <div className="flex gap-2">
                                 {item.additionalImages.map((img, index) => (
-                                  <div key={index} className="w-12 h-12 bg-gray-100 rounded overflow-hidden">
+                                  <AspectRatio ratio={1} key={index} className="w-16 h-16 overflow-hidden rounded-lg">
                                     <img
                                       src={img}
                                       alt={`Item ${index+1}`}
-                                      className="w-full h-full object-cover"
+                                      className="w-full h-full object-cover hover:scale-105 transition-transform"
                                     />
-                                  </div>
+                                  </AspectRatio>
                                 ))}
                               </div>
                             </div>
