@@ -16,7 +16,7 @@ const initialCartItems = [
     quantity: 1,
     size: "M",
     color: "Crocus Purple",
-    type: "product"
+    type: "product" as const
   },
   {
     id: 2,
@@ -26,7 +26,7 @@ const initialCartItems = [
     quantity: 2,
     size: "L",
     color: "White",
-    type: "product"
+    type: "product" as const
   },
   {
     id: 3,
@@ -36,7 +36,7 @@ const initialCartItems = [
     quantity: 1,
     size: "S",
     color: "Floral",
-    type: "product"
+    type: "product" as const
   },
   {
     id: 101,
@@ -50,7 +50,7 @@ const initialCartItems = [
     price: 149.99,
     quantity: 1,
     description: "Crocus Purple blouse, neutral trousers, versatile blazer",
-    type: "combo"
+    type: "combo" as const
   },
   {
     id: 102,
@@ -63,7 +63,7 @@ const initialCartItems = [
     price: 129.99,
     quantity: 1,
     description: "Comfortable jeans, layerable tops, statement jacket",
-    type: "combo"
+    type: "combo" as const
   }
 ];
 
