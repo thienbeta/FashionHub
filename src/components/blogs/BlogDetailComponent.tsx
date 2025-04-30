@@ -1,15 +1,13 @@
-
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, MessageSquare, Share, ChevronLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { CommentForm } from "./CommentForm";
 import { CommentList } from "./CommentList";
-import { RelatedProducts } from "./RelatedProducts";
+import { BlogHeader } from "./BlogHeader";
+import { BlogContent } from "./BlogContent";
+import { RelatedItemsSection } from "./RelatedItemsSection";
 
 // Mock blog data
 const blogPosts = [
@@ -156,6 +154,10 @@ export const BlogDetailComponent = ({ blogId }: BlogDetailComponentProps) => {
     alert('Share functionality would open sharing options here');
   };
 
+  const scrollToComments = () => {
+    document.getElementById('comments-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="max-w-4xl mx-auto">
       <Button variant="ghost" className="mb-4" onClick={() => navigate('/blogs')}>
@@ -163,84 +165,25 @@ export const BlogDetailComponent = ({ blogId }: BlogDetailComponentProps) => {
         Back to Blogs
       </Button>
 
-      <div className="mb-6">
-        <Badge variant="outline" className="mb-2">
-          {blog.category === "product" ? "Product Feature" : "Combo Suggestion"}
-        </Badge>
-        <h1 className="text-3xl font-bold mb-2">{blog.title}</h1>
-        <div className="flex items-center justify-between mt-4">
-          <div className="flex items-center space-x-3">
-            <Avatar>
-              <AvatarImage src={blog.authorImage} alt={blog.author} />
-              <AvatarFallback>{blog.author.substring(0, 2)}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-medium">{blog.author}</p>
-              <p className="text-sm text-gray-500">{blog.date}</p>
-            </div>
-          </div>
+      <BlogHeader 
+        blog={blog}
+        onLike={handleLike}
+        onShare={handleShare}
+        onCommentClick={scrollToComments}
+        liked={liked}
+      />
 
-          <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className={`flex items-center ${liked ? 'text-red-500' : 'text-gray-500'}`}
-              onClick={handleLike}
-            >
-              <Heart className={`h-5 w-5 mr-1 ${liked ? 'fill-current' : ''}`} />
-              <span>{liked ? blog.likes + 1 : blog.likes}</span>
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="flex items-center text-gray-500"
-              onClick={() => document.getElementById('comments-section')?.scrollIntoView({ behavior: 'smooth' })}
-            >
-              <MessageSquare className="h-5 w-5 mr-1" />
-              <span>{blog.comments}</span>
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="flex items-center text-gray-500"
-              onClick={handleShare}
-            >
-              <Share className="h-5 w-5 mr-1" />
-              <span>Share</span>
-            </Button>
-          </div>
-        </div>
-      </div>
+      <BlogContent 
+        image={blog.image}
+        title={blog.title}
+        content={blog.content}
+      />
 
-      <div className="aspect-[16/9] w-full overflow-hidden rounded-lg mb-6">
-        <img 
-          src={blog.image} 
-          alt={blog.title} 
-          className="w-full h-full object-cover"
-        />
-      </div>
-
-      <Card className="mb-8">
-        <CardContent className="pt-6">
-          <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: blog.content }} />
-        </CardContent>
-      </Card>
-
-      {blog.category === "product" && blog.relatedProducts && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Featured Products</h2>
-          <RelatedProducts ids={blog.relatedProducts} type="product" />
-        </div>
-      )}
-
-      {blog.category === "combo" && blog.relatedCombos && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Featured Combos</h2>
-          <RelatedProducts ids={blog.relatedCombos} type="combo" />
-        </div>
-      )}
+      <RelatedItemsSection 
+        category={blog.category}
+        relatedProducts={blog.relatedProducts}
+        relatedCombos={blog.relatedCombos}
+      />
 
       <Separator className="my-8" />
       
