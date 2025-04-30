@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Minus, Plus, Trash } from "lucide-react";
+import { Minus, Plus, Trash, Images } from "lucide-react";
 import { CartItem } from "@/types/cart";
 
 interface ComboCartItemProps {
@@ -14,13 +14,21 @@ export const ComboCartItem = ({ item, onQuantityChange, onRemoveItem }: ComboCar
   return (
     <div>
       <div className="flex items-center gap-4">
-        <AspectRatio ratio={16/9} className="w-32 overflow-hidden rounded-lg">
-          <img
-            src={item.image}
-            alt={item.name}
-            className="w-full h-full object-cover hover:scale-105 transition-transform"
-          />
-        </AspectRatio>
+        <div className="w-32 overflow-hidden rounded-lg border border-gray-200 relative">
+          <AspectRatio ratio={16/9} className="bg-gray-50">
+            <img
+              src={item.image}
+              alt={item.name}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            />
+            {item.additionalImages && item.additionalImages.length > 0 && (
+              <div className="absolute bottom-1 right-1 bg-black bg-opacity-60 text-white rounded-md px-1.5 py-0.5 text-xs flex items-center">
+                <Images className="h-3 w-3 mr-1" />
+                {item.additionalImages.length}
+              </div>
+            )}
+          </AspectRatio>
+        </div>
         <div className="flex-1">
           <h3 className="font-medium">{item.name}</h3>
           <p className="text-sm text-gray-500">{item.description}</p>
@@ -63,13 +71,15 @@ export const ComboCartItem = ({ item, onQuantityChange, onRemoveItem }: ComboCar
           <p className="text-xs text-gray-500 mb-2">Included items:</p>
           <div className="flex gap-2">
             {item.additionalImages.map((img, index) => (
-              <AspectRatio ratio={1} key={index} className="w-16 h-16 overflow-hidden rounded-lg">
-                <img
-                  src={img}
-                  alt={`Item ${index+1}`}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform"
-                />
-              </AspectRatio>
+              <div key={index} className="w-16 h-16 overflow-hidden rounded-lg border border-gray-200">
+                <AspectRatio ratio={1} className="bg-gray-50">
+                  <img
+                    src={img}
+                    alt={`${item.name} item ${index+1}`}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                </AspectRatio>
+              </div>
             ))}
           </div>
         </div>

@@ -13,17 +13,20 @@ interface ProductCartItemProps {
 export const ProductCartItem = ({ item, onQuantityChange, onRemoveItem }: ProductCartItemProps) => {
   return (
     <div className="flex items-center gap-4">
-      <AspectRatio ratio={1} className="w-24 h-24 overflow-hidden rounded-lg">
-        <img
-          src={item.image}
-          alt={item.name}
-          className="w-full h-full object-cover hover:scale-105 transition-transform"
-        />
-      </AspectRatio>
+      <div className="w-24 h-24 overflow-hidden rounded-lg border border-gray-200">
+        <AspectRatio ratio={1} className="bg-gray-50">
+          <img
+            src={item.image}
+            alt={item.name}
+            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          />
+        </AspectRatio>
+      </div>
       <div className="flex-1">
         <h3 className="font-medium">{item.name}</h3>
         <p className="text-sm text-gray-500">
-          Size: {item.size} | Color: {item.color}
+          {item.size && <span>Size: {item.size} | </span>}
+          {item.color && <span>Color: {item.color}</span>}
         </p>
         <p className="font-medium mt-1">${item.price.toFixed(2)}</p>
       </div>

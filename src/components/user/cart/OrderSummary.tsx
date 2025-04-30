@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { CartItem } from "@/types/cart";
+import { ShoppingBag } from "lucide-react";
 
 interface OrderSummaryProps {
   cartItems: CartItem[];
@@ -16,32 +17,50 @@ export const OrderSummary = ({ cartItems }: OrderSummaryProps) => {
   const total = subtotal + shipping + tax;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Order Summary</CardTitle>
+    <Card className="shadow-sm border-gray-200">
+      <CardHeader className="bg-gray-50">
+        <CardTitle className="flex items-center gap-2">
+          <ShoppingBag className="h-5 w-5" /> Order Summary
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-6">
         <div className="flex justify-between">
-          <span>Subtotal</span>
-          <span>${subtotal.toFixed(2)}</span>
+          <span className="text-gray-600">Subtotal</span>
+          <span className="font-medium">${subtotal.toFixed(2)}</span>
         </div>
         <div className="flex justify-between">
-          <span>Shipping</span>
-          <span>${shipping.toFixed(2)}</span>
+          <span className="text-gray-600">Shipping</span>
+          <span className="font-medium">${shipping.toFixed(2)}</span>
         </div>
         <div className="flex justify-between">
-          <span>Tax</span>
-          <span>${tax.toFixed(2)}</span>
+          <span className="text-gray-600">Tax (10%)</span>
+          <span className="font-medium">${tax.toFixed(2)}</span>
         </div>
         <Separator />
         <div className="flex justify-between font-medium text-lg">
           <span>Total</span>
-          <span>${total.toFixed(2)}</span>
+          <span className="text-crocus-600">${total.toFixed(2)}</span>
         </div>
+
+        {cartItems.length > 0 && (
+          <div className="pt-2">
+            <p className="text-xs text-gray-500 mb-2">Order items:</p>
+            <ul className="text-xs space-y-1 max-h-32 overflow-auto pr-2">
+              {cartItems.map((item) => (
+                <li key={item.id} className="flex justify-between">
+                  <span className="truncate flex-1">{item.name} × {item.quantity}</span>
+                  <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </CardContent>
       <CardFooter>
         <Button asChild className="w-full bg-crocus-500 hover:bg-crocus-600">
-          <Link to="/user/checkout">Proceed to Checkout</Link>
+          <Link to="/user/checkout">
+            Proceed to Checkout
+          </Link>
         </Button>
       </CardFooter>
     </Card>

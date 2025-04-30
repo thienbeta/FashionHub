@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,12 +9,12 @@ import { OrderSummary } from "./cart/OrderSummary";
 import { EmptyCart } from "./cart/EmptyCart";
 import { CartItem } from "@/types/cart";
 
-// Mock data for cart items
+// Mock data for cart items with better images
 const initialCartItems: CartItem[] = [
   {
     id: 1,
     name: "Crocus Cotton Tee",
-    image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
+    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=300&h=300",
     price: 29.99,
     quantity: 1,
     size: "M",
@@ -23,7 +24,7 @@ const initialCartItems: CartItem[] = [
   {
     id: 2,
     name: "Linen Blend Shirt",
-    image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
+    image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=300&h=300",
     price: 49.99,
     quantity: 2,
     size: "L",
@@ -33,7 +34,7 @@ const initialCartItems: CartItem[] = [
   {
     id: 3,
     name: "Summer Dress",
-    image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
+    image: "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?auto=format&fit=crop&w=300&h=300",
     price: 79.99,
     quantity: 1,
     size: "S",
@@ -43,11 +44,11 @@ const initialCartItems: CartItem[] = [
   {
     id: 101,
     name: "Essential Capsule Combo",
-    image: "https://images.unsplash.com/photo-1721322800607-8c38375eef04",
+    image: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=400&h=225",
     additionalImages: [
-      "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
-      "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
-      "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9"
+      "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=300&h=300",
+      "https://images.unsplash.com/photo-1566174053879-31528523f8c6?auto=format&fit=crop&w=300&h=300",
+      "https://images.unsplash.com/photo-1609505848912-b7c3b8b4beda?auto=format&fit=crop&w=300&h=300"
     ],
     price: 149.99,
     quantity: 1,
@@ -57,10 +58,10 @@ const initialCartItems: CartItem[] = [
   {
     id: 102,
     name: "Weekend Wanderer Combo",
-    image: "https://images.unsplash.com/photo-1721322800607-8c38375eef04",
+    image: "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=400&h=225",
     additionalImages: [
-      "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
-      "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9"
+      "https://images.unsplash.com/photo-1612723670862-1b9d7ceaf0b4?auto=format&fit=crop&w=300&h=300",
+      "https://images.unsplash.com/photo-1560859261-d69d1fb12c8c?auto=format&fit=crop&w=300&h=300"
     ],
     price: 129.99,
     quantity: 1,
@@ -97,9 +98,9 @@ export const CartComponent = () => {
       <h1 className="text-3xl font-bold mb-6">Your Shopping Cart</h1>
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Cart Items ({cartItems.length})</CardTitle>
+          <Card className="shadow-sm border-gray-200">
+            <CardHeader className="border-b">
+              <CardTitle className="text-lg">Cart Items ({cartItems.length})</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <ul className="divide-y">
