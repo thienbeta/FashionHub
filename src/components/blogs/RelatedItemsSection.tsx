@@ -1,4 +1,5 @@
 
+import { useIsMobile } from "@/hooks/use-mobile";
 import { RelatedProducts } from "./RelatedProducts";
 
 interface RelatedItemsSectionProps {
@@ -12,6 +13,8 @@ export const RelatedItemsSection = ({
   relatedProducts, 
   relatedCombos 
 }: RelatedItemsSectionProps) => {
+  const isMobile = useIsMobile();
+  
   if ((category === "product" && !relatedProducts?.length) || 
       (category === "combo" && !relatedCombos?.length)) {
     return null;
@@ -23,7 +26,7 @@ export const RelatedItemsSection = ({
 
   return (
     <div className="mb-8">
-      <h2 className="text-2xl font-bold mb-6">{title}</h2>
+      <h2 className={`text-xl ${isMobile ? "" : "text-2xl"} font-bold mb-4 md:mb-6`}>{title}</h2>
       <RelatedProducts ids={ids || []} type={type} />
     </div>
   );

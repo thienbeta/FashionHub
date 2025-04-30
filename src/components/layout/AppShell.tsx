@@ -1,22 +1,34 @@
-
 import { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { 
   Menu, 
   ShoppingCart, 
   User,
   LogIn,
   LogOut,
-  Home,
   Heart,
   MessageCircle,
   Package,
   LayoutGrid
 } from "lucide-react";
+import {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+import { 
+  Drawer,
+  DrawerClose, 
+  DrawerContent, 
+  DrawerTrigger 
+} from "@/components/ui/drawer";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -25,6 +37,7 @@ interface AppShellProps {
 export const AppShell = ({ children }: AppShellProps) => {
   const [userRole, setUserRole] = useState<"guest" | "user" | "staff" | "admin">("guest");
   const location = useLocation();
+  const isMobile = useIsMobile();
 
   // Demo function to toggle between user roles
   const cycleUserRole = () => {
@@ -33,6 +46,15 @@ export const AppShell = ({ children }: AppShellProps) => {
     else if (userRole === "staff") setUserRole("admin");
     else setUserRole("guest");
   };
+
+  // Links for navigation
+  const navLinks = [
+    { title: "Home", path: "/" },
+    { title: "Products", path: "/products" },
+    { title: "Combos", path: "/combos" },
+    { title: "Blog", path: "/blogs" },
+    { title: "Contact", path: "/contact" },
+  ];
 
   return (
     <SidebarProvider>
@@ -54,45 +76,57 @@ export const AppShell = ({ children }: AppShellProps) => {
                 </Link>
               </div>
 
-              {/* Main Navigation */}
-              <nav className="hidden md:flex items-center gap-6">
-                <Link to="/" className={cn(
-                  "text-gray-600 hover:text-crocus-600 transition-colors",
-                  location.pathname === "/" && "text-crocus-600 font-medium"
-                )}>
-                  Home
-                </Link>
-                <Link to="/products" className={cn(
-                  "text-gray-600 hover:text-crocus-600 transition-colors",
-                  location.pathname.startsWith("/products") && "text-crocus-600 font-medium"
-                )}>
-                  Products
-                </Link>
-                <Link to="/combos" className={cn(
-                  "text-gray-600 hover:text-crocus-600 transition-colors",
-                  location.pathname.startsWith("/combos") && "text-crocus-600 font-medium"
-                )}>
-                  Combos
-                </Link>
-                <Link to="/blogs" className={cn(
-                  "text-gray-600 hover:text-crocus-600 transition-colors",
-                  location.pathname.startsWith("/blogs") && "text-crocus-600 font-medium"
-                )}>
-                  Blog
-                </Link>
-                <Link to="/contact" className={cn(
-                  "text-gray-600 hover:text-crocus-600 transition-colors",
-                  location.pathname === "/contact" && "text-crocus-600 font-medium"
-                )}>
-                  Contact
-                </Link>
+              {/* Desktop Navigation */}
+              <nav className="hidden md:block">
+                <NavigationMenu>
+                  <NavigationMenuList>
+                    {navLinks.map(link => (
+                      <NavigationMenuItem key={link.path}>
+                        <Link to={link.path}>
+                          <NavigationMenuLink className={cn(
+                            navigationMenuTriggerStyle(),
+                            location.pathname === link.path && "bg-accent text-accent-foreground",
+                            "px-4 py-2"
+                          )}>
+                            {link.title}
+                          </NavigationMenuLink>
+                        </Link>
+                      </NavigationMenuItem>
+                    ))}
+                  </NavigationMenuList>
+                </NavigationMenu>
               </nav>
 
               <div className="flex items-center gap-4">
-                {/* Mobile Menu Button */}
-                <Button variant="ghost" size="icon" className="block md:hidden">
-                  <Menu className="h-5 w-5" />
-                </Button>
+                {/* Mobile Navigation Drawer */}
+                <Drawer>
+                  <DrawerTrigger asChild className="md:hidden">
+                    <Button variant="ghost" size="icon">
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <div className="p-4 pt-0">
+                      <div className="flex flex-col gap-2 py-4">
+                        {navLinks.map(link => (
+                          <DrawerClose key={link.path} asChild>
+                            <Link 
+                              to={link.path} 
+                              className={cn(
+                                "flex items-center gap-2 px-4 py-3 rounded-md",
+                                location.pathname === link.path 
+                                  ? "bg-crocus-100 text-crocus-700 font-medium" 
+                                  : "text-gray-600"
+                              )}
+                            >
+                              {link.title}
+                            </Link>
+                          </DrawerClose>
+                        ))}
+                      </div>
+                    </div>
+                  </DrawerContent>
+                </Drawer>
                 
                 {/* User Icons */}
                 {(userRole === "user") && (
@@ -115,7 +149,7 @@ export const AppShell = ({ children }: AppShellProps) => {
                   </>
                 )}
                 
-                <Button variant="ghost" size="sm" onClick={cycleUserRole}>
+                <Button variant="ghost" size="sm" onClick={cycleUserRole} className="hidden sm:flex">
                   {userRole === "guest" ? "Guest" : userRole === "user" ? "User" : userRole === "staff" ? "Staff" : "Admin"}
                 </Button>
                 
@@ -141,17 +175,19 @@ export const AppShell = ({ children }: AppShellProps) => {
             </div>
           </main>
 
-          {/* Footer */}
+          {/* Footer - Responsive */}
           <footer className="bg-gray-50 border-t border-gray-200 py-8">
             <div className="container mx-auto px-4">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div>
                   <h3 className="font-bold text-lg mb-4 text-crocus-700">CROCUS Fashion</h3>
                   <p className="text-gray-600">
                     Bringing you the hottest trends in fashion with the 2025 Pantone color.
                   </p>
                 </div>
-                <div>
+                
+                {/* Rest of the footer content */}
+                <div className="hidden md:block">
                   <h3 className="font-bold text-lg mb-4 text-crocus-700">Shop</h3>
                   <ul className="space-y-2">
                     <li><Link to="/products" className="text-gray-600 hover:text-crocus-500">Products</Link></li>
@@ -160,7 +196,7 @@ export const AppShell = ({ children }: AppShellProps) => {
                     <li><Link to="/favorites" className="text-gray-600 hover:text-crocus-500">Favorites</Link></li>
                   </ul>
                 </div>
-                <div>
+                <div className="hidden md:block">
                   <h3 className="font-bold text-lg mb-4 text-crocus-700">Account</h3>
                   <ul className="space-y-2">
                     <li><Link to="/user/profile" className="text-gray-600 hover:text-crocus-500">My Profile</Link></li>
@@ -174,7 +210,6 @@ export const AppShell = ({ children }: AppShellProps) => {
                   <ul className="space-y-2">
                     <li><Link to="/contact" className="text-gray-600 hover:text-crocus-500">Contact Us</Link></li>
                     <li><a href="#" className="text-gray-600 hover:text-crocus-500">About Us</a></li>
-                    <li><a href="#" className="text-gray-600 hover:text-crocus-500">Careers</a></li>
                   </ul>
                   <div className="flex space-x-4 mt-4">
                     <a href="#" className="text-gray-600 hover:text-crocus-500">
