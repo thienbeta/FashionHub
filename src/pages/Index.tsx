@@ -8,7 +8,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Heart } from "lucide-react";
+import { Heart, ShoppingCart, Package } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { BlogCard } from "@/components/blogs/BlogCard";
+import { useState } from "react";
+import { CartItem } from "@/types/cart";
+import { toast } from "@/hooks/use-toast";
 
 const featuredProducts = [
   {
@@ -17,7 +22,10 @@ const featuredProducts = [
     price: 59.99,
     image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
     rating: 4.5,
-    isFavorite: false
+    isFavorite: false,
+    sizes: ["XS", "S", "M", "L", "XL"],
+    colors: ["Purple", "Black", "White"],
+    description: "Elegant satin dress in our signature Crocus purple."
   },
   {
     id: 2,
@@ -25,7 +33,10 @@ const featuredProducts = [
     price: 29.99,
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
     rating: 4.8,
-    isFavorite: true
+    isFavorite: true,
+    sizes: ["S", "M", "L", "XL"],
+    colors: ["Purple", "Gray", "White"],
+    description: "Comfortable everyday tee with a subtle Crocus design."
   },
   {
     id: 3,
@@ -33,7 +44,10 @@ const featuredProducts = [
     price: 89.99,
     image: "https://images.unsplash.com/photo-1721322800607-8c38375eef04",
     rating: 4.7,
-    isFavorite: false
+    isFavorite: false,
+    sizes: ["S", "M", "L"],
+    colors: ["Navy", "Black"],
+    description: "Sophisticated blazer with Crocus-inspired lining."
   },
   {
     id: 4,
@@ -41,7 +55,10 @@ const featuredProducts = [
     price: 49.99,
     image: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
     rating: 4.6,
-    isFavorite: false
+    isFavorite: false,
+    sizes: ["XS", "S", "M", "L", "XL"],
+    colors: ["Light Blue", "Dark Blue", "Black"],
+    description: "Premium denim with Crocus-colored stitching."
   },
   {
     id: 5,
@@ -49,7 +66,10 @@ const featuredProducts = [
     price: 39.99,
     image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
     rating: 4.2,
-    isFavorite: true
+    isFavorite: true,
+    sizes: ["S", "M", "L"],
+    colors: ["Crocus", "White", "Beige"],
+    description: "Perfect light outfit for warm summer days."
   },
   {
     id: 6,
@@ -57,7 +77,10 @@ const featuredProducts = [
     price: 69.99,
     image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
     rating: 4.3,
-    isFavorite: false
+    isFavorite: false,
+    sizes: ["M", "L", "XL"],
+    colors: ["Purple", "White", "Gray"],
+    description: "Stay warm and stylish with our winter collection."
   },
 ];
 
@@ -69,7 +92,8 @@ const trendingCombos = [
     image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1",
     rating: 4.8,
     products: [1, 2, 5],
-    isFavorite: true
+    isFavorite: true,
+    description: "Complete summer look with coordinated pieces."
   },
   {
     id: 2,
@@ -78,7 +102,8 @@ const trendingCombos = [
     image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81",
     rating: 4.6,
     products: [3, 4, 6],
-    isFavorite: false
+    isFavorite: false,
+    description: "Professional wardrobe essentials for the modern workplace."
   },
   {
     id: 3,
@@ -87,11 +112,87 @@ const trendingCombos = [
     image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
     rating: 4.7,
     products: [2, 4, 5],
-    isFavorite: false
+    isFavorite: false,
+    description: "Relaxed pieces perfect for weekend activities."
+  },
+];
+
+// Featured blog posts for home page
+const featuredBlogs = [
+  {
+    id: "1",
+    title: "Summer 2025 Collection",
+    excerpt: "Discover our new summer collection featuring the hottest trends in fashion with the 2025 Pantone color.",
+    image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=crop&w=800&h=450",
+    date: "April 15, 2025",
+    author: "Emma Johnson",
+    authorImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=60&h=60",
+    category: "product"
+  },
+  {
+    id: "2",
+    title: "How to Style Crocus Purple",
+    excerpt: "Learn how to incorporate the trending Crocus Purple color into your wardrobe this season.",
+    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&h=450",
+    date: "April 10, 2025",
+    author: "Michael Chen",
+    authorImage: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=60&h=60",
+    category: "product"
+  },
+  {
+    id: "3",
+    title: "Perfect Outfit Combinations",
+    excerpt: "Explore our curated outfit combinations that will elevate your style game.",
+    image: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&h=450",
+    date: "April 5, 2025",
+    author: "Sophia Rodriguez",
+    authorImage: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=60&h=60",
+    category: "combo"
   },
 ];
 
 const Index = () => {
+  // State for quick purchase forms
+  const [selectedSize, setSelectedSize] = useState<string>("");
+  const [selectedColor, setSelectedColor] = useState<string>("");
+  const [quickViewProduct, setQuickViewProduct] = useState<number | null>(null);
+  const [quickViewCombo, setQuickViewCombo] = useState<number | null>(null);
+
+  // Handle adding product to cart
+  const addToCart = (item: any, type: "product" | "combo") => {
+    const cartItem: CartItem = {
+      id: item.id,
+      name: item.name,
+      image: item.image,
+      price: item.price,
+      quantity: 1,
+      type: type
+    };
+    
+    if (type === "product" && selectedSize) {
+      cartItem.size = selectedSize;
+    }
+    
+    if (type === "product" && selectedColor) {
+      cartItem.color = selectedColor;
+    }
+    
+    // In a real app, you would dispatch to a cart context or store
+    console.log("Added to cart:", cartItem);
+    
+    // Show success toast
+    toast({
+      title: "Added to cart",
+      description: `${item.name} has been added to your cart.`,
+    });
+    
+    // Reset selections
+    setSelectedSize("");
+    setSelectedColor("");
+    setQuickViewProduct(null);
+    setQuickViewCombo(null);
+  };
+
   return (
     <div className="space-y-16 py-6">
       {/* Hero Section */}
@@ -110,6 +211,12 @@ const Index = () => {
               </Button>
               <Button asChild variant="outline">
                 <Link to="/products/new">New Arrivals</Link>
+              </Button>
+              <Button asChild variant="outline" className="flex gap-2 items-center">
+                <Link to="/user/cart">
+                  <ShoppingCart className="h-4 w-4" />
+                  <span>View Cart</span>
+                </Link>
               </Button>
             </div>
           </div>
@@ -197,12 +304,21 @@ const Index = () => {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </Link>
-                <button 
-                  className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors"
-                  aria-label={product.isFavorite ? "Remove from favorites" : "Add to favorites"}
-                >
-                  <Heart className={`h-5 w-5 ${product.isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
-                </button>
+                <div className="absolute top-2 right-2 flex flex-col gap-2">
+                  <button 
+                    className="p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors"
+                    aria-label={product.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                  >
+                    <Heart className={`h-5 w-5 ${product.isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
+                  </button>
+                  <button
+                    className="p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors"
+                    aria-label="Quick view"
+                    onClick={() => setQuickViewProduct(product.id)}
+                  >
+                    <Package className="h-5 w-5 text-gray-600" />
+                  </button>
+                </div>
               </div>
               <div className="mt-3">
                 <Link to={`/products/${product.id}`} className="hover:text-crocus-600 transition-colors">
@@ -229,7 +345,95 @@ const Index = () => {
                     ))}
                   </div>
                 </div>
+                
+                {/* Quick Purchase Button */}
+                <Button 
+                  className="w-full mt-3 bg-crocus-500 hover:bg-crocus-600"
+                  onClick={() => setQuickViewProduct(product.id)}
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" /> Quick Buy
+                </Button>
               </div>
+              
+              {/* Quick Purchase Dialog */}
+              {quickViewProduct === product.id && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+                  <Card className="w-full max-w-md overflow-hidden">
+                    <div className="relative">
+                      <button 
+                        onClick={() => setQuickViewProduct(null)}
+                        className="absolute top-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                      <img 
+                        src={product.image} 
+                        alt={product.name} 
+                        className="w-full h-48 object-cover"
+                      />
+                    </div>
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-bold mb-2">{product.name}</h3>
+                      <p className="text-lg font-semibold mb-4">${product.price.toFixed(2)}</p>
+                      <p className="text-gray-600 mb-4">{product.description}</p>
+                      
+                      <div className="space-y-4">
+                        {product.sizes && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
+                            <div className="flex flex-wrap gap-2">
+                              {product.sizes.map((size) => (
+                                <button
+                                  key={size}
+                                  className={`px-3 py-1 border rounded-md text-sm ${
+                                    selectedSize === size 
+                                      ? "border-crocus-500 bg-crocus-50 text-crocus-700" 
+                                      : "border-gray-300 hover:border-gray-400"
+                                  }`}
+                                  onClick={() => setSelectedSize(size)}
+                                >
+                                  {size}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {product.colors && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
+                            <div className="flex flex-wrap gap-2">
+                              {product.colors.map((color) => (
+                                <button
+                                  key={color}
+                                  className={`px-3 py-1 border rounded-md text-sm ${
+                                    selectedColor === color 
+                                      ? "border-crocus-500 bg-crocus-50 text-crocus-700" 
+                                      : "border-gray-300 hover:border-gray-400"
+                                  }`}
+                                  onClick={() => setSelectedColor(color)}
+                                >
+                                  {color}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        <Button 
+                          className="w-full mt-4 bg-crocus-500 hover:bg-crocus-600"
+                          onClick={() => addToCart(product, "product")}
+                          disabled={product.sizes && !selectedSize}
+                        >
+                          <ShoppingCart className="h-4 w-4 mr-2" /> Add to Cart
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -255,12 +459,21 @@ const Index = () => {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </Link>
-                <button 
-                  className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors"
-                  aria-label={combo.isFavorite ? "Remove from favorites" : "Add to favorites"}
-                >
-                  <Heart className={`h-5 w-5 ${combo.isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
-                </button>
+                <div className="absolute top-2 right-2 flex flex-col gap-2">
+                  <button 
+                    className="p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors"
+                    aria-label={combo.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                  >
+                    <Heart className={`h-5 w-5 ${combo.isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
+                  </button>
+                  <button
+                    className="p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors"
+                    aria-label="Quick view"
+                    onClick={() => setQuickViewCombo(combo.id)}
+                  >
+                    <Package className="h-5 w-5 text-gray-600" />
+                  </button>
+                </div>
               </div>
               <div className="mt-3">
                 <Link to={`/combos/${combo.id}`} className="hover:text-crocus-600 transition-colors">
@@ -287,8 +500,79 @@ const Index = () => {
                     ))}
                   </div>
                 </div>
+                
+                {/* Quick Purchase Button */}
+                <Button 
+                  className="w-full mt-3 bg-crocus-500 hover:bg-crocus-600"
+                  onClick={() => setQuickViewCombo(combo.id)}
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" /> Quick Buy
+                </Button>
               </div>
+              
+              {/* Quick Purchase Dialog for Combos */}
+              {quickViewCombo === combo.id && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+                  <Card className="w-full max-w-md overflow-hidden">
+                    <div className="relative">
+                      <button 
+                        onClick={() => setQuickViewCombo(null)}
+                        className="absolute top-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                      <img 
+                        src={combo.image} 
+                        alt={combo.name} 
+                        className="w-full h-48 object-cover"
+                      />
+                    </div>
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-bold mb-2">{combo.name}</h3>
+                      <p className="text-lg font-semibold mb-4">${combo.price.toFixed(2)}</p>
+                      <p className="text-gray-600 mb-4">{combo.description}</p>
+                      
+                      <div className="mb-4">
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">Included in this combo:</h4>
+                        <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                          {combo.products.map((productId) => {
+                            const product = featuredProducts.find(p => p.id === productId);
+                            return product ? (
+                              <li key={productId}>{product.name}</li>
+                            ) : null;
+                          })}
+                        </ul>
+                      </div>
+                      
+                      <Button 
+                        className="w-full mt-4 bg-crocus-500 hover:bg-crocus-600"
+                        onClick={() => addToCart(combo, "combo")}
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-2" /> Add Bundle to Cart
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </div>
+          ))}
+        </div>
+      </section>
+      
+      {/* Featured Blog Posts */}
+      <section className="py-12">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-bold">Fashion Blog</h2>
+          <Button asChild variant="link" className="text-crocus-600">
+            <Link to="/blogs">View All <span aria-hidden="true">→</span></Link>
+          </Button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {featuredBlogs.map((post) => (
+            <BlogCard key={post.id} post={post} />
           ))}
         </div>
       </section>
