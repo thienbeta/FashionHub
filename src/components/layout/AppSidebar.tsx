@@ -59,24 +59,26 @@ export const AppSidebar = ({ role }: AppSidebarProps) => {
   const items = role === "staff" ? staffItems : adminItems;
 
   return (
-    <Sidebar>
-      <SidebarHeader className="px-4 py-2">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-crocus-500 to-crocus-700 flex items-center justify-center text-white font-semibold">
+    <Sidebar className="border-r border-crocus-100 bg-gradient-to-b from-white to-crocus-50">
+      <SidebarHeader className="px-5 py-4">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-crocus-400 to-crocus-600 flex items-center justify-center text-white font-semibold shadow-md shadow-crocus-300/20">
             {role === "staff" ? "S" : "A"}
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-medium">{role === "staff" ? "Staff Panel" : "Admin Panel"}</span>
-            <span className="text-xs text-slate-500">Fashion Hub</span>
+            <span className="text-base font-medium text-crocus-800">{role === "staff" ? "Staff Panel" : "Admin Panel"}</span>
+            <span className="text-xs text-crocus-500 font-medium">Fashion Hub</span>
           </div>
         </div>
       </SidebarHeader>
 
-      <SidebarSeparator />
+      <SidebarSeparator className="bg-crocus-100" />
       
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>{role === "staff" ? "Staff Menu" : "Admin Menu"}</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-crocus-600 font-medium px-5">
+            {role === "staff" ? "Staff Menu" : "Admin Menu"}
+          </SidebarGroupLabel>
           <SidebarMenu>
             {items.map((item) => (
               <SidebarMenuItem key={item.path}>
@@ -84,12 +86,17 @@ export const AppSidebar = ({ role }: AppSidebarProps) => {
                   asChild
                   isActive={location.pathname === item.path}
                   tooltip={isMobile ? undefined : item.title}
+                  className={`mx-3 transition-all px-4 ${
+                    location.pathname === item.path
+                      ? "bg-crocus-100 text-crocus-700 font-medium"
+                      : "text-slate-600 hover:bg-crocus-50"
+                  }`}
                 >
-                  <Link to={item.path} className="flex items-center gap-2">
-                    <item.icon className="h-4 w-4" />
+                  <Link to={item.path} className="flex items-center gap-3">
+                    <item.icon className="h-5 w-5" />
                     <span>{item.title}</span>
                     {item.badge && (
-                      <span className="ml-auto bg-crocus-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      <span className="ml-auto bg-gradient-to-br from-crocus-500 to-crocus-600 text-white text-xs rounded-full h-5 min-w-5 px-1.5 flex items-center justify-center shadow-sm">
                         {item.badge}
                       </span>
                     )}
@@ -101,25 +108,28 @@ export const AppSidebar = ({ role }: AppSidebarProps) => {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="mt-auto">
+      <SidebarFooter className="mt-auto border-t border-crocus-100 bg-crocus-50/50 pt-3">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link to="/help" className="flex items-center gap-2 text-slate-600">
-                <HelpCircle className="h-4 w-4" />
+            <SidebarMenuButton asChild className="mx-3 hover:bg-crocus-50 px-4">
+              <Link to="/help" className="flex items-center gap-3 text-slate-600">
+                <HelpCircle className="h-5 w-5" />
                 <span>Help & Support</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link to="/logout" className="flex items-center gap-2 text-slate-600">
-                <LogOut className="h-4 w-4" />
+            <SidebarMenuButton asChild className="mx-3 hover:bg-crocus-50 px-4">
+              <Link to="/logout" className="flex items-center gap-3 text-slate-600">
+                <LogOut className="h-5 w-5" />
                 <span>Logout</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+        <div className="p-4 text-xs text-center text-crocus-400">
+          Fashion Hub © 2025
+        </div>
       </SidebarFooter>
     </Sidebar>
   );
