@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -87,6 +88,31 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  
+  /* Color scheme variants */
+  .color-scheme-warm {
+    --primary: 38 92% 50%;
+    --primary-foreground: 38 92% 10%;
+    --secondary: 38 60% 40%;
+    --secondary-foreground: 38 100% 97%;
+    --muted: 38 30% 96%;
+    --muted-foreground: 38 10% 46.9%;
+    --accent: 38 60% 94%;
+    --accent-foreground: 38 70% 30%;
+    --ring: 38 92% 50%;
+  }
+  
+  .color-scheme-cool {
+    --primary: 188 86% 53%;
+    --primary-foreground: 188 86% 10%;
+    --secondary: 188 64% 40%;
+    --secondary-foreground: 188 100% 97%;
+    --muted: 188 30% 96%;
+    --muted-foreground: 188 10% 46.9%;
+    --accent: 188 60% 94%;
+    --accent-foreground: 188 70% 30%;
+    --ring: 188 86% 53%;
   }
 }
 
