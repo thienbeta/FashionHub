@@ -103,7 +103,7 @@ export const BlogFilters = ({
             <SelectValue placeholder="Author" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Authors</SelectItem>
+            <SelectItem value="all_authors">All Authors</SelectItem>
             {authors.map((name) => (
               <SelectItem key={name} value={name}>{name}</SelectItem>
             ))}
@@ -137,7 +137,7 @@ export const BlogFilters = ({
               <SelectValue placeholder="Author" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Authors</SelectItem>
+              <SelectItem value="all_authors">All Authors</SelectItem>
               {authors.map((name) => (
                 <SelectItem key={name} value={name}>{name}</SelectItem>
               ))}

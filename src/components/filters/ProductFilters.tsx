@@ -195,7 +195,7 @@ export const ProductFilters = ({
             <SelectValue placeholder="Color" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Colors</SelectItem>
+            <SelectItem value="all_colors">All Colors</SelectItem>
             {uniqueColors.map((color) => (
               <SelectItem key={color} value={color}>{color}</SelectItem>
             ))}
@@ -208,7 +208,7 @@ export const ProductFilters = ({
             <SelectValue placeholder="Size" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Sizes</SelectItem>
+            <SelectItem value="all_sizes">All Sizes</SelectItem>
             {uniqueSizes.map((size) => (
               <SelectItem key={size} value={size}>{size}</SelectItem>
             ))}
@@ -256,7 +256,7 @@ export const ProductFilters = ({
               <SelectValue placeholder="Brand" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Brands</SelectItem>
+              <SelectItem value="all_brands">All Brands</SelectItem>
               {brands.map((brand) => (
                 <SelectItem key={brand} value={brand}>{brand}</SelectItem>
               ))}
@@ -269,7 +269,7 @@ export const ProductFilters = ({
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="all_types">All Types</SelectItem>
               {types.map((type) => (
                 <SelectItem key={type} value={type}>{type}</SelectItem>
               ))}
@@ -284,7 +284,7 @@ export const ProductFilters = ({
               <SelectValue placeholder="Color" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Colors</SelectItem>
+              <SelectItem value="all_colors">All Colors</SelectItem>
               {uniqueColors.map((color) => (
                 <SelectItem key={color} value={color}>{color}</SelectItem>
               ))}
@@ -297,7 +297,7 @@ export const ProductFilters = ({
               <SelectValue placeholder="Size" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Sizes</SelectItem>
+              <SelectItem value="all_sizes">All Sizes</SelectItem>
               {uniqueSizes.map((size) => (
                 <SelectItem key={size} value={size}>{size}</SelectItem>
               ))}

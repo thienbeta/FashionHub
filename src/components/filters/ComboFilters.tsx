@@ -143,7 +143,7 @@ export const ComboFilters = ({
             <SelectValue placeholder="Min Items" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Combos</SelectItem>
+            <SelectItem value="all_items">All Combos</SelectItem>
             <SelectItem value="2">2+ Items</SelectItem>
             <SelectItem value="3">3+ Items</SelectItem>
             <SelectItem value="4">4+ Items</SelectItem>
@@ -191,7 +191,7 @@ export const ComboFilters = ({
             <SelectValue placeholder="Occasion" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Occasions</SelectItem>
+            <SelectItem value="all_occasions">All Occasions</SelectItem>
             {occasions.map((occasion) => (
               <SelectItem key={occasion} value={occasion}>{occasion}</SelectItem>
             ))}
@@ -204,7 +204,7 @@ export const ComboFilters = ({
             <SelectValue placeholder="Min Items" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Combos</SelectItem>
+            <SelectItem value="all_items">All Combos</SelectItem>
             <SelectItem value="2">2+ Items</SelectItem>
             <SelectItem value="3">3+ Items</SelectItem>
             <SelectItem value="4">4+ Items</SelectItem>
