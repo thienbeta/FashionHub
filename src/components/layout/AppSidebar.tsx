@@ -17,13 +17,20 @@ import {
   Users,
   Package,
   ShoppingCart,
+  BarChart,
+  FileText,
   Archive,
   Settings,
-  ShieldCheck,
   LogOut,
   HelpCircle,
+  CreditCard,
+  Megaphone,
+  ChevronLeft,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 interface SidebarItemType {
   title: string;
@@ -41,11 +48,18 @@ const staffItems: SidebarItemType[] = [
 
 const adminItems: SidebarItemType[] = [
   { title: "Dashboard", icon: LayoutDashboard, path: "/admin" },
-  { title: "Users", icon: Users, path: "/admin/users" },
-  { title: "Staff", icon: ShieldCheck, path: "/admin/staff" },
-  { title: "Products", icon: Package, path: "/admin/products" },
   { title: "Orders", icon: ShoppingCart, path: "/admin/orders", badge: "5" },
+  { title: "Products", icon: Package, path: "/admin/products" },
+  { title: "Customers", icon: Users, path: "/admin/users" },
+  { title: "Analytics", icon: BarChart, path: "/admin/analytics" },
+  { title: "Invoices", icon: FileText, path: "/admin/invoices" },
   { title: "Inventory", icon: Archive, path: "/admin/inventory" },
+];
+
+const adminManagementItems: SidebarItemType[] = [
+  { title: "Payments", icon: CreditCard, path: "/admin/payments" },
+  { title: "Marketing", icon: Megaphone, path: "/admin/marketing" },
+  { title: "Staff", icon: Users, path: "/admin/staff" },
   { title: "Settings", icon: Settings, path: "/admin/settings" },
 ];
 
@@ -57,27 +71,37 @@ export const AppSidebar = ({ role }: AppSidebarProps) => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const items = role === "staff" ? staffItems : adminItems;
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <Sidebar className="border-r border-crocus-100 bg-gradient-to-b from-white to-crocus-50">
-      <SidebarHeader className="px-5 py-4">
+    <Sidebar className="border-r border-gray-100 bg-white">
+      <SidebarHeader className="p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-crocus-400 to-crocus-600 flex items-center justify-center text-white font-semibold shadow-md shadow-crocus-300/20">
+          <div className="h-10 w-10 rounded-md bg-crocus-500 flex items-center justify-center text-white font-semibold">
             {role === "staff" ? "S" : "A"}
           </div>
-          <div className="flex flex-col">
-            <span className="text-base font-medium text-crocus-800">{role === "staff" ? "Staff Panel" : "Admin Panel"}</span>
-            <span className="text-xs text-crocus-500 font-medium">Fashion Hub</span>
-          </div>
+          {!collapsed && (
+            <span className="text-base font-semibold text-gray-700">
+              {role === "staff" ? "StaffPro" : "AdminPro"}
+            </span>
+          )}
         </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-gray-500 hover:bg-gray-100"
+          onClick={() => setCollapsed(!collapsed)}
+        >
+          <ChevronLeft className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")} />
+        </Button>
       </SidebarHeader>
 
-      <SidebarSeparator className="bg-crocus-100" />
-      
-      <SidebarContent>
+      <SidebarSeparator className="bg-gray-100" />
+
+      <SidebarContent className="px-2">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-crocus-600 font-medium px-5">
-            {role === "staff" ? "Staff Menu" : "Admin Menu"}
+          <SidebarGroupLabel className={cn("text-gray-500 font-medium px-3 py-2", collapsed && "sr-only")}>
+            MAIN
           </SidebarGroupLabel>
           <SidebarMenu>
             {items.map((item) => (
@@ -85,18 +109,19 @@ export const AppSidebar = ({ role }: AppSidebarProps) => {
                 <SidebarMenuButton
                   asChild
                   isActive={location.pathname === item.path}
-                  tooltip={isMobile ? undefined : item.title}
-                  className={`mx-3 transition-all px-4 ${
+                  tooltip={collapsed ? item.title : undefined}
+                  className={cn(
+                    "my-1 transition-all rounded-md",
                     location.pathname === item.path
-                      ? "bg-crocus-100 text-crocus-700 font-medium"
-                      : "text-slate-600 hover:bg-crocus-50"
-                  }`}
+                      ? "bg-crocus-500 text-white font-medium"
+                      : "text-gray-600 hover:bg-crocus-50 hover:text-crocus-600"
+                  )}
                 >
-                  <Link to={item.path} className="flex items-center gap-3">
+                  <Link to={item.path} className="flex items-center gap-3 px-3 py-2">
                     <item.icon className="h-5 w-5" />
-                    <span>{item.title}</span>
-                    {item.badge && (
-                      <span className="ml-auto bg-gradient-to-br from-crocus-500 to-crocus-600 text-white text-xs rounded-full h-5 min-w-5 px-1.5 flex items-center justify-center shadow-sm">
+                    {!collapsed && <span>{item.title}</span>}
+                    {item.badge && !collapsed && (
+                      <span className="ml-auto bg-white bg-opacity-20 text-white text-xs rounded-full h-5 min-w-5 px-1.5 flex items-center justify-center">
                         {item.badge}
                       </span>
                     )}
@@ -106,30 +131,70 @@ export const AppSidebar = ({ role }: AppSidebarProps) => {
             ))}
           </SidebarMenu>
         </SidebarGroup>
+
+        {role === "admin" && (
+          <SidebarGroup className="mt-6">
+            <SidebarGroupLabel className={cn("text-gray-500 font-medium px-3 py-2", collapsed && "sr-only")}>
+              MANAGEMENT
+            </SidebarGroupLabel>
+            <SidebarMenu>
+              {adminManagementItems.map((item) => (
+                <SidebarMenuItem key={item.path}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location.pathname === item.path}
+                    tooltip={collapsed ? item.title : undefined}
+                    className={cn(
+                      "my-1 transition-all rounded-md",
+                      location.pathname === item.path
+                        ? "bg-crocus-500 text-white font-medium"
+                        : "text-gray-600 hover:bg-crocus-50 hover:text-crocus-600"
+                    )}
+                  >
+                    <Link to={item.path} className="flex items-center gap-3 px-3 py-2">
+                      <item.icon className="h-5 w-5" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
-      <SidebarFooter className="mt-auto border-t border-crocus-100 bg-crocus-50/50 pt-3">
+      <SidebarFooter className="mt-auto border-t border-gray-100 pt-3">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="mx-3 hover:bg-crocus-50 px-4">
-              <Link to="/help" className="flex items-center gap-3 text-slate-600">
+            <SidebarMenuButton 
+              asChild 
+              tooltip={collapsed ? "Help & Support" : undefined}
+              className="hover:bg-crocus-50 hover:text-crocus-600 px-3 py-2 rounded-md mx-2"
+            >
+              <Link to="/help" className="flex items-center gap-3 text-gray-600">
                 <HelpCircle className="h-5 w-5" />
-                <span>Help & Support</span>
+                {!collapsed && <span>Help & Support</span>}
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="mx-3 hover:bg-crocus-50 px-4">
-              <Link to="/logout" className="flex items-center gap-3 text-slate-600">
+            <SidebarMenuButton 
+              asChild 
+              tooltip={collapsed ? "Logout" : undefined}
+              className="hover:bg-crocus-50 hover:text-crocus-600 px-3 py-2 rounded-md mx-2"
+            >
+              <Link to="/logout" className="flex items-center gap-3 text-gray-600">
                 <LogOut className="h-5 w-5" />
-                <span>Logout</span>
+                {!collapsed && <span>Logout</span>}
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <div className="p-4 text-xs text-center text-crocus-400">
-          Fashion Hub © 2025
-        </div>
+        {!collapsed && (
+          <div className="p-4 text-xs text-center text-gray-400">
+            Fashion Hub © 2025
+          </div>
+        )}
       </SidebarFooter>
     </Sidebar>
   );
