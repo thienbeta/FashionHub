@@ -70,8 +70,16 @@ export const ProductFilters = ({
   applyFilters
 }: ProductFiltersProps) => {
   const [open, setOpen] = useState(false);
+  const [brandPopoverOpen, setBrandPopoverOpen] = useState(false);
+  const [typePopoverOpen, setTypePopoverOpen] = useState(false);
+  
+  // Ensure these arrays always exist, even if empty
   const brands = ["Crocus", "Summer Breeze", "Winter Luxe", "Urban Style", "Eco Fashion"];
   const types = ["Dress", "Top", "Bottom", "Outerwear", "Accessory", "Footwear"];
+  
+  // Ensure uniqueColors and uniqueSizes are always arrays
+  const safeUniqueColors = Array.isArray(uniqueColors) ? uniqueColors : [];
+  const safeUniqueSizes = Array.isArray(uniqueSizes) ? uniqueSizes : [];
 
   return (
     <div className="space-y-4">
@@ -123,7 +131,7 @@ export const ProductFilters = ({
       {/* Desktop filters */}
       <div className="hidden md:flex flex-wrap gap-4">
         {/* Brand filter */}
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={brandPopoverOpen} onOpenChange={setBrandPopoverOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2">
               Brand
@@ -140,8 +148,8 @@ export const ProductFilters = ({
                     key={brand}
                     value={brand}
                     onSelect={() => {
-                      setSelectedBrand(selectedBrand === brand ? "" : brand);
-                      setOpen(false);
+                      setSelectedBrand(selectedBrand === brand ? "all_brands" : brand);
+                      setBrandPopoverOpen(false);
                     }}
                   >
                     <Check
@@ -158,7 +166,7 @@ export const ProductFilters = ({
         </Popover>
 
         {/* Product type filter */}
-        <Popover>
+        <Popover open={typePopoverOpen} onOpenChange={setTypePopoverOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2">
               Type
@@ -174,7 +182,10 @@ export const ProductFilters = ({
                   <CommandItem
                     key={type}
                     value={type}
-                    onSelect={() => setSelectedType(selectedType === type ? "" : type)}
+                    onSelect={() => {
+                      setSelectedType(selectedType === type ? "all_types" : type);
+                      setTypePopoverOpen(false);
+                    }}
                   >
                     <Check
                       className={`mr-2 h-4 w-4 ${
@@ -196,7 +207,7 @@ export const ProductFilters = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all_colors">All Colors</SelectItem>
-            {uniqueColors.map((color) => (
+            {safeUniqueColors.map((color) => (
               <SelectItem key={color} value={color}>{color}</SelectItem>
             ))}
           </SelectContent>
@@ -209,7 +220,7 @@ export const ProductFilters = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all_sizes">All Sizes</SelectItem>
-            {uniqueSizes.map((size) => (
+            {safeUniqueSizes.map((size) => (
               <SelectItem key={size} value={size}>{size}</SelectItem>
             ))}
           </SelectContent>
@@ -285,7 +296,7 @@ export const ProductFilters = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all_colors">All Colors</SelectItem>
-              {uniqueColors.map((color) => (
+              {safeUniqueColors.map((color) => (
                 <SelectItem key={color} value={color}>{color}</SelectItem>
               ))}
             </SelectContent>
@@ -298,7 +309,7 @@ export const ProductFilters = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all_sizes">All Sizes</SelectItem>
-              {uniqueSizes.map((size) => (
+              {safeUniqueSizes.map((size) => (
                 <SelectItem key={size} value={size}>{size}</SelectItem>
               ))}
             </SelectContent>
