@@ -44,6 +44,7 @@ import StaffDashboard from "./pages/staff/StaffDashboard";
 import StaffProducts from "./pages/staff/StaffProducts";
 import StaffOrders from "./pages/staff/StaffOrders";
 import StaffInventory from "./pages/staff/StaffInventory";
+import InventoryForm from "./pages/staff/InventoryForm";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -96,6 +97,7 @@ const App = () => (
             <Route path="/staff/products" element={<StaffProducts />} />
             <Route path="/staff/orders" element={<StaffOrders />} />
             <Route path="/staff/inventory" element={<StaffInventory />} />
+            <Route path="/staff/inventory/form" element={<InventoryForm />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
