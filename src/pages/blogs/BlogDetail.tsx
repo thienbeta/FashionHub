@@ -6,7 +6,7 @@ const BlogDetail = () => {
   const { id } = useParams<{ id: string }>();
   
   return (
-    <div className="py-10">
+    <div className="py-6 sm:py-8 md:py-10">
       <BlogDetailComponent blogId={id || ""} />
     </div>
   );

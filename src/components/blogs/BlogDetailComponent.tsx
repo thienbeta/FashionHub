@@ -8,6 +8,7 @@ import { CommentList } from "./CommentList";
 import { BlogHeader } from "./BlogHeader";
 import { BlogContent } from "./BlogContent";
 import { RelatedItemsSection } from "./RelatedItemsSection";
+import { useBreakpoint } from "@/hooks/use-mobile";
 
 // Mock blog data
 const blogPosts = [
@@ -124,6 +125,8 @@ export const BlogDetailComponent = ({ blogId }: BlogDetailComponentProps) => {
   const [blog, setBlog] = useState<any | null>(null);
   const [liked, setLiked] = useState(false);
   const navigate = useNavigate();
+  const isMobile = useBreakpoint("mobile");
+  const isTablet = useBreakpoint("tablet");
 
   useEffect(() => {
     // In a real app, this would be an API call
@@ -159,8 +162,13 @@ export const BlogDetailComponent = ({ blogId }: BlogDetailComponentProps) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <Button variant="ghost" className="mb-4" onClick={() => navigate('/blogs')}>
+    <div className={`mx-auto px-4 ${isMobile ? 'max-w-full' : isTablet ? 'max-w-2xl' : 'max-w-4xl'}`}>
+      <Button 
+        variant="ghost" 
+        size={isMobile ? "sm" : "default"} 
+        className="mb-4" 
+        onClick={() => navigate('/blogs')}
+      >
         <ChevronLeft className="h-4 w-4 mr-2" />
         Back to Blogs
       </Button>
@@ -185,10 +193,10 @@ export const BlogDetailComponent = ({ blogId }: BlogDetailComponentProps) => {
         relatedCombos={blog.relatedCombos}
       />
 
-      <Separator className="my-8" />
+      <Separator className="my-6 sm:my-8" />
       
-      <div id="comments-section">
-        <h2 className="text-2xl font-bold mb-6">Comments ({blog.comments})</h2>
+      <div id="comments-section" className="scroll-mt-16">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Comments ({blog.comments})</h2>
         <CommentForm blogId={blogId} />
         <CommentList blogId={blogId} />
       </div>
