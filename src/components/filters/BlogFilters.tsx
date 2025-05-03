@@ -1,8 +1,9 @@
 
 import { useState } from "react";
-import { Filter } from "lucide-react";
+import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Select,
   SelectContent,
@@ -10,6 +11,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetFooter,
+  SheetClose,
+} from "@/components/ui/sheet";
 
 interface BlogFiltersProps {
   searchTerm: string;
@@ -36,12 +46,13 @@ export const BlogFilters = ({
   resetFilters,
   authors,
 }: BlogFiltersProps) => {
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col md:flex-row gap-4">
-        {/* Search input */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        {/* Search input - always visible */}
         <div className="relative flex-1">
           <Input
             placeholder="Search blog posts..."
@@ -57,71 +68,107 @@ export const BlogFilters = ({
           </span>
         </div>
 
-        {/* Sort dropdown */}
-        <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-full md:w-[200px]">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="newest">Newest First</SelectItem>
-            <SelectItem value="oldest">Oldest First</SelectItem>
-            <SelectItem value="title_asc">Title (A-Z)</SelectItem>
-            <SelectItem value="title_desc">Title (Z-A)</SelectItem>
-            <SelectItem value="popular">Most Popular</SelectItem>
-            <SelectItem value="comments">Most Comments</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Filter button for mobile */}
-        <Button 
-          variant="outline" 
-          className="md:hidden flex items-center gap-2"
-          onClick={() => setOpen(!open)}
-        >
-          <Filter className="h-4 w-4" />
-          Filters
-        </Button>
+        {/* Mobile filter sheet */}
+        {isMobile ? (
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                Filters
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[85%] sm:max-w-md">
+              <SheetHeader>
+                <SheetTitle>Blog Filters</SheetTitle>
+              </SheetHeader>
+              
+              <div className="py-4 space-y-6">
+                {/* Category filter */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Category</label>
+                  <Select value={category} onValueChange={setCategory}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Posts</SelectItem>
+                      <SelectItem value="product">Product Features</SelectItem>
+                      <SelectItem value="combo">Combo Suggestions</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Sort options */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Sort By</label>
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="newest">Newest First</SelectItem>
+                      <SelectItem value="oldest">Oldest First</SelectItem>
+                      <SelectItem value="title_asc">Title (A-Z)</SelectItem>
+                      <SelectItem value="title_desc">Title (Z-A)</SelectItem>
+                      <SelectItem value="popular">Most Popular</SelectItem>
+                      <SelectItem value="comments">Most Comments</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Author filter */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Author</label>
+                  <Select value={author} onValueChange={setAuthor}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Author" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all_authors">All Authors</SelectItem>
+                      {authors.map((name) => (
+                        <SelectItem key={name} value={name}>{name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <SheetFooter className="flex flex-col sm:flex-row gap-2 pt-2">
+                <Button variant="outline" onClick={resetFilters} className="w-full">
+                  Reset All Filters
+                </Button>
+                <SheetClose asChild>
+                  <Button className="w-full">Apply Filters</Button>
+                </SheetClose>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
+        ) : (
+          <>
+            {/* Desktop layout - Sort dropdown */}
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="oldest">Oldest First</SelectItem>
+                <SelectItem value="title_asc">Title (A-Z)</SelectItem>
+                <SelectItem value="title_desc">Title (Z-A)</SelectItem>
+                <SelectItem value="popular">Most Popular</SelectItem>
+                <SelectItem value="comments">Most Comments</SelectItem>
+              </SelectContent>
+            </Select>
+          </>
+        )}
       </div>
 
       {/* Desktop filters */}
-      <div className="hidden md:flex flex-wrap gap-4">
-        {/* Category filter */}
-        <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Posts</SelectItem>
-            <SelectItem value="product">Product Features</SelectItem>
-            <SelectItem value="combo">Combo Suggestions</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Author filter */}
-        <Select value={author} onValueChange={setAuthor}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Author" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all_authors">All Authors</SelectItem>
-            {authors.map((name) => (
-              <SelectItem key={name} value={name}>{name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Reset filters */}
-        <Button variant="ghost" onClick={resetFilters}>
-          Reset
-        </Button>
-      </div>
-
-      {/* Mobile filter panel */}
-      <div className={`md:hidden space-y-4 ${open ? 'block' : 'hidden'}`}>
-        <div className="grid grid-cols-1 gap-3">
+      {!isMobile && (
+        <div className="flex flex-wrap gap-4">
           {/* Category filter */}
           <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger>
+            <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
@@ -133,7 +180,7 @@ export const BlogFilters = ({
 
           {/* Author filter */}
           <Select value={author} onValueChange={setAuthor}>
-            <SelectTrigger>
+            <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Author" />
             </SelectTrigger>
             <SelectContent>
@@ -143,14 +190,13 @@ export const BlogFilters = ({
               ))}
             </SelectContent>
           </Select>
-        </div>
 
-        <div className="flex gap-2 pt-2">
-          <Button variant="outline" onClick={resetFilters}>
-            Reset Filters
+          {/* Reset filters */}
+          <Button variant="ghost" onClick={resetFilters}>
+            Reset
           </Button>
         </div>
-      </div>
+      )}
     </div>
   );
 };

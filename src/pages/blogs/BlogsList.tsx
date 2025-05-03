@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import { BlogList } from "@/components/blogs/BlogList";
 import { BlogFilters } from "@/components/filters/BlogFilters";
 import { toast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Mock blog data for filter functionality
 const blogPosts = [
@@ -158,6 +159,7 @@ const BlogsList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [author, setAuthor] = useState("");
   const [sortBy, setSortBy] = useState("newest");
+  const isMobile = useIsMobile();
 
   // Get unique authors for filter
   const authors = useMemo(() => 
@@ -177,11 +179,11 @@ const BlogsList = () => {
   };
 
   return (
-    <div className="py-10 container mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Fashion Blog</h1>
+    <div className="py-6 sm:py-10 px-4 sm:px-6 container mx-auto">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Fashion Blog</h1>
       
-      {/* Blog Filters */}
-      <div className="mb-8">
+      {/* Blog Filters - more compact on mobile */}
+      <div className="mb-6 sm:mb-8">
         <BlogFilters 
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -196,9 +198,9 @@ const BlogsList = () => {
         />
       </div>
       
-      {/* Results count */}
-      <div className="mb-4">
-        <p className="text-gray-600">
+      {/* Results count - hidden on very small screens */}
+      <div className="hidden xs:block mb-2 sm:mb-4">
+        <p className="text-sm sm:text-base text-gray-600">
           {blogPosts.filter(post => 
             (activeTab === "all" || post.category === activeTab) &&
             (!searchTerm || post.title.toLowerCase().includes(searchTerm.toLowerCase()) || 

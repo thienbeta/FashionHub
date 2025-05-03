@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { BlogCard } from "./BlogCard";
 import {
   Select,
   SelectContent,
@@ -94,6 +96,7 @@ export const BlogList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [selectedAuthor, setSelectedAuthor] = useState("");
+  const isMobile = useIsMobile();
 
   // Get unique authors
   const authors = useMemo(() => {
@@ -147,16 +150,18 @@ export const BlogList = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-6">
-          <TabsList className="md:flex-none">
-            <TabsTrigger value="all">All Posts</TabsTrigger>
-            <TabsTrigger value="product">Product Features</TabsTrigger>
-            <TabsTrigger value="combo">Combo Suggestions</TabsTrigger>
+    <div className="space-y-4">
+      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <div className="flex flex-col space-y-4 mb-4">
+          {/* Tabs for categories - styled for mobile and desktop */}
+          <TabsList className="w-full max-w-full overflow-x-auto flex-wrap justify-start h-auto p-1">
+            <TabsTrigger value="all" className={`${isMobile ? 'text-sm py-1.5' : ''}`}>All Posts</TabsTrigger>
+            <TabsTrigger value="product" className={`${isMobile ? 'text-sm py-1.5' : ''}`}>Product Features</TabsTrigger>
+            <TabsTrigger value="combo" className={`${isMobile ? 'text-sm py-1.5' : ''}`}>Combo Suggestions</TabsTrigger>
           </TabsList>
 
-          <div className="flex flex-col md:flex-row gap-3 flex-1">
+          {/* Search and filter section */}
+          <div className="flex flex-col sm:flex-row gap-3">
             {/* Search input */}
             <div className="relative flex-1">
               <Input
@@ -173,9 +178,9 @@ export const BlogList = () => {
               </span>
             </div>
 
-            {/* Sort options */}
+            {/* Sort dropdown - responsive width */}
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full md:w-[180px]">
+              <SelectTrigger className={`${isMobile ? 'w-full' : 'w-[180px]'}`}>
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -187,10 +192,13 @@ export const BlogList = () => {
                 <SelectItem value="comments">Most Comments</SelectItem>
               </SelectContent>
             </Select>
+          </div>
 
+          {/* Additional filters - row on desktop, stack on mobile */}
+          <div className="flex flex-col sm:flex-row gap-3">
             {/* Author filter */}
             <Select value={selectedAuthor} onValueChange={setSelectedAuthor}>
-              <SelectTrigger className="w-full md:w-[180px]">
+              <SelectTrigger className={`${isMobile ? 'w-full' : 'w-[180px]'}`}>
                 <SelectValue placeholder="Filter by author" />
               </SelectTrigger>
               <SelectContent>
@@ -205,79 +213,35 @@ export const BlogList = () => {
             <Button 
               variant="outline" 
               onClick={resetFilters}
-              className="md:w-auto"
+              className="w-full sm:w-auto"
+              size={isMobile ? "sm" : "default"}
             >
-              Reset
+              Reset Filters
             </Button>
           </div>
         </div>
         
         <TabsContent value={activeTab} className="mt-0">
           {filteredBlogs.length === 0 ? (
-            <div className="text-center py-12 border rounded-md bg-gray-50">
-              <h3 className="text-xl font-semibold mb-2">No blog posts found</h3>
-              <p className="text-gray-600 mb-4">Try adjusting your search or filter criteria</p>
-              <Button onClick={resetFilters}>Reset All Filters</Button>
+            <div className="text-center py-6 sm:py-12 border rounded-md bg-gray-50">
+              <h3 className="text-lg sm:text-xl font-semibold mb-2">No blog posts found</h3>
+              <p className="text-gray-600 mb-4 px-4">Try adjusting your search or filter criteria</p>
+              <Button size={isMobile ? "sm" : "default"} onClick={resetFilters}>Reset All Filters</Button>
             </div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {filteredBlogs.map(post => (
-                <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <Link to={`/blogs/${post.id}`}>
-                    <AspectRatio ratio={16/9} className="w-full overflow-hidden">
-                      <img 
-                        src={post.image} 
-                        alt={post.title} 
-                        className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
-                      />
-                    </AspectRatio>
-                  </Link>
-                  
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <Badge variant="outline" className={`mb-2 ${post.category === "product" ? "bg-crocus-50 text-crocus-700" : "bg-blue-50 text-blue-700"}`}>
-                        {post.category === "product" ? "Product Feature" : "Combo Suggestion"}
-                      </Badge>
-                      <span className="text-sm text-gray-500">{post.date}</span>
-                    </div>
-                    <Link to={`/blogs/${post.id}`} className="hover:text-crocus-600 transition-colors">
-                      <h3 className="font-bold text-xl">{post.title}</h3>
-                    </Link>
-                    <div className="flex items-center space-x-2 mt-1">
-                      <img 
-                        src={post.authorImage} 
-                        alt={post.author} 
-                        className="w-6 h-6 rounded-full object-cover" 
-                      />
-                      <p className="text-sm text-gray-500">By {post.author}</p>
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent>
-                    <p className="text-gray-600">{post.excerpt}</p>
-                  </CardContent>
-                  
-                  <CardFooter className="flex justify-between border-t pt-4">
-                    <div className="flex space-x-4">
-                      <span className="flex items-center text-sm text-gray-500">
-                        <Heart className="h-4 w-4 mr-1 text-gray-400" />
-                        {post.likes}
-                      </span>
-                      <span className="flex items-center text-sm text-gray-500">
-                        <MessageSquare className="h-4 w-4 mr-1 text-gray-400" />
-                        {post.comments}
-                      </span>
-                    </div>
-                    <Link to={`/blogs/${post.id}`} className="text-sm text-crocus-600 hover:text-crocus-700">
-                      Read More
-                    </Link>
-                  </CardFooter>
-                </Card>
+                <BlogCard key={post.id} post={post} />
               ))}
             </div>
           )}
         </TabsContent>
       </Tabs>
+      
+      {/* Results count */}
+      <div className="text-sm text-gray-500">
+        {filteredBlogs.length} posts found
+      </div>
     </div>
   );
 };
