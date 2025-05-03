@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
@@ -195,7 +194,7 @@ export const BlogList = () => {
                 <SelectValue placeholder="Filter by author" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Authors</SelectItem>
+                <SelectItem value="all_authors">All Authors</SelectItem>
                 {authors.map(author => (
                   <SelectItem key={author} value={author}>{author}</SelectItem>
                 ))}
