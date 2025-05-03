@@ -8,6 +8,7 @@ import { ComboCartItem } from "./cart/ComboCartItem";
 import { OrderSummary } from "./cart/OrderSummary";
 import { EmptyCart } from "./cart/EmptyCart";
 import { CartItem } from "@/types/cart";
+import { useBreakpoint } from "@/hooks/use-mobile";
 
 // Mock data for cart items with better images
 const initialCartItems: CartItem[] = [
@@ -72,6 +73,7 @@ const initialCartItems: CartItem[] = [
 
 export const CartComponent = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>(initialCartItems);
+  const isMobile = useBreakpoint("mobile");
 
   const handleQuantityChange = (id: number, change: number) => {
     setCartItems(prevItems =>
@@ -94,47 +96,56 @@ export const CartComponent = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Your Shopping Cart</h1>
+    <div className="w-full">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Your Shopping Cart</h1>
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <Card className="shadow-sm border-gray-200">
-            <CardHeader className="border-b">
-              <CardTitle className="text-lg">Cart Items ({cartItems.length})</CardTitle>
+            <CardHeader className="border-b py-3 sm:py-4">
+              <CardTitle className="text-base sm:text-lg">Cart Items ({cartItems.length})</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <ul className="divide-y">
                 {cartItems.map((item) => (
-                  <li key={item.id} className="p-4">
+                  <li key={item.id} className="p-3 sm:p-4">
                     {item.type === "product" ? (
                       <ProductCartItem
                         item={item}
                         onQuantityChange={handleQuantityChange}
                         onRemoveItem={handleRemoveItem}
+                        isMobile={isMobile}
                       />
                     ) : (
                       <ComboCartItem
                         item={item}
                         onQuantityChange={handleQuantityChange}
                         onRemoveItem={handleRemoveItem}
+                        isMobile={isMobile}
                       />
                     )}
                   </li>
                 ))}
               </ul>
             </CardContent>
-            <CardFooter className="flex justify-between pt-6">
-              <Button variant="outline" asChild>
+            <CardFooter className="flex flex-col sm:flex-row justify-between gap-3 pt-4 sm:pt-6">
+              <Button variant="outline" asChild className="w-full sm:w-auto">
                 <Link to="/products">Continue Shopping</Link>
               </Button>
-              <Button variant="outline" onClick={() => setCartItems([])}>
+              <Button variant="outline" onClick={() => setCartItems([])} className="w-full sm:w-auto">
                 Clear Cart
               </Button>
             </CardFooter>
           </Card>
         </div>
-        <div>
+        <div className={isMobile ? "mt-4" : ""}>
           <OrderSummary cartItems={cartItems} />
+          {isMobile && (
+            <div className="mt-4">
+              <Button asChild className="w-full bg-crocus-500 hover:bg-crocus-600">
+                <Link to="/user/checkout">Proceed to Checkout</Link>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
