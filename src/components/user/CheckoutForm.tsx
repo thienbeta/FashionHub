@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useBreakpoint } from "@/hooks/use-mobile";
 
 // Mock data
 const cartItems = [
@@ -90,6 +91,8 @@ export const CheckoutForm = () => {
   const [discountCode, setDiscountCode] = useState<string>("");
   const [isSpinning, setIsSpinning] = useState(false);
   const [spinResult, setSpinResult] = useState<string | null>(null);
+  const isMobile = useBreakpoint("mobile");
+  const isTablet = useBreakpoint("tablet");
   
   // Calculate total with discount
   const discountAmount = subtotal * appliedDiscount;
@@ -163,42 +166,67 @@ export const CheckoutForm = () => {
   return (
     <div className="max-w-4xl mx-auto">
       {step !== 'confirmation' && (
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 sm:mb-8">
+          <div className={`hidden sm:flex items-center justify-between`}>
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'shipping' || step === 'payment' || step === 'review' ? 'bg-crocus-500 text-white' : 'bg-gray-200'}`}>
+              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${step === 'shipping' || step === 'payment' || step === 'review' ? 'bg-crocus-500 text-white' : 'bg-gray-200'}`}>
                 1
               </div>
-              <div className="ml-2">Shipping</div>
+              <div className="ml-2 text-sm sm:text-base">Shipping</div>
             </div>
             <div className="h-0.5 flex-1 bg-gray-200 mx-4" />
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'payment' || step === 'review' ? 'bg-crocus-500 text-white' : 'bg-gray-200'}`}>
+              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${step === 'payment' || step === 'review' ? 'bg-crocus-500 text-white' : 'bg-gray-200'}`}>
                 2
               </div>
-              <div className="ml-2">Payment</div>
+              <div className="ml-2 text-sm sm:text-base">Payment</div>
             </div>
             <div className="h-0.5 flex-1 bg-gray-200 mx-4" />
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'review' ? 'bg-crocus-500 text-white' : 'bg-gray-200'}`}>
+              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${step === 'review' ? 'bg-crocus-500 text-white' : 'bg-gray-200'}`}>
                 3
               </div>
-              <div className="ml-2">Review</div>
+              <div className="ml-2 text-sm sm:text-base">Review</div>
+            </div>
+          </div>
+          
+          <div className="sm:hidden">
+            <div className="flex justify-between items-center px-2 bg-gray-50 rounded-lg py-2 text-sm">
+              <div className="flex flex-col items-center">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center mb-1 ${step === 'shipping' || step === 'payment' || step === 'review' ? 'bg-crocus-500 text-white' : 'bg-gray-200'}`}>
+                  1
+                </div>
+                <div className="text-xs">Shipping</div>
+              </div>
+              <div className="h-0.5 flex-1 bg-gray-200 mx-2" />
+              <div className="flex flex-col items-center">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center mb-1 ${step === 'payment' || step === 'review' ? 'bg-crocus-500 text-white' : 'bg-gray-200'}`}>
+                  2
+                </div>
+                <div className="text-xs">Payment</div>
+              </div>
+              <div className="h-0.5 flex-1 bg-gray-200 mx-2" />
+              <div className="flex flex-col items-center">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center mb-1 ${step === 'review' ? 'bg-crocus-500 text-white' : 'bg-gray-200'}`}>
+                  3
+                </div>
+                <div className="text-xs">Review</div>
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {step === 'shipping' && (
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <Card>
-              <CardHeader>
-                <CardTitle>Shipping Information</CardTitle>
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="text-lg sm:text-xl">Shipping Information</CardTitle>
                 <CardDescription>Enter your shipping details</CardDescription>
               </CardHeader>
               <CardContent>
-                <form id="shippingForm" onSubmit={handleShippingSubmit} className="space-y-4">
+                <form id="shippingForm" onSubmit={handleShippingSubmit} className="space-y-3 sm:space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="fullName">Full Name</Label>
                     <Input
@@ -223,7 +251,7 @@ export const CheckoutForm = () => {
                     />
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="city">City</Label>
                       <Input
@@ -249,7 +277,7 @@ export const CheckoutForm = () => {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="zipCode">Zip/Postal Code</Label>
                       <Input
@@ -276,46 +304,46 @@ export const CheckoutForm = () => {
                   </div>
                 </form>
               </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button asChild variant="outline">
+              <CardFooter className="flex flex-col sm:flex-row justify-between gap-3">
+                <Button asChild variant="outline" className="w-full sm:w-auto order-2 sm:order-1">
                   <Link to="/user/cart">Back to Cart</Link>
                 </Button>
-                <Button type="submit" form="shippingForm" className="bg-crocus-500 hover:bg-crocus-600">
+                <Button type="submit" form="shippingForm" className="bg-crocus-500 hover:bg-crocus-600 w-full sm:w-auto order-1 sm:order-2">
                   Continue to Payment <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardFooter>
             </Card>
           </div>
           
-          <div>
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
+          <div className="order-first lg:order-none mb-4 lg:mb-0">
+            <Card className="mb-4 sm:mb-6 sticky top-4">
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="text-base sm:text-lg">Order Summary</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-3">
+              <CardContent className="space-y-3 sm:space-y-4">
+                <ul className={`space-y-2 ${cartItems.length > 2 ? 'max-h-32 sm:max-h-40 overflow-y-auto pr-2' : ''}`}>
                   {cartItems.map((item) => (
                     <li key={item.id} className="flex justify-between">
                       <div className="flex gap-2">
                         <img 
                           src={item.image} 
                           alt={item.name} 
-                          className="w-10 h-10 object-cover rounded"
+                          className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded"
                         />
                         <div>
-                          <span className="font-medium">{item.name}</span>
-                          <span className="text-gray-500 text-sm ml-2">x{item.quantity}</span>
+                          <span className="font-medium text-sm sm:text-base">{item.name}</span>
+                          <span className="text-gray-500 text-xs sm:text-sm ml-1">x{item.quantity}</span>
                           {item.type === "product" && (
                             <p className="text-xs text-gray-500">{item.size} | {item.color}</p>
                           )}
                         </div>
                       </div>
-                      <span>${(item.price * item.quantity).toFixed(2)}</span>
+                      <span className="text-sm sm:text-base">${(item.price * item.quantity).toFixed(2)}</span>
                     </li>
                   ))}
                 </ul>
                 <Separator />
-                <div className="space-y-2">
+                <div className="space-y-1 text-sm sm:text-base">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
                     <span>${subtotal.toFixed(2)}</span>
@@ -336,127 +364,131 @@ export const CheckoutForm = () => {
                   )}
                 </div>
                 <Separator />
-                <div className="flex justify-between font-medium text-lg">
+                <div className="flex justify-between font-medium text-base sm:text-lg">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span className="text-crocus-600">${total.toFixed(2)}</span>
                 </div>
               </CardContent>
             </Card>
             
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="w-full mb-4">
-                  <Star className="w-4 h-4 mr-2 text-crocus-500" />
-                  Spin for a Discount
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle className="text-center">Lucky Spin Discount</DialogTitle>
-                  <DialogDescription className="text-center">
-                    Spin the wheel to win a discount code for your order!
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="flex flex-col items-center py-6">
-                  <div className="relative w-64 h-64 mb-6">
-                    {/* Simple representation of a spinning wheel */}
-                    <div 
-                      className={`w-full h-full rounded-full border-8 border-crocus-500 flex items-center justify-center transition-transform duration-1000 ${isSpinning ? 'animate-spin' : ''}`}
-                      style={{ 
-                        backgroundImage: "conic-gradient(#9b87f5, #7E69AB, #6E59A5, #9b87f5, #7E69AB, #6E59A5)",
-                        boxShadow: "0 0 15px rgba(155, 135, 245, 0.5)"
-                      }}
-                    >
-                      {!isSpinning && spinResult && (
-                        <div className="bg-white p-3 rounded-lg text-center z-10">
-                          <p className="font-bold text-crocus-700">{spinResult}</p>
-                          <p className="text-xs text-gray-500">Applied to your order</p>
-                        </div>
-                      )}
-                    </div>
-                    {/* Arrow pointer */}
-                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/3">
-                      <div className="w-0 h-0 border-left-8 border-right-8 border-top-8 border-transparent border-l-transparent border-r-transparent border-b-crocus-700"></div>
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    onClick={handleSpin} 
-                    disabled={isSpinning || spinResult !== null}
-                    className="bg-crocus-500 hover:bg-crocus-600"
-                  >
-                    {isSpinning ? (
-                      <span className="flex items-center">
-                        <RotateCcw className="w-4 h-4 mr-2 animate-spin" />
-                        Spinning...
-                      </span>
-                    ) : spinResult ? (
-                      <span>Discount Applied!</span>
-                    ) : (
-                      <span>Spin the Wheel</span>
-                    )}
+            <div className="space-y-3">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full">
+                    <Star className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-crocus-500" />
+                    <span className="text-sm sm:text-base">Spin for a Discount</span>
                   </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-            
-            <div className="flex gap-2">
-              <Input 
-                placeholder="Discount Code" 
-                value={discountCode}
-                onChange={(e) => setDiscountCode(e.target.value)}
-              />
-              <Button 
-                onClick={handleApplyDiscountCode}
-                variant="outline"
-                disabled={!discountCode}
-              >
-                Apply
-              </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="text-center">Lucky Spin Discount</DialogTitle>
+                    <DialogDescription className="text-center">
+                      Spin the wheel to win a discount code for your order!
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex flex-col items-center py-4 sm:py-6">
+                    <div className="relative w-48 h-48 sm:w-64 sm:h-64 mb-4 sm:mb-6">
+                      {/* Simple representation of a spinning wheel */}
+                      <div 
+                        className={`w-full h-full rounded-full border-8 border-crocus-500 flex items-center justify-center transition-transform duration-1000 ${isSpinning ? 'animate-spin' : ''}`}
+                        style={{ 
+                          backgroundImage: "conic-gradient(#9b87f5, #7E69AB, #6E59A5, #9b87f5, #7E69AB, #6E59A5)",
+                          boxShadow: "0 0 15px rgba(155, 135, 245, 0.5)"
+                        }}
+                      >
+                        {!isSpinning && spinResult && (
+                          <div className="bg-white p-2 sm:p-3 rounded-lg text-center z-10">
+                            <p className="font-bold text-crocus-700 text-sm sm:text-base">{spinResult}</p>
+                            <p className="text-xs text-gray-500">Applied to your order</p>
+                          </div>
+                        )}
+                      </div>
+                      {/* Arrow pointer */}
+                      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/3">
+                        <div className="w-0 h-0 border-left-8 border-right-8 border-top-8 border-transparent border-l-transparent border-r-transparent border-b-crocus-700"></div>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      onClick={handleSpin} 
+                      disabled={isSpinning || spinResult !== null}
+                      className="bg-crocus-500 hover:bg-crocus-600"
+                    >
+                      {isSpinning ? (
+                        <span className="flex items-center">
+                          <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin" />
+                          Spinning...
+                        </span>
+                      ) : spinResult ? (
+                        <span>Discount Applied!</span>
+                      ) : (
+                        <span>Spin the Wheel</span>
+                      )}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="Discount Code" 
+                  value={discountCode}
+                  onChange={(e) => setDiscountCode(e.target.value)}
+                  className="text-sm"
+                />
+                <Button 
+                  onClick={handleApplyDiscountCode}
+                  variant="outline"
+                  disabled={!discountCode}
+                  className="whitespace-nowrap text-sm"
+                >
+                  Apply
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {step === 'payment' && (
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <Card>
-              <CardHeader>
-                <CardTitle>Payment Method</CardTitle>
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="text-lg sm:text-xl">Payment Method</CardTitle>
                 <CardDescription>Choose how you want to pay</CardDescription>
               </CardHeader>
               <CardContent>
-                <form id="paymentForm" onSubmit={handlePaymentSubmit} className="space-y-6">
+                <form id="paymentForm" onSubmit={handlePaymentSubmit} className="space-y-4 sm:space-y-6">
                   <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} required>
-                    <div className="flex items-center space-x-2 border rounded-md p-4 cursor-pointer hover:bg-gray-50">
+                    <div className="flex items-center space-x-2 border rounded-md p-3 sm:p-4 cursor-pointer hover:bg-gray-50">
                       <RadioGroupItem value="credit-card" id="credit-card" />
                       <Label htmlFor="credit-card" className="flex items-center cursor-pointer w-full">
-                        <CreditCard className="h-5 w-5 mr-2" />
-                        <span>Credit/Debit Card</span>
+                        <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                        <span className="text-sm sm:text-base">Credit/Debit Card</span>
                       </Label>
                     </div>
                     
-                    <div className="flex items-center space-x-2 border rounded-md p-4 cursor-pointer hover:bg-gray-50">
+                    <div className="flex items-center space-x-2 border rounded-md p-3 sm:p-4 cursor-pointer hover:bg-gray-50">
                       <RadioGroupItem value="vnpay" id="vnpay" />
                       <Label htmlFor="vnpay" className="flex items-center cursor-pointer w-full">
                         <img src="https://via.placeholder.com/40x20" alt="VNPay" className="mr-2" />
-                        <span>VNPay</span>
+                        <span className="text-sm sm:text-base">VNPay</span>
                       </Label>
                     </div>
                     
-                    <div className="flex items-center space-x-2 border rounded-md p-4 cursor-pointer hover:bg-gray-50">
+                    <div className="flex items-center space-x-2 border rounded-md p-3 sm:p-4 cursor-pointer hover:bg-gray-50">
                       <RadioGroupItem value="zalopay" id="zalopay" />
                       <Label htmlFor="zalopay" className="flex items-center cursor-pointer w-full">
                         <img src="https://via.placeholder.com/40x20" alt="ZaloPay" className="mr-2" />
-                        <span>ZaloPay</span>
+                        <span className="text-sm sm:text-base">ZaloPay</span>
                       </Label>
                     </div>
                     
-                    <div className="flex items-center space-x-2 border rounded-md p-4 cursor-pointer hover:bg-gray-50">
+                    <div className="flex items-center space-x-2 border rounded-md p-3 sm:p-4 cursor-pointer hover:bg-gray-50">
                       <RadioGroupItem value="cod" id="cod" />
                       <Label htmlFor="cod" className="flex items-center cursor-pointer w-full">
-                        <span>Cash on Delivery (COD)</span>
+                        <span className="text-sm sm:text-base">Cash on Delivery (COD)</span>
                       </Label>
                     </div>
                   </RadioGroup>
@@ -481,7 +513,7 @@ export const CheckoutForm = () => {
                         />
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="expiry">Expiry Date</Label>
                           <Input
@@ -504,14 +536,18 @@ export const CheckoutForm = () => {
                   )}
                 </form>
               </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" onClick={() => setStep('shipping')}>
+              <CardFooter className="flex flex-col sm:flex-row justify-between gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setStep('shipping')}
+                  className="w-full sm:w-auto order-2 sm:order-1"
+                >
                   Back
                 </Button>
                 <Button 
                   type="submit" 
                   form="paymentForm" 
-                  className="bg-crocus-500 hover:bg-crocus-600"
+                  className="bg-crocus-500 hover:bg-crocus-600 w-full sm:w-auto order-1 sm:order-2"
                   disabled={!paymentMethod}
                 >
                   Continue to Review <ChevronRight className="ml-2 h-4 w-4" />
@@ -520,32 +556,32 @@ export const CheckoutForm = () => {
             </Card>
           </div>
           
-          <div>
-            <Card>
-              <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
+          <div className="order-first lg:order-none mb-4 lg:mb-0">
+            <Card className="sticky top-4">
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="text-base sm:text-lg">Order Summary</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-3 max-h-60 overflow-y-auto">
+              <CardContent className="space-y-3 sm:space-y-4">
+                <ul className={`space-y-2 ${cartItems.length > 2 ? 'max-h-32 sm:max-h-40 overflow-y-auto pr-2' : ''}`}>
                   {cartItems.map((item) => (
                     <li key={item.id} className="flex justify-between">
                       <div className="flex gap-2">
                         <img 
                           src={item.image} 
                           alt={item.name} 
-                          className="w-10 h-10 object-cover rounded"
+                          className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded"
                         />
                         <div>
-                          <span className="font-medium">{item.name}</span>
-                          <span className="text-gray-500 text-sm ml-2">x{item.quantity}</span>
+                          <span className="font-medium text-sm sm:text-base truncate max-w-[150px]">{item.name}</span>
+                          <span className="text-gray-500 text-xs sm:text-sm ml-1">x{item.quantity}</span>
                         </div>
                       </div>
-                      <span>${(item.price * item.quantity).toFixed(2)}</span>
+                      <span className="text-sm sm:text-base">${(item.price * item.quantity).toFixed(2)}</span>
                     </li>
                   ))}
                 </ul>
                 <Separator />
-                <div className="space-y-2">
+                <div className="space-y-1 text-sm sm:text-base">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
                     <span>${subtotal.toFixed(2)}</span>
@@ -566,9 +602,9 @@ export const CheckoutForm = () => {
                   )}
                 </div>
                 <Separator />
-                <div className="flex justify-between font-medium text-lg">
+                <div className="flex justify-between font-medium text-base sm:text-lg">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span className="text-crocus-600">${total.toFixed(2)}</span>
                 </div>
               </CardContent>
             </Card>
@@ -577,42 +613,42 @@ export const CheckoutForm = () => {
       )}
 
       {step === 'review' && (
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <Card>
-              <CardHeader>
-                <CardTitle>Review Your Order</CardTitle>
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="text-lg sm:text-xl">Review Your Order</CardTitle>
                 <CardDescription>Please verify your information</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4 sm:space-y-6">
                 <div>
-                  <h3 className="font-medium mb-2">Products</h3>
-                  <ul className="space-y-3 bg-gray-50 p-4 rounded-md">
+                  <h3 className="font-medium mb-2 text-sm sm:text-base">Products</h3>
+                  <ul className="space-y-3 bg-gray-50 p-3 sm:p-4 rounded-md">
                     {cartItems.map((item) => (
                       <li key={item.id} className="flex justify-between">
                         <div className="flex gap-2">
                           <img 
                             src={item.image} 
                             alt={item.name} 
-                            className="w-10 h-10 object-cover rounded"
+                            className="w-8 h-8 sm:w-10 sm:h-10 object-cover rounded"
                           />
                           <div>
-                            <span className="font-medium">{item.name}</span>
-                            <span className="text-gray-500 text-sm ml-2">x{item.quantity}</span>
+                            <span className="font-medium text-sm sm:text-base">{item.name}</span>
+                            <span className="text-gray-500 text-xs sm:text-sm ml-1">x{item.quantity}</span>
                             {item.type === "product" && (
                               <p className="text-xs text-gray-500">{item.size} | {item.color}</p>
                             )}
                           </div>
                         </div>
-                        <span>${(item.price * item.quantity).toFixed(2)}</span>
+                        <span className="text-sm sm:text-base">${(item.price * item.quantity).toFixed(2)}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
                 
                 <div>
-                  <h3 className="font-medium mb-2">Shipping Information</h3>
-                  <div className="bg-gray-50 p-4 rounded-md">
+                  <h3 className="font-medium mb-2 text-sm sm:text-base">Shipping Information</h3>
+                  <div className="bg-gray-50 p-3 sm:p-4 rounded-md text-sm sm:text-base">
                     <p className="font-medium">{shippingInfo.fullName}</p>
                     <p>{shippingInfo.address}</p>
                     <p>{shippingInfo.city}, {shippingInfo.state} {shippingInfo.zipCode}</p>
@@ -621,8 +657,8 @@ export const CheckoutForm = () => {
                 </div>
                 
                 <div>
-                  <h3 className="font-medium mb-2">Payment Method</h3>
-                  <div className="bg-gray-50 p-4 rounded-md">
+                  <h3 className="font-medium mb-2 text-sm sm:text-base">Payment Method</h3>
+                  <div className="bg-gray-50 p-3 sm:p-4 rounded-md text-sm sm:text-base">
                     {paymentMethod === 'credit-card' && <p>Credit/Debit Card</p>}
                     {paymentMethod === 'vnpay' && <p>VNPay</p>}
                     {paymentMethod === 'zalopay' && <p>ZaloPay</p>}
@@ -634,14 +670,18 @@ export const CheckoutForm = () => {
                   {/* Hidden form elements if needed */}
                 </form>
               </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" onClick={() => setStep('payment')}>
+              <CardFooter className="flex flex-col sm:flex-row justify-between gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setStep('payment')} 
+                  className="w-full sm:w-auto order-2 sm:order-1"
+                >
                   Back
                 </Button>
                 <Button
                   type="submit"
                   form="reviewForm"
-                  className="bg-crocus-500 hover:bg-crocus-600"
+                  className="bg-crocus-500 hover:bg-crocus-600 w-full sm:w-auto order-1 sm:order-2"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -660,13 +700,13 @@ export const CheckoutForm = () => {
             </Card>
           </div>
           
-          <div>
-            <Card>
-              <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
+          <div className="order-first lg:order-none mb-4 lg:mb-0">
+            <Card className="sticky top-4">
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="text-base sm:text-lg">Order Summary</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
+              <CardContent className="space-y-3 sm:space-y-4">
+                <div className="space-y-1 text-sm sm:text-base">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
                     <span>${subtotal.toFixed(2)}</span>
@@ -687,9 +727,9 @@ export const CheckoutForm = () => {
                   )}
                 </div>
                 <Separator />
-                <div className="flex justify-between font-medium text-lg">
+                <div className="flex justify-between font-medium text-base sm:text-lg">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span className="text-crocus-600">${total.toFixed(2)}</span>
                 </div>
               </CardContent>
             </Card>
@@ -701,20 +741,20 @@ export const CheckoutForm = () => {
         <Card className="max-w-md mx-auto">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                <Check className="h-6 w-6 text-green-600" />
+              <div className="mx-auto flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-green-100">
+                <Check className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
               </div>
-              <h2 className="mt-4 text-2xl font-bold">Order Confirmed!</h2>
-              <p className="mt-2 text-gray-600">
+              <h2 className="mt-4 text-xl sm:text-2xl font-bold">Order Confirmed!</h2>
+              <p className="mt-2 text-gray-600 text-sm sm:text-base">
                 Thank you for your order. We've received your payment and will process your order shortly.
               </p>
               
-              <div className="mt-6 border-t border-b py-4">
-                <p className="font-medium">Order #12345</p>
-                <p className="text-sm text-gray-500 mt-1">A confirmation has been sent to your email.</p>
+              <div className="mt-4 sm:mt-6 border-t border-b py-3 sm:py-4">
+                <p className="font-medium text-sm sm:text-base">Order #12345</p>
+                <p className="text-xs sm:text-sm text-gray-500 mt-1">A confirmation has been sent to your email.</p>
               </div>
               
-              <div className="mt-6 flex gap-4 justify-center">
+              <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row gap-3 justify-center">
                 <Button asChild className="bg-crocus-500 hover:bg-crocus-600">
                   <Link to="/user/orders">View Order</Link>
                 </Button>
