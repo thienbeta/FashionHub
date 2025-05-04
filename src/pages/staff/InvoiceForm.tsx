@@ -1,4 +1,3 @@
-
 import React from "react";
 import { FormLayout } from "@/components/forms/FormLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +12,7 @@ import { FileText } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 const formSchema = z.object({
   invoiceNumber: z.string().min(1, "Invoice number is required"),

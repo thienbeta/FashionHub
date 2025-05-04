@@ -1,4 +1,3 @@
-
 import React from "react";
 import { FormLayout } from "@/components/forms/FormLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +11,7 @@ import { z } from "zod";
 import { ShoppingCart } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Label } from "@/components/ui/label";
 
 const formSchema = z.object({
   customerName: z.string().min(1, "Customer name is required"),
