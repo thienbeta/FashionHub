@@ -1,3 +1,4 @@
+
 import React from "react";
 import { FormLayout } from "@/components/forms/FormLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +13,8 @@ import { ShoppingCart } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
+import { useBreakpoint } from "@/hooks/use-mobile";
+import { showSuccess, showError } from "@/utils/notifications";
 
 const formSchema = z.object({
   customerName: z.string().min(1, "Customer name is required"),
@@ -33,6 +36,9 @@ interface OrderItem {
 }
 
 const OrdersForm = () => {
+  const isMobile = useBreakpoint("mobile");
+  const isTablet = useBreakpoint("tablet");
+  
   const [orderItems, setOrderItems] = React.useState<OrderItem[]>([
     { id: "1", name: "T-Shirt", quantity: 2, price: 24.99 },
     { id: "2", name: "Jeans", quantity: 1, price: 49.99 }
@@ -60,6 +66,7 @@ const OrdersForm = () => {
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log({ ...values, orderItems });
     // Handle form submission
+    showSuccess("Order has been saved successfully");
   }
   
   const addOrderItem = () => {
@@ -76,6 +83,8 @@ const OrdersForm = () => {
       setItemName("");
       setItemQuantity(1);
       setItemPrice("");
+    } else {
+      showError("Please fill in all item fields");
     }
   };
   
@@ -96,7 +105,7 @@ const OrdersForm = () => {
   return (
     <FormLayout activeFormId="orders">
       <Card className="max-w-4xl mx-auto">
-        <CardHeader>
+        <CardHeader className="space-y-1">
           <div className="flex items-center gap-3">
             <ShoppingCart className="h-6 w-6 text-purple-500" />
             <div>
@@ -177,7 +186,7 @@ const OrdersForm = () => {
                 <h3 className="text-lg font-medium">Order Details</h3>
                 <p className="text-sm text-gray-500 mb-4">Add items to this order</p>
                 
-                <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div className={`mb-6 grid ${isMobile ? "grid-cols-1 gap-3" : "grid-cols-1 md:grid-cols-4 gap-4"} items-end`}>
                   <div className="col-span-1 md:col-span-2">
                     <Label htmlFor="itemName">Item Name</Label>
                     <Input 
@@ -214,7 +223,7 @@ const OrdersForm = () => {
                   </div>
                 </div>
                 
-                <div className="border rounded-md overflow-hidden">
+                <div className="border rounded-md overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -257,7 +266,7 @@ const OrdersForm = () => {
                 </div>
                 
                 <div className="mt-4 flex justify-end">
-                  <div className="w-full max-w-xs space-y-2">
+                  <div className={`${isMobile ? "w-full" : "w-full max-w-xs"} space-y-2`}>
                     <div className="flex justify-between text-sm">
                       <span>Subtotal:</span>
                       <span>${calculateSubtotal().toFixed(2)}</span>
@@ -386,7 +395,7 @@ const OrdersForm = () => {
                 />
               </div>
               
-              <div className="flex justify-end gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 justify-end">
                 <Button variant="outline" type="button">Cancel</Button>
                 <Button type="submit">Save Order</Button>
               </div>

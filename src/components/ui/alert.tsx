@@ -1,5 +1,7 @@
+
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
+import { AlertTriangle, CheckCircle2, Info, XCircle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -11,6 +13,12 @@ const alertVariants = cva(
         default: "bg-background text-foreground",
         destructive:
           "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+        success:
+          "border-green-500/50 bg-green-50 text-green-700 dark:border-green-500 [&>svg]:text-green-500",
+        warning:
+          "border-yellow-500/50 bg-yellow-50 text-yellow-700 dark:border-yellow-500 [&>svg]:text-yellow-500",
+        info:
+          "border-blue-500/50 bg-blue-50 text-blue-700 dark:border-blue-500 [&>svg]:text-blue-500",
       },
     },
     defaultVariants: {
@@ -19,17 +27,46 @@ const alertVariants = cva(
   }
 )
 
+interface AlertProps extends React.HTMLAttributes<HTMLDivElement>,
+  VariantProps<typeof alertVariants> {
+  icon?: React.ReactNode;
+}
+
 const Alert = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, variant, ...props }, ref) => (
-  <div
-    ref={ref}
-    role="alert"
-    className={cn(alertVariants({ variant }), className)}
-    {...props}
-  />
-))
+  AlertProps
+>(({ className, variant, children, icon, ...props }, ref) => {
+  // Default icons based on variant
+  const getDefaultIcon = () => {
+    if (icon) return icon;
+
+    switch(variant) {
+      case "success": 
+        return <CheckCircle2 className="h-4 w-4" />;
+      case "destructive": 
+        return <XCircle className="h-4 w-4" />;
+      case "warning": 
+        return <AlertTriangle className="h-4 w-4" />;
+      case "info": 
+        return <Info className="h-4 w-4" />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div
+      ref={ref}
+      role="alert"
+      className={cn(alertVariants({ variant }), className)}
+      {...props}
+    >
+      {getDefaultIcon()}
+      {children}
+    </div>
+  );
+})
+
 Alert.displayName = "Alert"
 
 const AlertTitle = React.forwardRef<

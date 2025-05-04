@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -5,8 +6,8 @@ import type {
   ToastProps,
 } from "@/components/ui/toast"
 
-const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_LIMIT = 3
+const TOAST_REMOVE_DELAY = 5000
 
 type ToasterToast = ToastProps & {
   id: string
@@ -90,8 +91,6 @@ export const reducer = (state: State, action: Action): State => {
     case "DISMISS_TOAST": {
       const { toastId } = action
 
-      // ! Side effects ! - This could be extracted into a dismissToast() action,
-      // but I'll keep it here for simplicity
       if (toastId) {
         addToRemoveQueue(toastId)
       } else {
@@ -167,6 +166,39 @@ function toast({ ...props }: Toast) {
     update,
   }
 }
+
+// Enhanced toast methods with better mobile support
+toast.success = (content: string) => {
+  return toast({
+    variant: "success",
+    title: content,
+    className: "bg-green-50 border-green-200 text-green-800",
+  });
+};
+
+toast.error = (content: string) => {
+  return toast({
+    variant: "destructive",
+    title: content,
+    className: "bg-red-50 border-red-200 text-red-800",
+  });
+};
+
+toast.warning = (content: string) => {
+  return toast({
+    variant: "warning",
+    title: content,
+    className: "bg-yellow-50 border-yellow-200 text-yellow-800",
+  });
+};
+
+toast.info = (content: string) => {
+  return toast({
+    variant: "default",
+    title: content,
+    className: "bg-blue-50 border-blue-200 text-blue-800",
+  });
+};
 
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState)
