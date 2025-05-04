@@ -17,9 +17,9 @@ interface SidebarSectionProps {
 
 export const SidebarSection = ({ title, items, collapsed }: SidebarSectionProps) => {
   return (
-    <SidebarGroup className="mt-6">
+    <SidebarGroup className="mt-4 md:mt-6">
       {!collapsed && title && (
-        <SidebarGroupLabel className="text-gray-500 font-medium px-3 py-2 text-base">
+        <SidebarGroupLabel className="text-gray-500 font-medium px-3 py-2 text-xs md:text-sm">
           {title}
         </SidebarGroupLabel>
       )}
@@ -29,7 +29,7 @@ export const SidebarSection = ({ title, items, collapsed }: SidebarSectionProps)
             <SidebarMenuButton
               asChild
               tooltip={collapsed ? item.title : undefined}
-              className="my-1.5 transition-all rounded-md"
+              className="my-1 transition-all rounded-md"
             >
               <SidebarItem
                 title={item.title}

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Sidebar, 
   SidebarContent, 
@@ -23,13 +23,30 @@ interface AppSidebarProps {
 export const AppSidebar = ({ role }: AppSidebarProps) => {
   const isMobile = useIsMobile();
   const [collapsed, setCollapsed] = useState(false);
+  
+  // Auto-collapse sidebar on smaller screens
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024 && !collapsed) {
+        setCollapsed(true);
+      } else if (window.innerWidth >= 1280 && collapsed) {
+        setCollapsed(false);
+      }
+    };
+    
+    // Set initial state
+    handleResize();
+    
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [collapsed]);
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
 
   return (
-    <Sidebar className="border-r border-gray-100 bg-white">
+    <Sidebar className="border-r border-gray-100 bg-white print:hidden">
       <SidebarHeader 
         role={role} 
         collapsed={collapsed} 
@@ -38,7 +55,7 @@ export const AppSidebar = ({ role }: AppSidebarProps) => {
 
       <SidebarSeparator className="bg-gray-100" />
 
-      <SidebarContent className="px-3">
+      <SidebarContent className="px-2 md:px-3">
         <SidebarSection 
           items={role === "staff" ? staffItems : adminItems}
           collapsed={collapsed}

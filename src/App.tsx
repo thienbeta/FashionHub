@@ -50,6 +50,7 @@ import InventoryForm from "./pages/staff/InventoryForm";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminStaff from "./pages/admin/AdminStaff";
+import AdminSettings from "./pages/admin/AdminSettings";
 
 const queryClient = new QueryClient();
 
@@ -103,9 +104,11 @@ const App = () => (
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<AdminUsers />} />
             <Route path="/admin/staff" element={<AdminStaff />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/admin/products" element={<StaffProducts />} />
             <Route path="/admin/orders" element={<StaffOrders />} />
             <Route path="/admin/inventory" element={<StaffInventory />} />
+            <Route path="/admin/analytics" element={<NotFound />} />
             
             {/* 404 Route */}
             <Route path="*" element={<NotFound />} />
