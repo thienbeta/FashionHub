@@ -15,7 +15,6 @@ export const SidebarItem = ({ title, icon: Icon, path, badge, collapsed }: Sideb
   const location = useLocation();
   const isActive = location.pathname === path || location.pathname.startsWith(`${path}/`);
 
-  // When collapsed, show tooltip on hover
   const linkContent = (
     <Link
       to={path}
@@ -26,17 +25,28 @@ export const SidebarItem = ({ title, icon: Icon, path, badge, collapsed }: Sideb
           : "text-gray-600 hover:bg-purple-50 hover:text-purple-600"
       )}
     >
-      <Icon className={cn("flex-shrink-0", collapsed ? "h-5 w-5" : "h-5 w-5", "text-purple-500")} />
-      {!collapsed && <span className="text-base truncate">{title}</span>}
-      {badge && !collapsed && (
-        <span className="ml-auto bg-purple-100 text-purple-600 text-xs rounded-full h-5 min-w-5 px-1.5 flex items-center justify-center">
-          {badge}
-        </span>
-      )}
-      {badge && collapsed && (
-        <span className="absolute top-0 right-0 translate-x-1/3 -translate-y-1/3 bg-purple-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-          {badge}
-        </span>
+      <div className={cn(
+        "relative flex items-center justify-center",
+        collapsed ? "w-full" : "w-auto"
+      )}>
+        <Icon className={cn("flex-shrink-0 h-5 w-5", isActive ? "text-purple-600" : "text-gray-500")} />
+        
+        {badge && collapsed && (
+          <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+            {badge}
+          </span>
+        )}
+      </div>
+      
+      {!collapsed && (
+        <>
+          <span className="text-sm truncate">{title}</span>
+          {badge && (
+            <span className="ml-auto bg-purple-100 text-purple-600 text-xs rounded-full px-2 py-0.5 flex items-center justify-center">
+              {badge}
+            </span>
+          )}
+        </>
       )}
     </Link>
   );

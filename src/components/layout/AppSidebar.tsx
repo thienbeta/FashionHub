@@ -3,9 +3,10 @@ import { useState, useEffect } from "react";
 import { 
   Sidebar, 
   SidebarContent, 
-  SidebarSeparator 
+  SidebarSeparator,
+  SidebarTrigger
 } from "@/components/ui/sidebar";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
 import { SidebarHeader } from "./sidebar/SidebarHeader";
 import { SidebarSection } from "./sidebar/SidebarSection";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
@@ -15,6 +16,8 @@ import {
   adminManagementItems, 
   supportItems 
 } from "./sidebar/sidebarItems";
+import { cn } from "@/lib/utils";
+import { successToast } from "@/utils/notifications";
 
 interface AppSidebarProps {
   role: "staff" | "admin";
@@ -22,6 +25,7 @@ interface AppSidebarProps {
 
 export const AppSidebar = ({ role }: AppSidebarProps) => {
   const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   const [collapsed, setCollapsed] = useState(false);
   
   // Auto-collapse sidebar on smaller screens
@@ -43,10 +47,14 @@ export const AppSidebar = ({ role }: AppSidebarProps) => {
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
+    successToast(collapsed ? "Sidebar expanded" : "Sidebar collapsed");
   };
 
   return (
-    <Sidebar className="border-r border-gray-100 bg-white print:hidden">
+    <Sidebar className={cn(
+      "border-r border-gray-100 bg-white print:hidden transition-all duration-300",
+      collapsed ? "w-[70px] md:w-[80px]" : "w-[250px] md:w-[280px]"
+    )}>
       <SidebarHeader 
         role={role} 
         collapsed={collapsed} 
