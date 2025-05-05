@@ -2,12 +2,15 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Package, Search } from "lucide-react";
+import { Search, Package } from "lucide-react";
+import { useBreakpoint } from "@/hooks/use-mobile";
 
 const StaffOrders = () => {
+  const isMobile = useBreakpoint("mobile");
+  
   return (
     <div className="py-6 space-y-6">
-      <h1 className="text-2xl md:text-3xl font-bold">Orders</h1>
+      <h1 className="text-2xl font-bold">Orders</h1>
 
       <div className="bg-white p-4 md:p-6 rounded-lg border border-gray-100 space-y-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -29,10 +32,10 @@ const StaffOrders = () => {
           </div>
         </div>
 
-        <div className="border rounded-lg overflow-hidden">
+        <div className="border rounded-lg overflow-x-auto">
           <Table>
-            <TableHeader>
-              <TableRow className="bg-gray-50">
+            <TableHeader className="bg-gray-50">
+              <TableRow>
                 <TableHead className="w-[15%]">Order ID</TableHead>
                 <TableHead className="w-[25%]">Customer</TableHead>
                 <TableHead className="w-[25%]">Products</TableHead>
@@ -41,12 +44,14 @@ const StaffOrders = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow className="hover:bg-gray-50">
+              <TableRow className="hover:bg-gray-50 border-b border-gray-100">
                 <TableCell className="font-medium">#12345</TableCell>
                 <TableCell>John Doe</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Package className="h-4 w-4 text-purple-500" />
+                    <div className="bg-purple-100 p-1 rounded">
+                      <Package className="h-4 w-4 text-purple-500" />
+                    </div>
                     <span>3 items</span>
                   </div>
                 </TableCell>
@@ -58,12 +63,14 @@ const StaffOrders = () => {
                 </TableCell>
               </TableRow>
               
-              <TableRow className="hover:bg-gray-50">
+              <TableRow className="hover:bg-gray-50 border-b border-gray-100">
                 <TableCell className="font-medium">#12346</TableCell>
                 <TableCell>Jane Smith</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Package className="h-4 w-4 text-purple-500" />
+                    <div className="bg-purple-100 p-1 rounded">
+                      <Package className="h-4 w-4 text-purple-500" />
+                    </div>
                     <span>1 item</span>
                   </div>
                 </TableCell>
@@ -80,7 +87,9 @@ const StaffOrders = () => {
                 <TableCell>Robert Johnson</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Package className="h-4 w-4 text-purple-500" />
+                    <div className="bg-purple-100 p-1 rounded">
+                      <Package className="h-4 w-4 text-purple-500" />
+                    </div>
                     <span>2 items</span>
                   </div>
                 </TableCell>
