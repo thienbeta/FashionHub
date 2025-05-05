@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { SidebarHeader as Header } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
+import { useBreakpoint } from "@/hooks/use-mobile";
 
 interface SidebarHeaderProps {
   role: "staff" | "admin";
@@ -12,17 +13,23 @@ interface SidebarHeaderProps {
 }
 
 export const SidebarHeader = ({ role, collapsed, toggleCollapse }: SidebarHeaderProps) => {
+  const isMobile = useBreakpoint("mobile");
+  const isTablet = useBreakpoint("tablet");
+  
+  // Always show text on mobile/tablet when collapsed
+  const showText = !collapsed || (collapsed && (isMobile || isTablet));
+  
   return (
     <Header className="p-3 flex items-center justify-between">
       <div className={cn(
         "flex items-center gap-3",
-        collapsed ? "justify-center w-full" : ""
+        collapsed && !showText ? "justify-center w-full" : ""
       )}>
         <Link to={role === "admin" ? "/admin" : "/staff"} className="flex items-center gap-2">
           <div className="h-10 w-10 rounded-md bg-purple-400 flex items-center justify-center text-white text-lg font-semibold">
             {role === "staff" ? "S" : "A"}
           </div>
-          {!collapsed && (
+          {showText && (
             <div className="flex flex-col">
               <span className="text-base font-semibold text-gray-800">
                 Fashion Hub

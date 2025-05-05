@@ -6,7 +6,7 @@ import {
   SidebarSeparator,
   SidebarTrigger
 } from "@/components/ui/sidebar";
-import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
+import { useBreakpoint } from "@/hooks/use-mobile";
 import { SidebarHeader } from "./sidebar/SidebarHeader";
 import { SidebarSection } from "./sidebar/SidebarSection";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
@@ -24,14 +24,14 @@ interface AppSidebarProps {
 }
 
 export const AppSidebar = ({ role }: AppSidebarProps) => {
-  const isMobile = useIsMobile();
-  const isTablet = useIsTablet();
+  const isMobile = useBreakpoint("mobile");
+  const isTablet = useBreakpoint("tablet");
   const [collapsed, setCollapsed] = useState(false);
   
-  // Auto-collapse sidebar on smaller screens
+  // Auto-collapse sidebar on larger screens, but leave expanded on mobile/tablet
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 1024 && !collapsed) {
+      if (window.innerWidth < 1024 && window.innerWidth > 768 && !collapsed) {
         setCollapsed(true);
       } else if (window.innerWidth >= 1280 && collapsed) {
         setCollapsed(false);
@@ -49,11 +49,22 @@ export const AppSidebar = ({ role }: AppSidebarProps) => {
     setCollapsed(!collapsed);
     successToast(collapsed ? "Sidebar expanded" : "Sidebar collapsed");
   };
+  
+  // Determine adaptive width based on device and collapse state
+  const sidebarWidth = () => {
+    if (collapsed) {
+      if (isMobile || isTablet) {
+        return "w-[200px]"; // Wider on mobile/tablet when "collapsed" to show text
+      }
+      return "w-[70px] md:w-[80px]"; // Icon-only on desktop when collapsed
+    }
+    return "w-[250px] md:w-[280px]"; // Full width when expanded
+  };
 
   return (
     <Sidebar className={cn(
       "border-r border-gray-100 bg-white print:hidden transition-all duration-300",
-      collapsed ? "w-[70px] md:w-[80px]" : "w-[250px] md:w-[280px]"
+      sidebarWidth()
     )}>
       <SidebarHeader 
         role={role} 

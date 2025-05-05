@@ -2,6 +2,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useBreakpoint } from "@/hooks/use-mobile";
 
 interface SidebarItemProps {
   title: string;
@@ -14,6 +15,11 @@ interface SidebarItemProps {
 export const SidebarItem = ({ title, icon: Icon, path, badge, collapsed }: SidebarItemProps) => {
   const location = useLocation();
   const isActive = location.pathname === path || location.pathname.startsWith(`${path}/`);
+  const isMobile = useBreakpoint("mobile");
+  const isTablet = useBreakpoint("tablet");
+  
+  // Always show text on mobile/tablet when collapsed
+  const showText = !collapsed || (collapsed && (isMobile || isTablet));
 
   const linkContent = (
     <Link
@@ -27,18 +33,18 @@ export const SidebarItem = ({ title, icon: Icon, path, badge, collapsed }: Sideb
     >
       <div className={cn(
         "relative flex items-center justify-center",
-        collapsed ? "w-full" : "w-auto"
+        collapsed && !showText ? "w-full" : "w-auto"
       )}>
         <Icon className={cn("flex-shrink-0 h-5 w-5", isActive ? "text-purple-600" : "text-gray-500")} />
         
-        {badge && collapsed && (
+        {badge && collapsed && !showText && (
           <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
             {badge}
           </span>
         )}
       </div>
       
-      {!collapsed && (
+      {showText && (
         <>
           <span className="text-sm truncate">{title}</span>
           {badge && (
@@ -51,7 +57,7 @@ export const SidebarItem = ({ title, icon: Icon, path, badge, collapsed }: Sideb
     </Link>
   );
 
-  if (collapsed) {
+  if (collapsed && !isMobile && !isTablet) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>
