@@ -113,11 +113,7 @@ export function NotificationsDemo() {
   );
 
   function showNotificationWithTimer() {
-    showSuccess(
-      "This alert will close in 2 seconds", 
-      "Auto-closing", 
-      { timer: 2000, timerProgressBar: true }
-    );
+    showSuccess("This alert will close in 2 seconds", "Auto-closing", { timer: 2000, timerProgressBar: true });
   }
 
   function showPositionedNotification() {

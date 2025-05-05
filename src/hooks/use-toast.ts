@@ -170,7 +170,7 @@ function toast({ ...props }: Toast) {
 // Enhanced toast methods with better mobile support
 toast.success = (content: string) => {
   return toast({
-    variant: "success",
+    variant: "default",
     title: content,
     className: "bg-green-50 border-green-200 text-green-800",
   });
@@ -186,7 +186,7 @@ toast.error = (content: string) => {
 
 toast.warning = (content: string) => {
   return toast({
-    variant: "warning",
+    variant: "default",
     title: content,
     className: "bg-yellow-50 border-yellow-200 text-yellow-800",
   });

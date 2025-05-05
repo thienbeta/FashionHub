@@ -111,23 +111,23 @@ export const showConfirmation = (options: NotificationOptions) => {
 };
 
 // Success notification
-export const showSuccess = (text: string, title = 'Success') => {
-  return showNotification('success', { title, text });
+export const showSuccess = (text: string, title = 'Success', options = {}) => {
+  return showNotification('success', { title, text, ...options });
 };
 
 // Error notification
-export const showError = (text: string, title = 'Error') => {
-  return showNotification('error', { title, text });
+export const showError = (text: string, title = 'Error', options = {}) => {
+  return showNotification('error', { title, text, ...options });
 };
 
 // Warning notification
-export const showWarning = (text: string, title = 'Warning') => {
-  return showNotification('warning', { title, text });
+export const showWarning = (text: string, title = 'Warning', options = {}) => {
+  return showNotification('warning', { title, text, ...options });
 };
 
 // Info notification
-export const showInfo = (text: string, title = 'Information') => {
-  return showNotification('info', { title, text });
+export const showInfo = (text: string, title = 'Information', options = {}) => {
+  return showNotification('info', { title, text, ...options });
 };
 
 // Toast shortcuts
