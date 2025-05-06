@@ -38,6 +38,8 @@ import Profile from "./pages/user/Profile";
 import Cart from "./pages/user/Cart";
 import Checkout from "./pages/user/Checkout";
 import Orders from "./pages/user/Orders";
+import ViewProfile from "./pages/user/ViewProfile";
+import Messages from "./pages/user/Messages";
 
 // Staff Pages
 import StaffDashboard from "./pages/staff/StaffDashboard";
@@ -97,6 +99,8 @@ const App = () => (
             <Route path="/user/cart" element={<Cart />} />
             <Route path="/user/checkout" element={<Checkout />} />
             <Route path="/user/orders" element={<Orders />} />
+            <Route path="/user/messages" element={<Messages />} />
+            <Route path="/user/profile/:userId" element={<ViewProfile />} />
             
             {/* Staff Routes */}
             <Route path="/staff" element={<StaffDashboard />} />
