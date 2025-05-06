@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Package, Plus, Search, Filter, ArrowDownToLine } from "lucide-react";
 import { FormSidebar } from "@/components/forms/FormSidebar";
+import { cn } from "@/lib/utils";
 
 const StaffProducts = () => {
   return (
@@ -85,3 +86,4 @@ const StaffProducts = () => {
 };
 
 export default StaffProducts;
+
