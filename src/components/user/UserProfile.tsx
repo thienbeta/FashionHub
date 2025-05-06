@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Mail, User } from "lucide-react";
+import { MessageSquare, Mail, User, Globe, MapPin, Users } from "lucide-react";
 import { MessageForm } from "./MessageForm";
 
 interface UserProfileProps {
@@ -17,6 +17,10 @@ interface UserProfileProps {
   joinDate: string;
   email?: string;
   isCurrentUser?: boolean;
+  location?: string;
+  website?: string;
+  followers?: number;
+  following?: number;
 }
 
 export const UserProfile = ({
@@ -28,6 +32,10 @@ export const UserProfile = ({
   joinDate,
   email,
   isCurrentUser = false,
+  location,
+  website,
+  followers,
+  following,
 }: UserProfileProps) => {
   return (
     <div className="container mx-auto py-6 px-4">
@@ -91,7 +99,52 @@ export const UserProfile = ({
                   </p>
                 </div>
               )}
+
+              {location && (
+                <div>
+                  <h3 className="font-medium text-gray-700 mb-1">Location</h3>
+                  <p className="text-gray-600 flex items-center">
+                    <MapPin className="h-4 w-4 mr-2 text-gray-400" />
+                    {location}
+                  </p>
+                </div>
+              )}
+
+              {website && (
+                <div>
+                  <h3 className="font-medium text-gray-700 mb-1">Website</h3>
+                  <p className="text-gray-600 flex items-center">
+                    <Globe className="h-4 w-4 mr-2 text-gray-400" />
+                    <a href={`https://${website.replace(/^https?:\/\//, '')}`} 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       className="text-purple-600 hover:underline">
+                      {website}
+                    </a>
+                  </p>
+                </div>
+              )}
             </div>
+
+            {(followers !== undefined || following !== undefined) && (
+              <div className="flex gap-4 mt-2">
+                {followers !== undefined && (
+                  <div className="flex items-center">
+                    <Users className="h-4 w-4 mr-1 text-gray-400" />
+                    <span className="font-medium mr-1">{followers}</span> 
+                    <span className="text-gray-500">Followers</span>
+                  </div>
+                )}
+                
+                {following !== undefined && (
+                  <div className="flex items-center">
+                    <Users className="h-4 w-4 mr-1 text-gray-400" />
+                    <span className="font-medium mr-1">{following}</span>
+                    <span className="text-gray-500">Following</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </CardContent>
         
