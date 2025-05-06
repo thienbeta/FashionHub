@@ -58,6 +58,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminStaff from "./pages/admin/AdminStaff";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminInvoices from "./pages/admin/AdminInvoices";
 
 const queryClient = new QueryClient();
 
@@ -125,6 +126,7 @@ const App = () => (
             <Route path="/admin/orders" element={<StaffOrders />} />
             <Route path="/admin/inventory" element={<StaffInventory />} />
             <Route path="/admin/analytics" element={<NotFound />} />
+            <Route path="/admin/invoices" element={<AdminInvoices />} />
             
             {/* Admin Form Routes */}
             <Route path="/admin/inventory/form" element={<InventoryForm />} />
