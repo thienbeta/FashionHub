@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -11,7 +10,10 @@ import {
   Filter,
   RefreshCw,
   Download,
-  ArrowUpDown
+  ArrowUpDown,
+  Edit,
+  Trash,
+  Eye
 } from "lucide-react";
 import { 
   Card,
@@ -45,6 +47,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
+import { Link } from "react-router-dom";
 
 type Product = {
   id: string;
@@ -114,6 +118,7 @@ const StaffInventory = () => {
   const [products, setProducts] = useState<Product[]>(mockProducts);
   const [searchQuery, setSearchQuery] = useState("");
   const [openProductForm, setOpenProductForm] = useState(false);
+  const { toast } = useToast();
   
   const form = useForm({
     defaultValues: {
@@ -151,40 +156,40 @@ const StaffInventory = () => {
   return (
     <div className="py-6 space-y-8">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">Inventory Management</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Inventory Management</h1>
         <p className="text-gray-500">Track and manage your product inventory</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-gradient-to-br from-purple-50 to-white border-purple-100">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xl text-gray-700">Total Products</CardTitle>
+            <CardTitle className="text-lg text-gray-700">Total Products</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold">{products.length}</p>
+            <p className="text-3xl font-bold text-purple-700">{products.length}</p>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gradient-to-br from-yellow-50 to-white border-yellow-100">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xl text-gray-700">Low Stock Items</CardTitle>
+            <CardTitle className="text-lg text-gray-700">Low Stock Items</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold">{products.filter(p => p.status === "Low Stock").length}</p>
+            <p className="text-3xl font-bold text-yellow-700">{products.filter(p => p.status === "Low Stock").length}</p>
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gradient-to-br from-red-50 to-white border-red-100">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xl text-gray-700">Out of Stock</CardTitle>
+            <CardTitle className="text-lg text-gray-700">Out of Stock</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold">{products.filter(p => p.status === "Out of Stock").length}</p>
+            <p className="text-3xl font-bold text-red-700">{products.filter(p => p.status === "Out of Stock").length}</p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-lg border shadow-sm">
         <div className="relative w-full sm:w-auto max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <Input 
@@ -195,139 +200,42 @@ const StaffInventory = () => {
           />
         </div>
         
-        <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <Button variant="outline" className="flex items-center gap-2" size="sm">
             <Filter className="h-4 w-4" />
-            <span>Filter</span>
+            <span className="hidden sm:inline">Filter</span>
           </Button>
-          <Button variant="outline" className="flex items-center gap-2" size="sm">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2" 
+            size="sm"
+            onClick={() => {
+              toast({ 
+                title: "Inventory refreshed", 
+                description: "Your inventory data has been updated." 
+              });
+            }}
+          >
             <RefreshCw className="h-4 w-4" />
-            <span>Refresh</span>
+            <span className="hidden sm:inline">Refresh</span>
           </Button>
           <Button variant="outline" className="flex items-center gap-2" size="sm">
             <Download className="h-4 w-4" />
-            <span>Export</span>
+            <span className="hidden sm:inline">Export</span>
           </Button>
-          <Dialog open={openProductForm} onOpenChange={setOpenProductForm}>
-            <DialogTrigger asChild>
-              <Button className="gap-2" size="sm">
-                <Plus className="h-4 w-4" />
-                Add Product
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Add New Inventory Item</DialogTitle>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={handleSubmit} className="space-y-4 py-4">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Product Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter product name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="sku"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>SKU</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter SKU number" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="quantity"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Initial Quantity</FormLabel>
-                        <FormControl>
-                          <Input type="number" min="0" placeholder="0" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="category"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Category</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select category" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="Clothing">Clothing</SelectItem>
-                              <SelectItem value="Footwear">Footwear</SelectItem>
-                              <SelectItem value="Accessories">Accessories</SelectItem>
-                              <SelectItem value="Electronics">Electronics</SelectItem>
-                              <SelectItem value="Home">Home</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="location"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Storage Location</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select location" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="Warehouse A">Warehouse A</SelectItem>
-                              <SelectItem value="Warehouse B">Warehouse B</SelectItem>
-                              <SelectItem value="Warehouse C">Warehouse C</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setOpenProductForm(false)}>Cancel</Button>
-                    <Button type="submit">Save Product</Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
+          <Link to="/staff/inventory/form">
+            <Button className="gap-2" size="sm">
+              <Plus className="h-4 w-4" />
+              <span>Add Item</span>
+            </Button>
+          </Link>
         </div>
       </div>
 
-      <div className="border rounded-lg shadow-sm bg-white">
+      <div className="border rounded-lg shadow-sm bg-white overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="bg-gray-50">
               <TableHead className="w-[300px]">
                 <div className="flex items-center gap-2">
                   Product
@@ -338,14 +246,15 @@ const StaffInventory = () => {
               <TableHead className="text-right">In Stock</TableHead>
               <TableHead className="text-right">Reserved</TableHead>
               <TableHead className="text-center">Status</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Location</TableHead>
+              <TableHead className="hidden md:table-cell">Category</TableHead>
+              <TableHead className="hidden md:table-cell">Location</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredProducts.length > 0 ? (
               filteredProducts.map(product => (
-                <TableRow key={product.id}>
+                <TableRow key={product.id} className="hover:bg-gray-50">
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
                       <Package className="h-4 w-4 text-purple-500" />
@@ -367,20 +276,33 @@ const StaffInventory = () => {
                       {product.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{product.category}</TableCell>
-                  <TableCell>{product.location}</TableCell>
+                  <TableCell className="hidden md:table-cell">{product.category}</TableCell>
+                  <TableCell className="hidden md:table-cell">{product.location}</TableCell>
+                  <TableCell>
+                    <div className="flex justify-end gap-1">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500">
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-6 text-gray-500">
+                <TableCell colSpan={8} className="text-center py-6 text-gray-500">
                   No products found matching your search criteria
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
-        <div className="py-3 px-4 bg-gray-50 border-t flex items-center justify-between">
+        <div className="py-3 px-4 bg-gray-50 border-t flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-sm text-gray-500">
             Showing <span className="font-medium">{filteredProducts.length}</span> of <span className="font-medium">{products.length}</span> products
           </p>

@@ -32,6 +32,7 @@ export const MessageForm = ({
 }: MessageFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const [charCount, setCharCount] = useState(initialMessage.length);
 
   const form = useForm<MessageFormValues>({
     resolver: zodResolver(messageSchema),
@@ -55,6 +56,7 @@ export const MessageForm = ({
       });
       
       form.reset({ message: "" });
+      setCharCount(0);
       
       if (onSuccess) {
         onSuccess();
@@ -71,6 +73,11 @@ export const MessageForm = ({
     }
   };
 
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCharCount(e.target.value.length);
+    form.setValue("message", e.target.value);
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -79,15 +86,19 @@ export const MessageForm = ({
           name="message"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Message</FormLabel>
+              <FormLabel className="text-gray-700">Message to {recipientName}</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder={`Write your message to ${recipientName}...`}
-                  className="min-h-[120px]"
+                  className="min-h-[120px] resize-none border-purple-100 focus-visible:ring-purple-500"
                   {...field}
+                  onChange={handleTextChange}
                 />
               </FormControl>
-              <FormMessage />
+              <div className="flex justify-between items-center mt-1">
+                <FormMessage />
+                <div className="text-xs text-gray-500">{charCount}/1000</div>
+              </div>
             </FormItem>
           )}
         />
@@ -96,7 +107,7 @@ export const MessageForm = ({
           <Button 
             type="submit" 
             disabled={isSubmitting}
-            className="bg-purple-600 hover:bg-purple-700"
+            className="bg-purple-600 hover:bg-purple-700 transition-all"
           >
             <Send className="mr-2 h-4 w-4" />
             {isSubmitting ? "Sending..." : "Send Message"}

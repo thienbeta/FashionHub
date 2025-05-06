@@ -3,7 +3,15 @@ import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel } from "@/components/ui/sidebar";
 import { Link, useLocation } from "react-router-dom";
-import { FileText, ClipboardList, Package, TruckIcon, TagIcon, ShoppingCart, ChevronLeft } from "lucide-react";
+import { 
+  FileText, 
+  ClipboardList, 
+  Package, 
+  TruckIcon, 
+  TagIcon, 
+  ShoppingCart, 
+  ChevronLeft 
+} from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { successToast } from "@/utils/notifications";
@@ -65,11 +73,11 @@ const formOptions: FormOption[] = [
 interface FormSidebarProps {
   activeFormId?: string;
   onFormSelect?: (formId: string) => void;
+  collapsed?: boolean;
 }
 
-export const FormSidebar = ({ activeFormId, onFormSelect }: FormSidebarProps) => {
+export const FormSidebar = ({ activeFormId, onFormSelect, collapsed = false }: FormSidebarProps) => {
   const [selectedFormId, setSelectedFormId] = useState<string>(activeFormId || "");
-  const [collapsed, setCollapsed] = useState<boolean>(false);
   const location = useLocation();
   const isAdmin = location.pathname.includes('/admin');
   const isMobile = useBreakpoint("mobile");
@@ -87,14 +95,9 @@ export const FormSidebar = ({ activeFormId, onFormSelect }: FormSidebarProps) =>
       onFormSelect(formId);
     }
   };
-  
-  const toggleCollapsed = () => {
-    setCollapsed(!collapsed);
-    successToast(collapsed ? "Sidebar expanded" : "Sidebar collapsed");
-  };
 
   // Determine if we should show text in collapsed state (always true on mobile/tablet)
-  const showText = !collapsed || (collapsed && (isMobile || isTablet));
+  const showText = !collapsed || isMobile || isTablet;
   
   // Adjust paths based on whether we're in admin or staff section
   const adjustedFormOptions = formOptions.map(form => ({
@@ -104,26 +107,16 @@ export const FormSidebar = ({ activeFormId, onFormSelect }: FormSidebarProps) =>
 
   return (
     <Sidebar className={cn(
-      "border-r border-gray-200 bg-white transition-all duration-300",
-      collapsed 
-        ? (isMobile || isTablet ? "w-[170px]" : "w-[60px]") 
-        : "w-64"
+      "border-r border-purple-100 bg-white h-full transition-all duration-300 ease-in-out shadow-sm",
+      collapsed && !(isMobile || isTablet) ? "w-[60px]" : "w-64"
     )}>
-      <div className="flex items-center justify-between p-3 border-b border-gray-200">
+      <div className="flex items-center justify-between p-3 border-b border-purple-100">
         <h2 className={cn(
-          "font-medium text-gray-700 transition-opacity duration-300",
+          "font-medium text-gray-800 transition-opacity duration-300",
           collapsed && !showText ? "opacity-0 w-0" : "opacity-100"
         )}>
           Forms
         </h2>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-gray-500 hover:bg-gray-100"
-          onClick={toggleCollapsed}
-        >
-          <ChevronLeft className={cn("h-5 w-5 transition-transform", collapsed && "rotate-180")} />
-        </Button>
       </div>
       <SidebarContent>
         <SidebarGroup>
@@ -133,8 +126,8 @@ export const FormSidebar = ({ activeFormId, onFormSelect }: FormSidebarProps) =>
             </SidebarGroupLabel>
           )}
           {showText && (
-            <SidebarGroupLabel className="text-gray-500 font-medium px-3 py-4 text-base sm:text-lg">
-              Forms
+            <SidebarGroupLabel className="text-gray-500 font-medium px-3 py-4 text-sm">
+              FORM NAVIGATION
             </SidebarGroupLabel>
           )}
           <div className="flex flex-col space-y-1 px-2">
@@ -144,7 +137,7 @@ export const FormSidebar = ({ activeFormId, onFormSelect }: FormSidebarProps) =>
                   <Link
                     to={form.path}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 sm:py-3 text-sm sm:text-base rounded-md cursor-pointer transition-colors",
+                      "flex items-center gap-3 px-3 py-2.5 text-sm rounded-md cursor-pointer transition-all",
                       selectedFormId === form.id
                         ? "bg-purple-500 text-white font-medium"
                         : "bg-white text-gray-700 hover:bg-purple-50 hover:text-purple-600",
@@ -153,11 +146,11 @@ export const FormSidebar = ({ activeFormId, onFormSelect }: FormSidebarProps) =>
                     onClick={() => handleFormSelect(form.id)}
                   >
                     <form.icon className={cn(
-                      "h-4 w-4 sm:h-5 sm:w-5",
+                      "h-5 w-5",
                       selectedFormId === form.id ? "text-white" : "text-purple-500"
                     )} />
                     {showText && (
-                      <span className="text-sm sm:text-base truncate">{form.name}</span>
+                      <span className="text-sm truncate">{form.name}</span>
                     )}
                   </Link>
                 </TooltipTrigger>
