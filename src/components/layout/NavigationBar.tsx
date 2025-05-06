@@ -19,8 +19,8 @@ export const NavigationBar = ({ className }: NavigationBarProps) => {
   const location = useLocation();
   const currentPath = location.pathname;
   
-  // Don't render the navigation bar on admin/chat route
-  if (currentPath === "/admin/chat") {
+  // Don't render the navigation bar on any admin routes
+  if (currentPath.startsWith('/admin')) {
     return null;
   }
   
