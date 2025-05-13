@@ -1,50 +1,32 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
+import AdminLayout from "@/components/layout/AdminLayout";
+import UserLayout from "@/components/layout/UserLayout";
 
-// Pages
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-
-// Product Pages
 import ProductList from "./pages/products/ProductList";
 import ProductDetail from "./pages/products/ProductDetail";
-
-// Combo Pages
 import CombosList from "./pages/combos/CombosList";
 import ComboDetail from "./pages/combos/ComboDetail";
-
-// Blog Pages
 import BlogsList from "./pages/blogs/BlogsList";
 import BlogDetail from "./pages/blogs/BlogDetail";
-
-// Favorites Page
 import FavoritesList from "./pages/favorites/FavoritesList";
-
-// Contact Page
 import Contact from "./pages/contact/Contact";
-
-// About Page
 import About from "./pages/about/About";
-
-// Auth Pages
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
-
-// User Pages
 import Profile from "./pages/user/Profile";
 import Cart from "./pages/user/Cart";
 import Checkout from "./pages/user/Checkout";
 import Orders from "./pages/user/Orders";
 import ViewProfile from "./pages/user/ViewProfile";
 import Messages from "./pages/user/Messages";
-
-// Staff Pages
 import StaffDashboard from "./pages/staff/StaffDashboard";
 import StaffProducts from "./pages/staff/StaffProducts";
 import StaffOrders from "./pages/staff/StaffOrders";
@@ -55,8 +37,6 @@ import ProductsForm from "./pages/staff/ProductsForm";
 import ShippingForm from "./pages/staff/ShippingForm";
 import OrdersForm from "./pages/staff/OrdersForm";
 import InvoiceForm from "./pages/staff/InvoiceForm";
-
-// Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminStaff from "./pages/admin/AdminStaff";
@@ -70,81 +50,63 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AppShell>
-          <Toaster />
-          <Sonner />
           <Routes>
-            <Route path="/" element={<Index />} />
-            
-            {/* Product Routes */}
-            <Route path="/products" element={<ProductList />} />
-            <Route path="/products/:id" element={<ProductDetail />} />
-            
-            {/* Combo Routes */}
-            <Route path="/combos" element={<CombosList />} />
-            <Route path="/combos/:id" element={<ComboDetail />} />
-            
-            {/* Blog Routes */}
-            <Route path="/blogs" element={<BlogsList />} />
-            <Route path="/blogs/:id" element={<BlogDetail />} />
-            
-            {/* Favorites */}
-            <Route path="/favorites" element={<FavoritesList />} />
-            
-            {/* Contact */}
-            <Route path="/contact" element={<Contact />} />
-            
-            {/* About */}
-            <Route path="/about" element={<About />} />
+            <Route path="/" element={<UserLayout />}>
+              <Route index element={<Index />} />
+              <Route path="products" element={<ProductList />} />
+              <Route path="products/:id" element={<ProductDetail />} />
+              <Route path="combos" element={<CombosList />} />
+              <Route path="combos/:id" element={<ComboDetail />} />
+              <Route path="blogs" element={<BlogsList />} />
+              <Route path="blogs/:id" element={<BlogDetail />} />
+              <Route path="favorites" element={<FavoritesList />} />
+              <Route path="contact" element={<Contact />} />
+              <Route path="about" element={<About />} />
+              <Route path="auth/login" element={<Login />} />
+              <Route path="auth/register" element={<Register />} />
+              <Route path="auth/forgot-password" element={<ForgotPassword />} />
+              <Route path="user/profile" element={<Profile />} />
+              <Route path="user/cart" element={<Cart />} />
+              <Route path="user/checkout" element={<Checkout />} />
+              <Route path="user/orders" element={<Orders />} />
+              <Route path="user/messages" element={<Messages />} />
+              <Route path="user/profile/:userId" element={<ViewProfile />} />
+            </Route>
 
-            {/* Auth Routes */}
-            <Route path="/auth/login" element={<Login />} />
-            <Route path="/auth/register" element={<Register />} />
-            <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-            
-            {/* User Routes */}
-            <Route path="/user/profile" element={<Profile />} />
-            <Route path="/user/cart" element={<Cart />} />
-            <Route path="/user/checkout" element={<Checkout />} />
-            <Route path="/user/orders" element={<Orders />} />
-            <Route path="/user/messages" element={<Messages />} />
-            <Route path="/user/profile/:userId" element={<ViewProfile />} />
-            
-            {/* Staff Routes */}
-            <Route path="/staff" element={<StaffDashboard />} />
-            <Route path="/staff/products" element={<StaffProducts />} />
-            <Route path="/staff/orders" element={<StaffOrders />} />
-            <Route path="/staff/inventory" element={<StaffInventory />} />
-            
-            {/* Staff Form Routes */}
-            <Route path="/staff/inventory/form" element={<InventoryForm />} />
-            <Route path="/staff/purchase-orders/form" element={<PurchaseOrdersForm />} />
-            <Route path="/staff/products/form" element={<ProductsForm />} />
-            <Route path="/staff/shipping/form" element={<ShippingForm />} />
-            <Route path="/staff/orders/form" element={<OrdersForm />} />
-            <Route path="/staff/invoice/form" element={<InvoiceForm />} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/staff" element={<AdminStaff />} />
-            <Route path="/admin/settings" element={<AdminSettings />} />
-            <Route path="/admin/products" element={<StaffProducts />} />
-            <Route path="/admin/orders" element={<StaffOrders />} />
-            <Route path="/admin/inventory" element={<StaffInventory />} />
-            <Route path="/admin/analytics" element={<NotFound />} />
-            <Route path="/admin/invoices" element={<AdminInvoices />} />
-            
-            {/* Admin Form Routes */}
-            <Route path="/admin/inventory/form" element={<InventoryForm />} />
-            <Route path="/admin/purchase-orders/form" element={<PurchaseOrdersForm />} />
-            <Route path="/admin/products/form" element={<ProductsForm />} />
-            <Route path="/admin/shipping/form" element={<ShippingForm />} />
-            <Route path="/admin/orders/form" element={<OrdersForm />} />
-            <Route path="/admin/invoice/form" element={<InvoiceForm />} />
-            
-            {/* 404 Route */}
+            <Route path="/staff" element={<AdminLayout role="staff" />}>
+              <Route index element={<StaffDashboard />} />
+              <Route path="products" element={<StaffProducts />} />
+              <Route path="orders" element={<StaffOrders />} />
+              <Route path="inventory" element={<StaffInventory />} />
+              <Route path="inventory/form" element={<InventoryForm />} />
+              <Route path="purchase-orders/form" element={<PurchaseOrdersForm />} />
+              <Route path="products/form" element={<ProductsForm />} />
+              <Route path="shipping/form" element={<ShippingForm />} />
+              <Route path="orders/form" element={<OrdersForm />} />
+              <Route path="invoice/form" element={<InvoiceForm />} />
+            </Route>
+
+            <Route path="/admin" element={<AdminLayout role="admin" />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="staff" element={<AdminStaff />} />
+              <Route path="settings" element={<AdminSettings />} />
+              <Route path="products" element={<StaffProducts />} />
+              <Route path="orders" element={<StaffOrders />} />
+              <Route path="inventory" element={<StaffInventory />} />
+              <Route path="invoices" element={<AdminInvoices />} />
+              <Route path="inventory/form" element={<InventoryForm />} />
+              <Route path="purchase-orders/form" element={<PurchaseOrdersForm />} />
+              <Route path="products/form" element={<ProductsForm />} />
+              <Route path="shipping/form" element={<ShippingForm />} />
+              <Route path="orders/form" element={<OrdersForm />} />
+              <Route path="invoice/form" element={<InvoiceForm />} />
+            </Route>
+
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <Toaster />
+          <Sonner />
         </AppShell>
       </TooltipProvider>
     </QueryClientProvider>
