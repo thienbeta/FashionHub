@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -10,35 +9,40 @@ interface SidebarItemProps {
   path: string;
   badge?: string;
   collapsed: boolean;
+  color?: string;
 }
 
-export const SidebarItem = ({ title, icon: Icon, path, badge, collapsed }: SidebarItemProps) => {
+export const SidebarItem = ({ title, icon: Icon, path, badge, collapsed, color }: SidebarItemProps) => {
   const location = useLocation();
   const isActive = location.pathname === path || location.pathname.startsWith(`${path}/`);
   const isMobile = useBreakpoint("mobile");
   const isTablet = useBreakpoint("tablet");
   
-  // Always show text on mobile/tablet when collapsed
   const showText = !collapsed || (collapsed && (isMobile || isTablet));
 
   const linkContent = (
     <Link
       to={path}
       className={cn(
-        "flex items-center gap-3 px-3 py-2.5 text-base rounded-md cursor-pointer transition-colors",
+        "flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer transition-colors",
         isActive
-          ? "bg-purple-100 text-purple-600 font-medium"
-          : "text-gray-600 hover:bg-purple-50 hover:text-purple-600"
+          ? "bg-crocus-100 text-crocus-600 font-medium"
+          : "text-gray-600 hover:bg-crocus-50 hover:text-crocus-600"
       )}
     >
       <div className={cn(
         "relative flex items-center justify-center",
         collapsed && !showText ? "w-full" : "w-auto"
       )}>
-        <Icon className={cn("flex-shrink-0 h-5 w-5", isActive ? "text-purple-600" : "text-gray-500")} />
+        <Icon
+          className={cn(
+            "flex-shrink-0 h-5 w-5",
+            isActive ? "text-crocus-600" : color || "text-gray-500"
+          )}
+        />
         
         {badge && collapsed && !showText && (
-          <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+          <span className="absolute -top-2 -right-2 bg-crocus-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
             {badge}
           </span>
         )}
@@ -48,7 +52,7 @@ export const SidebarItem = ({ title, icon: Icon, path, badge, collapsed }: Sideb
         <>
           <span className="text-sm truncate">{title}</span>
           {badge && (
-            <span className="ml-auto bg-purple-100 text-purple-600 text-xs rounded-full px-2 py-0.5 flex items-center justify-center">
+            <span className="ml-auto bg-crocus-100 text-crocus-600 text-xs rounded-full px-2 py-0.5 flex items-center justify-center">
               {badge}
             </span>
           )}

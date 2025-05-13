@@ -28,6 +28,9 @@ import FavoritesList from "./pages/favorites/FavoritesList";
 // Contact Page
 import Contact from "./pages/contact/Contact";
 
+// About Page
+import About from "./pages/about/About";
+
 // Auth Pages
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -90,6 +93,9 @@ const App = () => (
             {/* Contact */}
             <Route path="/contact" element={<Contact />} />
             
+            {/* About */}
+            <Route path="/about" element={<About />} />
+
             {/* Auth Routes */}
             <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/register" element={<Register />} />

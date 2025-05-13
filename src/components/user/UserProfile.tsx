@@ -1,11 +1,10 @@
-
 import React from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Mail, User, Globe, MapPin, Users } from "lucide-react";
+import { MessageSquare, Mail, User, Globe, MapPin, Users, Calendar, Info } from "lucide-react";
 import { MessageForm } from "./MessageForm";
 
 interface UserProfileProps {
@@ -28,7 +27,7 @@ export const UserProfile = ({
   fullName,
   username,
   avatarUrl,
-  bio = "No bio available",
+  bio = "Chưa có thông tin",
   joinDate,
   email,
   isCurrentUser = false,
@@ -63,12 +62,12 @@ export const UserProfile = ({
                 <DialogTrigger asChild>
                   <Button className="bg-purple-600 hover:bg-purple-700">
                     <MessageSquare className="mr-2 h-4 w-4" />
-                    Message
+                    Gửi tin nhắn
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Send a message to {fullName}</DialogTitle>
+                    <DialogTitle>Gửi tin nhắn đến {fullName}</DialogTitle>
                   </DialogHeader>
                   <MessageForm recipientId={userId} recipientName={fullName} />
                 </DialogContent>
@@ -80,21 +79,29 @@ export const UserProfile = ({
         <CardContent className="pt-6">
           <div className="space-y-4">
             <div>
-              <h3 className="font-medium text-gray-700 mb-1">About</h3>
+              <h3 className="font-medium text-gray-700 mb-1 flex items-center">
+                <Info className="h-4 w-4 mr-2 text-gray-400" />
+                Giới thiệu
+              </h3>
               <p className="text-gray-600">{bio}</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <h3 className="font-medium text-gray-700 mb-1">Member since</h3>
+                <h3 className="font-medium text-gray-700 mb-1 flex items-center">
+                  <Calendar className="h-4 w-4 mr-2 text-gray-400" />
+                  Tham gia từ
+                </h3>
                 <p className="text-gray-600">{joinDate}</p>
               </div>
               
               {email && (
                 <div>
-                  <h3 className="font-medium text-gray-700 mb-1">Contact</h3>
-                  <p className="text-gray-600 flex items-center">
+                  <h3 className="font-medium text-gray-700 mb-1 flex items-center">
                     <Mail className="h-4 w-4 mr-2 text-gray-400" />
+                    Liên hệ
+                  </h3>
+                  <p className="text-gray-600 flex items-center">
                     {email}
                   </p>
                 </div>
@@ -102,9 +109,11 @@ export const UserProfile = ({
 
               {location && (
                 <div>
-                  <h3 className="font-medium text-gray-700 mb-1">Location</h3>
-                  <p className="text-gray-600 flex items-center">
+                  <h3 className="font-medium text-gray-700 mb-1 flex items-center">
                     <MapPin className="h-4 w-4 mr-2 text-gray-400" />
+                    Vị trí
+                  </h3>
+                  <p className="text-gray-600 flex items-center">
                     {location}
                   </p>
                 </div>
@@ -112,9 +121,11 @@ export const UserProfile = ({
 
               {website && (
                 <div>
-                  <h3 className="font-medium text-gray-700 mb-1">Website</h3>
-                  <p className="text-gray-600 flex items-center">
+                  <h3 className="font-medium text-gray-700 mb-1 flex items-center">
                     <Globe className="h-4 w-4 mr-2 text-gray-400" />
+                    Website
+                  </h3>
+                  <p className="text-gray-600 flex items-center">
                     <a href={`https://${website.replace(/^https?:\/\//, '')}`} 
                        target="_blank" 
                        rel="noopener noreferrer"
@@ -132,7 +143,7 @@ export const UserProfile = ({
                   <div className="flex items-center">
                     <Users className="h-4 w-4 mr-1 text-gray-400" />
                     <span className="font-medium mr-1">{followers}</span> 
-                    <span className="text-gray-500">Followers</span>
+                    <span className="text-gray-500">Người theo dõi</span>
                   </div>
                 )}
                 
@@ -140,7 +151,7 @@ export const UserProfile = ({
                   <div className="flex items-center">
                     <Users className="h-4 w-4 mr-1 text-gray-400" />
                     <span className="font-medium mr-1">{following}</span>
-                    <span className="text-gray-500">Following</span>
+                    <span className="text-gray-500">Đang theo dõi</span>
                   </div>
                 )}
               </div>
@@ -150,7 +161,7 @@ export const UserProfile = ({
         
         <CardFooter className="border-t pt-4">
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="bg-gray-100 hover:bg-gray-200">Active Member</Badge>
+            <Badge variant="outline" className="bg-gray-100 hover:bg-gray-200">Thành viên tích cực</Badge>
           </div>
         </CardFooter>
       </Card>

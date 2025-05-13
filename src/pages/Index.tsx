@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
@@ -18,133 +17,132 @@ import { toast } from "@/hooks/use-toast";
 const featuredProducts = [
   {
     id: 1,
-    name: "Crocus Satin Dress",
+    name: "Váy lụa Crocus",
     price: 59.99,
     image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
     rating: 4.5,
     isFavorite: false,
     sizes: ["XS", "S", "M", "L", "XL"],
-    colors: ["Purple", "Black", "White"],
-    description: "Elegant satin dress in our signature Crocus purple."
+    colors: ["Tím", "Đen", "Trắng"],
+    description: "Váy lụa sang trọng với màu tím Crocus đặc trưng."
   },
   {
     id: 2,
-    name: "Crocus Casual Tee",
+    name: "Áo thun Crocus",
     price: 29.99,
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
     rating: 4.8,
     isFavorite: true,
     sizes: ["S", "M", "L", "XL"],
-    colors: ["Purple", "Gray", "White"],
-    description: "Comfortable everyday tee with a subtle Crocus design."
+    colors: ["Tím", "Xám", "Trắng"],
+    description: "Áo thun thoải mái hàng ngày với thiết kế Crocus tinh tế."
   },
   {
     id: 3,
-    name: "Crocus Formal Blazer",
+    name: "Áo khoác Crocus",
     price: 89.99,
     image: "https://images.unsplash.com/photo-1721322800607-8c38375eef04",
     rating: 4.7,
     isFavorite: false,
     sizes: ["S", "M", "L"],
-    colors: ["Navy", "Black"],
-    description: "Sophisticated blazer with Crocus-inspired lining."
+    colors: ["Xanh navy", "Đen"],
+    description: "Áo khoác tinh tế với lớp lót lấy cảm hứng từ Crocus."
   },
   {
     id: 4,
-    name: "Crocus Denim Collection",
+    name: "Bộ sưu tập Denim Crocus",
     price: 49.99,
     image: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
     rating: 4.6,
     isFavorite: false,
     sizes: ["XS", "S", "M", "L", "XL"],
-    colors: ["Light Blue", "Dark Blue", "Black"],
-    description: "Premium denim with Crocus-colored stitching."
+    colors: ["Xanh nhạt", "Xanh đậm", "Đen"],
+    description: "Denim cao cấp với đường may màu Crocus."
   },
   {
     id: 5,
-    name: "Crocus Summer Outfit",
+    name: "Trang phục mùa hè Crocus",
     price: 39.99,
     image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
     rating: 4.2,
     isFavorite: true,
     sizes: ["S", "M", "L"],
-    colors: ["Crocus", "White", "Beige"],
-    description: "Perfect light outfit for warm summer days."
+    colors: ["Tím Crocus", "Trắng", "Be"],
+    description: "Trang phục nhẹ nhàng hoàn hảo cho những ngày hè ấm áp."
   },
   {
     id: 6,
-    name: "Crocus Winter Collection",
+    name: "Bộ sưu tập mùa đông Crocus",
     price: 69.99,
     image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
     rating: 4.3,
     isFavorite: false,
     sizes: ["M", "L", "XL"],
-    colors: ["Purple", "White", "Gray"],
-    description: "Stay warm and stylish with our winter collection."
+    colors: ["Tím", "Trắng", "Xám"],
+    description: "Giữ ấm và phong cách với bộ sưu tập mùa đông của chúng tôi."
   },
 ];
 
 const trendingCombos = [
   {
     id: 1,
-    name: "Crocus Summer Ensemble",
+    name: "Bộ trang phục hè Crocus",
     price: 129.99,
     image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1",
     rating: 4.8,
     products: [1, 2, 5],
     isFavorite: true,
-    description: "Complete summer look with coordinated pieces."
+    description: "Bộ trang phục hè hoàn chỉnh với các mảnh phối hợp."
   },
   {
     id: 2,
-    name: "Crocus Office Attire",
+    name: "Trang phục công sở Crocus",
     price: 159.99,
     image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81",
     rating: 4.6,
     products: [3, 4, 6],
     isFavorite: false,
-    description: "Professional wardrobe essentials for the modern workplace."
+    description: "Những món đồ thiết yếu cho tủ quần áo chuyên nghiệp."
   },
   {
     id: 3,
-    name: "Crocus Weekend Casual",
+    name: "Trang phục cuối tuần Crocus",
     price: 99.99,
     image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
     rating: 4.7,
     products: [2, 4, 5],
     isFavorite: false,
-    description: "Relaxed pieces perfect for weekend activities."
+    description: "Những mảnh thoải mái hoàn hảo cho hoạt động cuối tuần."
   },
 ];
 
-// Featured blog posts for home page
 const featuredBlogs = [
   {
     id: "1",
-    title: "Summer 2025 Collection",
-    excerpt: "Discover our new summer collection featuring the hottest trends in fashion with the 2025 Pantone color.",
+    title: "Bộ sưu tập Hè 2025",
+    excerpt: "Khám phá bộ sưu tập hè mới với xu hướng thời trang hot nhất cùng màu Pantone 2025.",
     image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=crop&w=800&h=450",
-    date: "April 15, 2025",
+    date: "15 tháng 4, 2025",
     author: "Emma Johnson",
     authorImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=60&h=60",
-    category: "product"
+    category: "sản phẩm"
   },
   {
     id: "2",
-    title: "How to Style Crocus Purple",
-    excerpt: "Learn how to incorporate the trending Crocus Purple color into your wardrobe this season.",
+    title: "Cách phối đồ với màu Tím Crocus",
+    excerpt: "Học cách kết hợp màu Tím Crocus thịnh hành vào tủ quần áo của bạn trong mùa này.",
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&h=450",
-    date: "April 10, 2025",
+    date: "10 tháng 4, 2025",
     author: "Michael Chen",
     authorImage: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=60&h=60",
-    category: "product"
+    category: "sản phẩm"
   },
   {
     id: "3",
-    title: "Perfect Outfit Combinations",
-    excerpt: "Explore our curated outfit combinations that will elevate your style game.",
+    title: "Kết hợp trang phục hoàn hảo",
+    excerpt: "Khám phá các kết hợp trang phục được tuyển chọn để nâng tầm phong cách của bạn.",
     image: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&h=450",
-    date: "April 5, 2025",
+    date: "5 tháng 4, 2025",
     author: "Sophia Rodriguez",
     authorImage: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=60&h=60",
     category: "combo"
@@ -152,41 +150,36 @@ const featuredBlogs = [
 ];
 
 const Index = () => {
-  // State for quick purchase forms
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [quickViewProduct, setQuickViewProduct] = useState<number | null>(null);
   const [quickViewCombo, setQuickViewCombo] = useState<number | null>(null);
 
-  // Handle adding product to cart
-  const addToCart = (item: any, type: "product" | "combo") => {
+  const addToCart = (item: any, type: "sản phẩm" | "combo") => {
     const cartItem: CartItem = {
       id: item.id,
       name: item.name,
       image: item.image,
       price: item.price,
       quantity: 1,
-      type: type
+      type: type === "sản phẩm" ? "product" : "combo"
     };
     
-    if (type === "product" && selectedSize) {
+    if (type === "sản phẩm" && selectedSize) {
       cartItem.size = selectedSize;
     }
     
-    if (type === "product" && selectedColor) {
+    if (type === "sản phẩm" && selectedColor) {
       cartItem.color = selectedColor;
     }
     
-    // In a real app, you would dispatch to a cart context or store
-    console.log("Added to cart:", cartItem);
+    console.log("Đã thêm vào giỏ hàng:", cartItem);
     
-    // Show success toast
     toast({
-      title: "Added to cart",
-      description: `${item.name} has been added to your cart.`,
+      title: "Đã thêm vào giỏ hàng",
+      description: `${item.name} đã được thêm vào giỏ hàng của bạn.`,
     });
     
-    // Reset selections
     setSelectedSize("");
     setSelectedColor("");
     setQuickViewProduct(null);
@@ -200,22 +193,22 @@ const Index = () => {
         <div className="bg-gradient-to-r from-crocus-500/20 to-crocus-200/40 rounded-xl p-8 md:p-16 flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 space-y-6 text-center md:text-left">
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-              Discover the 2025 <span className="bg-gradient-to-r from-crocus-500 to-crocus-700 bg-clip-text text-transparent">Crocus</span> Collection
+              Khám phá bộ sưu tập <span className="bg-gradient-to-r from-crocus-500 to-crocus-700 bg-clip-text text-transparent">FashionHub</span> 2025
             </h1>
             <p className="text-lg text-gray-700 max-w-lg">
-              Elevate your style with the hottest Pantone color of 2025. Our new collection blends elegance with contemporary designs.
+              Nâng tầm phong cách của bạn với sản phẩm hot nhất năm 2025. Bộ sưu tập mới của chúng tôi kết hợp sự thanh lịch với thiết kế đương đại.
             </p>
             <div className="flex flex-wrap gap-4 justify-center md:justify-start">
               <Button asChild className="bg-crocus-500 hover:bg-crocus-600">
-                <Link to="/products">Shop Now</Link>
+                <Link to="/products">Mua sắm ngay</Link>
               </Button>
               <Button asChild variant="outline">
-                <Link to="/products/new">New Arrivals</Link>
+                <Link to="/products/new">Hàng mới về</Link>
               </Button>
               <Button asChild variant="outline" className="flex gap-2 items-center">
                 <Link to="/user/cart">
                   <ShoppingCart className="h-4 w-4" />
-                  <span>View Cart</span>
+                  <span>Xem giỏ hàng</span>
                 </Link>
               </Button>
             </div>
@@ -250,7 +243,7 @@ const Index = () => {
       
       {/* Features */}
       <section className="py-12">
-        <h2 className="text-3xl font-bold text-center mb-12">Why Choose Crocus Fashion</h2>
+        <h2 className="text-3xl font-bold text-center mb-12">Tại sao chọn FashionHub</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 text-center">
             <div className="w-12 h-12 bg-crocus-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -258,8 +251,8 @@ const Index = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold mb-2">Premium Quality</h3>
-            <p className="text-gray-600">Crafted with the finest materials for comfort and durability</p>
+            <h3 className="text-xl font-semibold mb-2">Chất lượng cao cấp</h3>
+            <p className="text-gray-600">Được làm từ những chất liệu tốt nhất cho sự thoải mái và độ bền</p>
           </div>
           
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 text-center">
@@ -268,8 +261,8 @@ const Index = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold mb-2">Fast Delivery</h3>
-            <p className="text-gray-600">Quick shipping and hassle-free returns on all orders</p>
+            <h3 className="text-xl font-semibold mb-2">Giao hàng nhanh</h3>
+            <p className="text-gray-600">Vận chuyển nhanh chóng và đổi trả dễ dàng cho tất cả đơn hàng</p>
           </div>
           
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 text-center">
@@ -278,8 +271,8 @@ const Index = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold mb-2">Sustainable Fashion</h3>
-            <p className="text-gray-600">Eco-friendly processes and materials for a better planet</p>
+            <h3 className="text-xl font-semibold mb-2">Thời trang bền vững</h3>
+            <p className="text-gray-600">Quy trình và vật liệu thân thiện với môi trường cho một hành tinh tốt đẹp hơn</p>
           </div>
         </div>
       </section>
@@ -287,9 +280,9 @@ const Index = () => {
       {/* Featured Products */}
       <section className="py-12">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold">Featured Products</h2>
+          <h2 className="text-3xl font-bold">Sản phẩm</h2>
           <Button asChild variant="link" className="text-crocus-600">
-            <Link to="/products">View All <span aria-hidden="true">→</span></Link>
+            <Link to="/products">Xem tất cả <span aria-hidden="true">→</span></Link>
           </Button>
         </div>
         
@@ -307,13 +300,13 @@ const Index = () => {
                 <div className="absolute top-2 right-2 flex flex-col gap-2">
                   <button 
                     className="p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors"
-                    aria-label={product.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                    aria-label={product.isFavorite ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
                   >
                     <Heart className={`h-5 w-5 ${product.isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
                   </button>
                   <button
                     className="p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors"
-                    aria-label="Quick view"
+                    aria-label="Xem nhanh"
                     onClick={() => setQuickViewProduct(product.id)}
                   >
                     <Package className="h-5 w-5 text-gray-600" />
@@ -346,16 +339,13 @@ const Index = () => {
                   </div>
                 </div>
                 
-                {/* Quick Purchase Button */}
-                <Button 
-                  className="w-full mt-3 bg-crocus-500 hover:bg-crocus-600"
-                  onClick={() => setQuickViewProduct(product.id)}
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" /> Quick Buy
-                </Button>
+<Button asChild className="w-full mt-3 bg-crocus-500 hover:bg-crocus-600">
+  <Link to={`/products/${product.id}`}>
+    <ShoppingCart className="h-4 w-4 mr-2" /> Xem chi tiết
+  </Link>
+</Button>
               </div>
               
-              {/* Quick Purchase Dialog */}
               {quickViewProduct === product.id && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
                   <Card className="w-full max-w-md overflow-hidden">
@@ -382,7 +372,7 @@ const Index = () => {
                       <div className="space-y-4">
                         {product.sizes && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Kích cỡ</label>
                             <div className="flex flex-wrap gap-2">
                               {product.sizes.map((size) => (
                                 <button
@@ -403,7 +393,7 @@ const Index = () => {
                         
                         {product.colors && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Màu sắc</label>
                             <div className="flex flex-wrap gap-2">
                               {product.colors.map((color) => (
                                 <button
@@ -424,10 +414,10 @@ const Index = () => {
                         
                         <Button 
                           className="w-full mt-4 bg-crocus-500 hover:bg-crocus-600"
-                          onClick={() => addToCart(product, "product")}
+                          onClick={() => addToCart(product, "sản phẩm")}
                           disabled={product.sizes && !selectedSize}
                         >
-                          <ShoppingCart className="h-4 w-4 mr-2" /> Add to Cart
+                          <ShoppingCart className="h-4 w-4 mr-2" /> Thêm vào giỏ hàng
                         </Button>
                       </div>
                     </CardContent>
@@ -442,9 +432,9 @@ const Index = () => {
       {/* Trending Combos */}
       <section className="py-12">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold">Trending Combos</h2>
+          <h2 className="text-3xl font-bold">Combo</h2>
           <Button asChild variant="link" className="text-crocus-600">
-            <Link to="/combos">View All <span aria-hidden="true">→</span></Link>
+            <Link to="/combos">Xem tất cả <span aria-hidden="true">→</span></Link>
           </Button>
         </div>
         
@@ -462,13 +452,13 @@ const Index = () => {
                 <div className="absolute top-2 right-2 flex flex-col gap-2">
                   <button 
                     className="p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors"
-                    aria-label={combo.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                    aria-label={combo.isFavorite ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
                   >
                     <Heart className={`h-5 w-5 ${combo.isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
                   </button>
                   <button
                     className="p-1.5 rounded-full bg-white/80 hover:bg-white transition-colors"
-                    aria-label="Quick view"
+                    aria-label="Xem nhanh"
                     onClick={() => setQuickViewCombo(combo.id)}
                   >
                     <Package className="h-5 w-5 text-gray-600" />
@@ -501,16 +491,14 @@ const Index = () => {
                   </div>
                 </div>
                 
-                {/* Quick Purchase Button */}
                 <Button 
                   className="w-full mt-3 bg-crocus-500 hover:bg-crocus-600"
                   onClick={() => setQuickViewCombo(combo.id)}
                 >
-                  <ShoppingCart className="h-4 w-4 mr-2" /> Quick Buy
+                  <ShoppingCart className="h-4 w-4 mr-2" /> Mua nhanh
                 </Button>
               </div>
               
-              {/* Quick Purchase Dialog for Combos */}
               {quickViewCombo === combo.id && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
                   <Card className="w-full max-w-md overflow-hidden">
@@ -535,7 +523,7 @@ const Index = () => {
                       <p className="text-gray-600 mb-4">{combo.description}</p>
                       
                       <div className="mb-4">
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Included in this combo:</h4>
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">Bao gồm trong combo này:</h4>
                         <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
                           {combo.products.map((productId) => {
                             const product = featuredProducts.find(p => p.id === productId);
@@ -550,7 +538,7 @@ const Index = () => {
                         className="w-full mt-4 bg-crocus-500 hover:bg-crocus-600"
                         onClick={() => addToCart(combo, "combo")}
                       >
-                        <ShoppingCart className="h-4 w-4 mr-2" /> Add Bundle to Cart
+                        <ShoppingCart className="h-4 w-4 mr-2" /> Thêm combo vào giỏ hàng
                       </Button>
                     </CardContent>
                   </Card>
@@ -564,9 +552,9 @@ const Index = () => {
       {/* Featured Blog Posts */}
       <section className="py-12">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold">Fashion Blog</h2>
+          <h2 className="text-3xl font-bold">Bài viết</h2>
           <Button asChild variant="link" className="text-crocus-600">
-            <Link to="/blogs">View All <span aria-hidden="true">→</span></Link>
+            <Link to="/blogs">Xem tất cả <span aria-hidden="true">→</span></Link>
           </Button>
         </div>
         
@@ -580,18 +568,18 @@ const Index = () => {
       {/* Newsletter */}
       <section className="py-12 bg-crocus-50 rounded-xl">
         <div className="text-center max-w-xl mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-4">Subscribe to Our Newsletter</h2>
+          <h2 className="text-3xl font-bold mb-4">Đăng ký nhận tin tức</h2>
           <p className="text-gray-600 mb-6">
-            Stay updated with our latest collections and exclusive offers
+            Cập nhật các bộ sưu tập mới nhất và ưu đãi độc quyền
           </p>
           <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="email"
-              placeholder="Enter your email"
+              placeholder="Nhập email của bạn"
               className="flex-grow px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-crocus-500"
             />
             <Button className="bg-crocus-500 hover:bg-crocus-600">
-              Subscribe
+              Đăng ký
             </Button>
           </div>
         </div>

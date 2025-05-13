@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,8 +10,8 @@ import { useToast } from "@/components/ui/use-toast";
 
 const messageSchema = z.object({
   message: z.string()
-    .min(1, { message: "Message cannot be empty" })
-    .max(1000, { message: "Message cannot exceed 1000 characters" }),
+    .min(1, { message: "Tin nhắn không được để trống" })
+    .max(1000, { message: "Tin nhắn không được vượt quá 1000 ký tự" }),
 });
 
 type MessageFormValues = z.infer<typeof messageSchema>;
@@ -44,15 +43,12 @@ export const MessageForm = ({
   const onSubmit = async (data: MessageFormValues) => {
     setIsSubmitting(true);
     try {
-      // This would be replaced with actual API call in a real app
-      console.log("Sending message to", recipientId, ":", data.message);
-      
-      // Simulate API delay
+      console.log("Đang gửi tin nhắn đến", recipientId, ":", data.message);
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
-        title: "Message sent",
-        description: `Your message has been sent to ${recipientName}`,
+        title: "Tin nhắn đã được gửi",
+        description: `Tin nhắn của bạn đã được gửi đến ${recipientName}`,
       });
       
       form.reset({ message: "" });
@@ -62,11 +58,11 @@ export const MessageForm = ({
         onSuccess();
       }
     } catch (error) {
-      console.error("Failed to send message:", error);
+      console.error("Gửi tin nhắn thất bại:", error);
       toast({
         variant: "destructive",
-        title: "Failed to send message",
-        description: "Please try again later",
+        title: "Gửi tin nhắn thất bại",
+        description: "Vui lòng thử lại sau",
       });
     } finally {
       setIsSubmitting(false);
@@ -86,11 +82,11 @@ export const MessageForm = ({
           name="message"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-gray-700">Message to {recipientName}</FormLabel>
+              <FormLabel className="text-gray-700">Tin nhắn đến {recipientName}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder={`Write your message to ${recipientName}...`}
-                  className="min-h-[120px] resize-none border-purple-100 focus-visible:ring-purple-500"
+                  placeholder={`Viết tin nhắn đến ${recipientName}...`}
+                  className="min-h-[100px] md:min-h-[150px] resize-none border-purple-100 focus-visible:ring-purple-500"
                   {...field}
                   onChange={handleTextChange}
                 />
@@ -107,10 +103,10 @@ export const MessageForm = ({
           <Button 
             type="submit" 
             disabled={isSubmitting}
-            className="bg-purple-600 hover:bg-purple-700 transition-all"
+            className="bg-purple-600 hover:bg-purple-700 transition-all w-full md:w-auto"
           >
             <Send className="mr-2 h-4 w-4" />
-            {isSubmitting ? "Sending..." : "Send Message"}
+            {isSubmitting ? "Đang gửi..." : "Gửi tin nhắn"}
           </Button>
         </div>
       </form>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, LogIn, Mail, User, Lock } from "lucide-react";
@@ -27,28 +26,28 @@ export const LoginForm = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Login form submitted:", formData);
-    // Handle login logic here
+    console.log("Form đăng nhập đã được gửi:", formData);
+    // Xử lý logic đăng nhập tại đây
   };
 
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
+        <CardTitle className="text-2xl font-bold text-center">Đăng nhập</CardTitle>
         <CardDescription className="text-center">
-          Enter your credentials to access your account
+          Nhập thông tin đăng nhập của bạn để truy cập tài khoản
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Username / Email</Label>
+            <Label htmlFor="username">Tài khoản</Label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4" />
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4" />
               <Input
                 id="username"
                 name="username"
-                placeholder="your@email.com"
+                placeholder="Nhập tài khoản"
                 type="text"
                 required
                 value={formData.username}
@@ -59,12 +58,12 @@ export const LoginForm = () => {
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Mật khẩu</Label>
               <Link
                 to="/auth/forgot-password"
                 className="text-sm font-medium text-crocus-600 hover:text-crocus-700"
               >
-                Forgot password?
+                Quên mật khẩu?
               </Link>
             </div>
             <div className="relative">
@@ -73,7 +72,7 @@ export const LoginForm = () => {
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder="Nhập mật khẩu"
                 required
                 value={formData.password}
                 onChange={handleChange}
@@ -98,11 +97,11 @@ export const LoginForm = () => {
               htmlFor="rememberMe"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Remember me
+              Ghi nhớ
             </label>
           </div>
           <Button type="submit" className="w-full bg-crocus-500 hover:bg-crocus-600">
-            <LogIn className="mr-2 h-4 w-4" /> Login
+            <LogIn className="mr-2 h-4 w-4" /> Đăng nhập
           </Button>
           
           <div className="relative my-4">
@@ -110,7 +109,7 @@ export const LoginForm = () => {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              <span className="bg-background px-2 text-muted-foreground">Hoặc tiếp tục với</span>
             </div>
           </div>
           
@@ -150,9 +149,9 @@ export const LoginForm = () => {
       </CardContent>
       <CardFooter className="flex flex-col">
         <div className="text-center text-sm">
-          Don't have an account?{" "}
+          Chưa có tài khoản?{" "}
           <Link to="/auth/register" className="font-medium text-crocus-600 hover:text-crocus-700">
-            Register here
+            Đăng ký
           </Link>
         </div>
       </CardFooter>

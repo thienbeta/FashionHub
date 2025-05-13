@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageForm } from "./MessageForm";
 import { cn } from "@/lib/utils";
@@ -22,25 +21,24 @@ interface MessageThreadProps {
   user: User;
 }
 
-// Mock data for demo purposes
 const MOCK_MESSAGES: Record<string, Message[]> = {
   '1': [
     {
       id: 'm1',
       senderId: 'user1',
-      content: 'Hey, I was wondering about your latest product...',
+      content: 'Chào, tôi muốn hỏi về sản phẩm mới nhất của bạn...',
       timestamp: '2023-05-15T14:30:00Z',
     },
     {
       id: 'm2',
       senderId: 'currentUser',
-      content: 'Hi there! Which product are you interested in?',
+      content: 'Xin chào! Bạn quan tâm đến sản phẩm nào?',
       timestamp: '2023-05-15T14:35:00Z',
     },
     {
       id: 'm3',
       senderId: 'user1',
-      content: 'The new wireless headphones. Do they have noise cancellation?',
+      content: 'Tai nghe không dây mới. Chúng có tính năng khử tiếng ồn không?',
       timestamp: '2023-05-15T14:40:00Z',
     },
   ],
@@ -48,19 +46,19 @@ const MOCK_MESSAGES: Record<string, Message[]> = {
     {
       id: 'm1',
       senderId: 'user2',
-      content: 'I received my order today, thank you!',
+      content: 'Tôi đã nhận được đơn hàng hôm nay, cảm ơn bạn!',
       timestamp: '2023-05-14T10:15:00Z',
     },
     {
       id: 'm2',
       senderId: 'currentUser',
-      content: "You're welcome! I'm glad everything arrived safely.",
+      content: "Không có gì! Tôi rất vui khi mọi thứ đến nơi an toàn.",
       timestamp: '2023-05-14T10:20:00Z',
     },
     {
       id: 'm3',
       senderId: 'user2',
-      content: 'Thanks for your help with my order!',
+      content: 'Cảm ơn bạn đã giúp tôi với đơn hàng!',
       timestamp: '2023-05-14T10:25:00Z',
     },
   ],
@@ -68,13 +66,13 @@ const MOCK_MESSAGES: Record<string, Message[]> = {
     {
       id: 'm1',
       senderId: 'user3',
-      content: 'When will the new items be in stock?',
+      content: 'Khi nào các mặt hàng mới sẽ có hàng?',
       timestamp: '2023-05-12T09:00:00Z',
     },
     {
       id: 'm2',
       senderId: 'currentUser',
-      content: 'We expect them to arrive next week. I can notify you when they come in.',
+      content: 'Chúng tôi dự kiến sẽ có hàng vào tuần tới. Tôi có thể thông báo cho bạn khi chúng đến.',
       timestamp: '2023-05-12T09:10:00Z',
     },
   ],
@@ -82,34 +80,37 @@ const MOCK_MESSAGES: Record<string, Message[]> = {
 
 const formatMessageDate = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleString();
+  return date.toLocaleString('vi-VN', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 };
 
 export const MessageThread = ({ threadId, user }: MessageThreadProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const messageContainerRef = React.useRef<HTMLDivElement>(null);
+  const messageContainerRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    // In a real app, this would fetch messages from an API
     setMessages(MOCK_MESSAGES[threadId] || []);
   }, [threadId]);
   
   useEffect(() => {
-    // Scroll to bottom of messages when they change
     if (messageContainerRef.current) {
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
     }
   }, [messages]);
 
   const handleNewMessage = () => {
-    // In a real app, this would update with latest messages from API
-    console.log("Message sent. Would refresh thread in real application.");
+    console.log("Tin nhắn đã được gửi. Sẽ làm mới luồng trong ứng dụng thực tế.");
   };
 
   return (
-    <div className="flex flex-col h-[600px]">
+    <div className="flex flex-col h-[500px] md:h-[600px]">
       <div className="flex items-center p-4 border-b">
-        <Avatar className="h-10 w-10 mr-3">
+        <Avatar className="h-8 w-8 md:h-10 md:w-10 mr-3">
           {user.avatar ? (
             <AvatarImage src={user.avatar} alt={user.name} />
           ) : (

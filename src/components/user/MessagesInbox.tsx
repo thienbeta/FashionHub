@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { 
   Card, 
@@ -14,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { MessageThread } from "./MessageThread";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Mock data for demo purposes
 const MOCK_THREADS = [
   {
     id: '1',
@@ -24,8 +22,8 @@ const MOCK_THREADS = [
       avatar: null,
     },
     lastMessage: {
-      content: 'Hey, I was wondering about your latest product...',
-      timestamp: '2 hours ago',
+      content: 'Chào, tôi muốn hỏi về sản phẩm mới nhất của bạn...',
+      timestamp: '2 giờ trước',
       isRead: false,
     },
   },
@@ -37,8 +35,8 @@ const MOCK_THREADS = [
       avatar: null,
     },
     lastMessage: {
-      content: 'Thanks for your help with my order!',
-      timestamp: '1 day ago',
+      content: 'Cảm ơn bạn đã giúp tôi với đơn hàng!',
+      timestamp: '1 ngày trước',
       isRead: true,
     },
   },
@@ -50,8 +48,8 @@ const MOCK_THREADS = [
       avatar: null,
     },
     lastMessage: {
-      content: 'When will the new items be in stock?',
-      timestamp: '3 days ago',
+      content: 'Khi nào các mặt hàng mới sẽ có hàng?',
+      timestamp: '3 ngày trước',
       isRead: true,
     },
   },
@@ -61,7 +59,6 @@ export const MessagesInbox = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedThread, setSelectedThread] = useState<string | null>(null);
   
-  // Filter threads based on search query
   const filteredThreads = MOCK_THREADS.filter(thread => 
     thread.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     thread.lastMessage.content.toLowerCase().includes(searchQuery.toLowerCase())
@@ -76,14 +73,14 @@ export const MessagesInbox = () => {
   };
   
   return (
-    <Card className="max-w-5xl mx-auto">
+    <Card className="max-w-full md:max-w-auto mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center">
           <MessageSquare className="mr-2 h-5 w-5" />
-          Messages
+          Tin nhắn
         </CardTitle>
         <CardDescription>
-          View and respond to your messages
+          Xem và phản hồi tin nhắn của bạn
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -94,7 +91,7 @@ export const MessagesInbox = () => {
               className="mb-4" 
               onClick={handleBackToInbox}
             >
-              Back to Inbox
+              Quay lại hộp thư
             </Button>
             <MessageThread 
               threadId={selectedThread} 
@@ -106,7 +103,7 @@ export const MessagesInbox = () => {
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input 
-                placeholder="Search messages..." 
+                placeholder="Tìm kiếm tin nhắn..." 
                 className="pl-9"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -115,8 +112,8 @@ export const MessagesInbox = () => {
             
             <Tabs defaultValue="all">
               <TabsList className="mb-4">
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="unread">Unread</TabsTrigger>
+                <TabsTrigger value="all">Tất cả</TabsTrigger>
+                <TabsTrigger value="unread">Chưa đọc</TabsTrigger>
               </TabsList>
               
               <TabsContent value="all">
@@ -128,7 +125,7 @@ export const MessagesInbox = () => {
                         onClick={() => handleThreadClick(thread.id)}
                         className={`p-3 rounded-md border flex items-start cursor-pointer hover:bg-gray-50 transition-colors ${!thread.lastMessage.isRead ? 'bg-purple-50 border-purple-200' : ''}`}
                       >
-                        <Avatar className="h-10 w-10 mr-3">
+                        <Avatar className="h-8 w-8 md:h-10 md:w-10 mr-3">
                           {thread.user.avatar ? (
                             <AvatarImage src={thread.user.avatar} alt={thread.user.name} />
                           ) : (
@@ -153,7 +150,7 @@ export const MessagesInbox = () => {
                   ) : (
                     <div className="text-center py-8 text-gray-500">
                       <MessageSquare className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                      <p>No messages found</p>
+                      <p>Không tìm thấy tin nhắn</p>
                     </div>
                   )}
                 </div>
@@ -170,7 +167,7 @@ export const MessagesInbox = () => {
                           onClick={() => handleThreadClick(thread.id)}
                           className="p-3 rounded-md border border-purple-200 bg-purple-50 flex items-start cursor-pointer hover:bg-purple-100 transition-colors"
                         >
-                          <Avatar className="h-10 w-10 mr-3">
+                          <Avatar className="h-8 w-8 md:h-10 md:w-10 mr-3">
                             {thread.user.avatar ? (
                               <AvatarImage src={thread.user.avatar} alt={thread.user.name} />
                             ) : (
@@ -195,7 +192,7 @@ export const MessagesInbox = () => {
                   ) : (
                     <div className="text-center py-8 text-gray-500">
                       <MessageSquare className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                      <p>No unread messages</p>
+                      <p>Không có tin nhắn chưa đọc</p>
                     </div>
                   )}
                 </div>
