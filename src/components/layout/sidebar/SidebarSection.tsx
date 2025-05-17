@@ -55,3 +55,10 @@ export const SidebarSection = ({ title, items, collapsed }: SidebarSectionProps)
     </SidebarGroup>
   );
 };
+
+// Ví dụ sử dụng trong một container cha với thanh cuộn tùy chỉnh
+/*
+<SidebarContent className="scrollbar-thin scrollbar-thumb-crocus-500 scrollbar-track-gray-100">
+  <SidebarSection title="MANAGEMENT" items={yourItems} collapsed={collapsed} />
+</SidebarContent>
+*/

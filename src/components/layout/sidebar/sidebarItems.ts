@@ -28,9 +28,11 @@ export const adminItems: SidebarItemType[] = [
   { title: "Bảng điều khiển", icon: LayoutDashboard, path: "/admin", color: "text-blue-600" },
   { title: "Đơn hàng", icon: ShoppingCart, path: "/admin/orders", badge: "5", color: "text-orange-600" },
   { title: "Sản phẩm", icon: Package, path: "/admin/products", color: "text-green-600" },
-  { title: "Khách hàng", icon: Users, path: "/admin/users", color: "text-red-600" },
+  { title: "Người dùng", icon: Users, path: "/admin/users", color: "text-red-600" },
+  { title: "Nhân viên", icon: Users, path: "/admin/staff", color: "text-red-600" },
   { title: "Phân tích", icon: BarChart, path: "/admin/analytics", color: "text-cyan-600" },
   { title: "Hóa đơn", icon: FileText, path: "/admin/invoices", color: "text-gray-600" },
+  { title: "Kho hàng", icon: Archive, path: "/admin/inventory", color: "text-purple-600" },
 ];
 
 export const adminManagementItems: SidebarItemType[] = [
@@ -44,7 +46,7 @@ export const adminManagementItems: SidebarItemType[] = [
 
 export const supportItems: SidebarItemType[] = [
   { title: "Cài đặt", icon: Settings, path: "/admin/settings", color: "text-gray-600" },
-  { title: "Trung tâm hỗ trợ", icon: HelpCircle, path: "/admin/help", color: "text-blue-600" },
+  { title: "Liên hệ", icon: HelpCircle, path: "/admin/contact", color: "text-blue-600" },
   { title: "Yêu thích", icon: Heart, path: "/admin/favorites", color: "text-red-600" },
   { title: "Trang web", icon: Globe, path: "/admin/website", color: "text-green-600" },
   { title: "Bảo mật", icon: Shield, path: "/admin/security", color: "text-purple-600" },

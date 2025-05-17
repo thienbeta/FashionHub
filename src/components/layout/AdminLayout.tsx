@@ -21,6 +21,7 @@ const getPageTitle = (pathname: string): string => {
     settings: "Cài đặt",
     invoices: "Hóa đơn",
     form: "Form",
+    contact: "Liên hệ",
   };
   return titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
 };
