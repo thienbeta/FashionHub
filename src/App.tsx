@@ -43,6 +43,9 @@ import AdminStaff from "./pages/admin/AdminStaff";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminInvoices from "./pages/admin/AdminInvoices";
 import AdminContact from "./pages/admin/AdminContact";
+import AdminType from "./pages/admin/AdminType";
+import AdminSubcategories from "./pages/admin/AdminSubcategories";
+import AdminTrademark from "./pages/admin/AdminTrademark";
 
 const queryClient = new QueryClient();
 
@@ -104,6 +107,9 @@ const App = () => (
               <Route path="orders/form" element={<OrdersForm />} />
               <Route path="invoice/form" element={<InvoiceForm />} />
               <Route path="contact" element={<AdminContact />} />
+              <Route path="type" element={<AdminType />} />
+              <Route path="subcategories" element={<AdminSubcategories />} />
+              <Route path="trademark" element={<AdminTrademark />} />
               <Route path="*" element={<NotFound />} />
             </Route>
 

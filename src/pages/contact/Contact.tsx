@@ -94,7 +94,8 @@ const Contact = () => {
         icon: "error",
         title: "Lỗi",
         text: "Vui lòng kiểm tra lại các trường thông tin và xác minh reCAPTCHA!",
-        confirmButtonText: "Đóng",
+        timer: 3000, // 3 seconds
+        showConfirmButton: false,
       });
       return;
     }
@@ -136,7 +137,8 @@ const Contact = () => {
         icon: "success",
         title: "Thành công!",
         text: "Tin nhắn của bạn đã được gửi. Chúng tôi sẽ phản hồi sớm nhất có thể.",
-        confirmButtonText: "OK",
+        timer: 3000, // 3 seconds
+        showConfirmButton: false,
       });
     } catch (error) {
       setIsSubmitting(false);
@@ -144,7 +146,8 @@ const Contact = () => {
         icon: "error",
         title: "Lỗi",
         text: "Có lỗi xảy ra khi gửi tin nhắn. Vui lòng thử lại!",
-        confirmButtonText: "Đóng",
+        timer: 3000, // 3 seconds
+        showConfirmButton: false,
       });
       console.error("Error submitting contact form:", error);
     }

@@ -22,6 +22,21 @@ const getPageTitle = (pathname: string): string => {
     invoices: "Hóa đơn",
     form: "Form",
     contact: "Liên hệ",
+    marketing: "Tiếp thị",
+    messages: "Tin nhắn",
+    chat: "Trò chuyện",
+    calendar: "Lịch",
+    reports: "Báo cáo",
+    payments: "Thanh toán",
+    favorites: "Yêu thích",
+    website: "Trang web",
+    security: "Bảo mật",
+    trademark: "Thương hiệu",
+    type: "Loại sản phẩm",
+    subcategories: "Danh mục con",
+    purchaseOrders: "Đơn đặt hàng",
+    shipping: "Danh Mục",
+    categories: "Danh mục",
   };
   return titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
 };
