@@ -1,7 +1,6 @@
 
 import { useState, useMemo } from "react";
 import { BlogList } from "@/components/blogs/BlogList";
-import { BlogFilters } from "@/components/filters/BlogFilters";
 import { toast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -182,22 +181,7 @@ const BlogsList = () => {
     <div className="py-6 sm:py-10 px-4 sm:px-6 container mx-auto">
       <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Fashion Blog</h1>
       
-      {/* Blog Filters - more compact on mobile */}
-      <div className="mb-6 sm:mb-8">
-        <BlogFilters 
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          category={activeTab}
-          setCategory={setActiveTab}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          author={author}
-          setAuthor={setAuthor}
-          resetFilters={resetFilters}
-          authors={authors}
-        />
-      </div>
-      
+
       {/* Results count - hidden on very small screens */}
       <div className="hidden xs:block mb-2 sm:mb-4">
         <p className="text-sm sm:text-base text-gray-600">

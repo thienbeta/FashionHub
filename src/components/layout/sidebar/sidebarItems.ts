@@ -1,3 +1,4 @@
+import { BlogCard } from "@/components/blogs/BlogCard";
 import { 
   LayoutDashboard, Users, Package, ShoppingCart, 
   BarChart, FileText, Archive, Settings, 
@@ -33,6 +34,7 @@ export const adminItems: SidebarItemType[] = [
   { title: "Phân tích", icon: BarChart, path: "/admin/analytics", color: "text-cyan-600" },
   { title: "Hóa đơn", icon: FileText, path: "/admin/invoices", color: "text-gray-600" },
   { title: "Kho hàng", icon: Archive, path: "/admin/inventory", color: "text-purple-600" },
+  { title: "Blog", icon: Calendar, path: "/admin/blogs", color: "text-red-600" },
 ];
 
 export const adminManagementItems: SidebarItemType[] = [

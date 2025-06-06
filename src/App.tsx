@@ -46,6 +46,7 @@ import AdminContact from "./pages/admin/AdminContact";
 import AdminType from "./pages/admin/AdminType";
 import AdminSubcategories from "./pages/admin/AdminSubcategories";
 import AdminTrademark from "./pages/admin/AdminTrademark";
+import AdminBlogs from "./pages/admin/BlogAdmin/AdminBlogs";
 
 const queryClient = new QueryClient();
 
@@ -110,6 +111,7 @@ const App = () => (
               <Route path="type" element={<AdminType />} />
               <Route path="subcategories" element={<AdminSubcategories />} />
               <Route path="trademark" element={<AdminTrademark />} />
+              <Route path="blogs" element={<AdminBlogs />} />
               <Route path="*" element={<NotFound />} />
             </Route>
 

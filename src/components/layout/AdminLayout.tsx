@@ -37,6 +37,7 @@ const getPageTitle = (pathname: string): string => {
     purchaseOrders: "Đơn đặt hàng",
     shipping: "Danh Mục",
     categories: "Danh mục",
+    blogs: "Blog",
   };
   return titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
 };
