@@ -1,8 +1,10 @@
+
 import { Outlet, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import Sidebar from "./Sidebar";
+import { AppSidebar } from "./AppSidebar";
 import Header from "./Header";
+import { SidebarInset } from "@/components/ui/sidebar";
 
 interface AdminLayoutProps {
   role: "staff" | "admin";
@@ -68,21 +70,21 @@ const AdminLayout = ({ role }: AdminLayoutProps) => {
 
   return (
     <div className="flex min-h-screen w-full">
-      <Sidebar role={role} />
-      <main className="flex-1 flex flex-col">
+      <AppSidebar role={role} />
+      <SidebarInset className="flex flex-col min-h-screen">
         <Header title={pageTitle} />
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-3 md:p-6 overflow-auto">
           {isPageLoading ? (
-            <div className="h-full w-full flex items-center justify-center">
-              <div className="h-8 w-8 rounded-full border-4 border-t-crocus-500 border-crocus-200 animate-spin"></div>
+            <div className="h-full w-full flex items-center justify-center min-h-[50vh]">
+              <div className="h-6 w-6 md:h-8 md:w-8 rounded-full border-4 border-t-crocus-500 border-crocus-200 animate-spin"></div>
             </div>
           ) : (
-            <div className="animate-fade-in">
+            <div className="animate-fade-in w-full">
               <Outlet />
             </div>
           )}
         </div>
-      </main>
+      </SidebarInset>
     </div>
   );
 };

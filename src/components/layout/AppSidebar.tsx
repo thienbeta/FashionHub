@@ -1,10 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { 
   Sidebar, 
   SidebarContent, 
   SidebarSeparator,
-  SidebarTrigger
 } from "@/components/ui/sidebar";
 import { useBreakpoint } from "@/hooks/use-mobile";
 import { SidebarHeader } from "./sidebar/SidebarHeader";
@@ -14,10 +12,10 @@ import {
   staffItems, 
   adminItems, 
   adminManagementItems, 
-  supportItems 
+  supportItems,
+  categoryItems 
 } from "./sidebar/sidebarItems";
 import { cn } from "@/lib/utils";
-import { successToast } from "@/utils/notifications";
 
 interface AppSidebarProps {
   role: "staff" | "admin";
@@ -30,10 +28,17 @@ export const AppSidebar = ({ role }: AppSidebarProps) => {
 
   useEffect(() => {
     const handleResize = () => {
+      // Auto-collapse on tablet size
       if (window.innerWidth < 1024 && window.innerWidth > 768 && !collapsed) {
         setCollapsed(true);
-      } else if (window.innerWidth >= 1280 && collapsed) {
+      } 
+      // Auto-expand on desktop
+      else if (window.innerWidth >= 1280 && collapsed) {
         setCollapsed(false);
+      }
+      // Keep collapsed on mobile
+      else if (window.innerWidth <= 768) {
+        setCollapsed(true);
       }
     };
 
@@ -45,24 +50,16 @@ export const AppSidebar = ({ role }: AppSidebarProps) => {
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
-    successToast(collapsed ? "Sidebar expanded" : "Sidebar collapsed");
-  };
-
-  const sidebarWidth = () => {
-    if (collapsed) {
-      if (isMobile || isTablet) {
-        return "w-[200px]";
-      }
-      return "w-[70px] md:w-[80px]";
-    }
-    return "w-[250px] md:w-[280px]";
   };
 
   return (
-    <Sidebar className={cn(
-      "border-r border-gray-100 bg-white print:hidden transition-all duration-300",
-      sidebarWidth()
-    )}>
+    <Sidebar 
+      className={cn(
+        "border-r border-gray-100 bg-white print:hidden transition-all duration-300",
+        collapsed && !isMobile ? "w-[70px]" : "w-[250px] md:w-[280px]"
+      )}
+      collapsible={isMobile ? "offcanvas" : "icon"}
+    >
       <SidebarHeader 
         role={role} 
         collapsed={collapsed} 
@@ -80,13 +77,19 @@ export const AppSidebar = ({ role }: AppSidebarProps) => {
         {role === "admin" && (
           <>
             <SidebarSection
-              title="MANAGEMENT"
+              title="QUẢN LÝ"
               items={adminManagementItems}
               collapsed={collapsed}
             />
 
             <SidebarSection
-              title="SUPPORT"
+              title="DANH MỤC"
+              items={categoryItems}
+              collapsed={collapsed}
+            />
+
+            <SidebarSection
+              title="HỖ TRỢ"
               items={supportItems}
               collapsed={collapsed}
             />
