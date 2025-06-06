@@ -52,7 +52,7 @@ const AdminLayout = ({ role }: AdminLayoutProps) => {
   useEffect(() => {
     setPageTitle(getPageTitle(location.pathname));
     setIsPageLoading(true);
-    const timer = setTimeout(() => setIsPageLoading(false), 300);
+    const timer = setTimeout(() => setIsPageLoading(false), 200);
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
@@ -69,21 +69,23 @@ const AdminLayout = ({ role }: AdminLayoutProps) => {
   }, [location.pathname]);
 
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex min-h-screen w-full bg-gray-50">
       <AppSidebar role={role} />
-      <SidebarInset className="flex flex-col min-h-screen">
+      <SidebarInset className="flex flex-col min-h-screen flex-1 min-w-0">
         <Header title={pageTitle} />
-        <div className="flex-1 p-3 md:p-6 overflow-auto">
-          {isPageLoading ? (
-            <div className="h-full w-full flex items-center justify-center min-h-[50vh]">
-              <div className="h-6 w-6 md:h-8 md:w-8 rounded-full border-4 border-t-crocus-500 border-crocus-200 animate-spin"></div>
-            </div>
-          ) : (
-            <div className="animate-fade-in w-full">
-              <Outlet />
-            </div>
-          )}
-        </div>
+        <main className="flex-1 overflow-auto">
+          <div className="p-2 sm:p-4 md:p-6 h-full">
+            {isPageLoading ? (
+              <div className="h-full w-full flex items-center justify-center min-h-[40vh]">
+                <div className="h-6 w-6 md:h-8 md:w-8 rounded-full border-4 border-t-crocus-500 border-crocus-200 animate-spin"></div>
+              </div>
+            ) : (
+              <div className="animate-fade-in w-full h-full">
+                <Outlet />
+              </div>
+            )}
+          </div>
+        </main>
       </SidebarInset>
     </div>
   );

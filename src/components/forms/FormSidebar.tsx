@@ -96,13 +96,71 @@ export const FormSidebar = ({ activeFormId, onFormSelect, collapsed = false }: F
     }
   };
 
-  // Determine if we should show text in collapsed state (always true on mobile/tablet)
   const showText = !collapsed || isMobile || isTablet;
   
-  // Adjust paths based on whether we're in admin or staff section
   const adjustedFormOptions = formOptions.map(form => ({
     ...form,
     path: isAdmin ? form.path.replace('/staff/', '/admin/') : form.path
   }));
 
+  return (
+    <div className={cn("p-2", collapsed && !isMobile ? "px-1" : "")}>
+      <div className="space-y-1">
+        {adjustedFormOptions.map((form) => {
+          const Icon = form.icon;
+          const isActive = selectedFormId === form.id;
+          
+          if (collapsed && !showText) {
+            return (
+              <Tooltip key={form.id}>
+                <TooltipTrigger asChild>
+                  <Link
+                    to={form.path}
+                    onClick={() => handleFormSelect(form.id)}
+                    className={cn(
+                      "flex items-center justify-center p-2 rounded-md transition-colors",
+                      isActive 
+                        ? "bg-crocus-100 text-crocus-600" 
+                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    )}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>{form.name}</p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          }
+
+          return (
+            <Link
+              key={form.id}
+              to={form.path}
+              onClick={() => handleFormSelect(form.id)}
+              className={cn(
+                "flex items-center gap-3 p-3 rounded-md transition-colors",
+                isActive 
+                  ? "bg-crocus-100 text-crocus-600" 
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+              )}
+            >
+              <Icon className="h-5 w-5 shrink-0" />
+              {showText && (
+                <div className="min-w-0">
+                  <p className="font-medium text-sm truncate">{form.name}</p>
+                  {form.description && (
+                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                      {form.description}
+                    </p>
+                  )}
+                </div>
+              )}
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
 };
