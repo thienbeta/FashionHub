@@ -5,7 +5,7 @@ import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Mail, User, Globe, MapPin, Users, Calendar, Info } from "lucide-react";
-import { MessageForm } from "./MessageForm";
+import { MessageForm } from "./messages/MessageForm";
 
 interface UserProfileProps {
   userId: string;

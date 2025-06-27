@@ -21,8 +21,7 @@ export function useBreakpoint(breakpoint: keyof typeof BREAKPOINTS = "mobile") {
     const onChange = () => {
       setIsBreakpoint(mql.matches);
     };
-    
-    // Modern browsers
+
     mql.addEventListener("change", onChange);
     setIsBreakpoint(mql.matches);
     
@@ -32,12 +31,10 @@ export function useBreakpoint(breakpoint: keyof typeof BREAKPOINTS = "mobile") {
   return !!isBreakpoint;
 }
 
-// Legacy function for backward compatibility
 export function useIsMobile() {
   return useBreakpoint("mobile");
 }
 
-// Helper hooks for other breakpoints
 export function useIsTablet() {
   return useBreakpoint("tablet");
 }

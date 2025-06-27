@@ -43,20 +43,18 @@ import {
   TabsTrigger,
   TabsContent,
 } from "@/components/ui/tabs";
-import { Search, MoreVertical, Upload, X, Plus, Loader2, ChevronLeft, ChevronRight, Settings2 } from "lucide-react";
+import { Search, MoreVertical, X, Plus, Loader2, ChevronLeft, ChevronRight, Settings2 } from "lucide-react";
 import Swal from "sweetalert2";
 
-// Interface for DanhMucCon data from the backend
 interface DanhMucCon {
   maDanhMucCon: number;
   tenDanhMucCon: string;
-  maLoaiSanPham?: string;
+  kiHieu?: string;
   trangThai?: number;
 }
 
-// Interface for LoaiSanPham data from the backend
 interface LoaiSanPham {
-  maLoaiSanPham: string;
+  maLoaiSanPham: number;
   tenLoaiSanPham: string;
   kiHieu: string;
   kichThuoc?: string;
@@ -64,23 +62,18 @@ interface LoaiSanPham {
   trangThai?: number;
 }
 
-// Interface for grouped LoaiSanPham data for combobox
-interface GroupedLoaiSanPham {
-  id: string;
+interface KiHieuOption {
+  kiHieu: string;
   tenLoaiSanPham: string;
-  trangThai: number;
-  entries: LoaiSanPham[];
 }
 
 const ITEMS_PER_PAGE = 10;
 const API_URL = import.meta.env.VITE_API_URL;
 
-// Main Component
 const AdminSubcategories = () => {
   const [danhMucCons, setDanhMucCons] = useState<DanhMucCon[]>([]);
   const [loaiSanPhams, setLoaiSanPhams] = useState<LoaiSanPham[]>([]);
-  const [groupedLoaiSanPhams, setGroupedLoaiSanPhams] = useState<GroupedLoaiSanPham[]>([]);
-  const [filteredDanhMucCons, setFilteredDanhMucCons] = useState<DanhMucCon[]>([]);
+  const [kiHieuOptions, setKiHieuOptions] = useState<KiHieuOption[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"active" | "inactive">("active");
   const [loading, setLoading] = useState<boolean>(true);
@@ -96,34 +89,22 @@ const AdminSubcategories = () => {
   const [danhMucConCanXoaVinhVien, setDanhMucConCanXoaVinhVien] = useState<DanhMucCon | null>(null);
   const [danhMucConCanKhoiPhuc, setDanhMucConCanKhoiPhuc] = useState<DanhMucCon | null>(null);
   const [tenDanhMucConMoi, setTenDanhMucConMoi] = useState("");
-  const [maLoaiSanPhamMoi, setMaLoaiSanPhamMoi] = useState("");
+  const [kiHieuMoi, setKiHieuMoi] = useState<string>("");
+  const [kiHieuFilter, setKiHieuFilter] = useState<string>("all");
   const [danhMucConDangSua, setDanhMucConDangSua] = useState<DanhMucCon | null>(null);
   const [danhMucConChiTiet, setDanhMucConChiTiet] = useState<DanhMucCon | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [errorsThem, setErrorsThem] = useState({ ten: "", maLoaiSanPham: "" });
-  const [errorsSua, setErrorsSua] = useState({ ten: "", maLoaiSanPham: "" });
+  const [errorsThem, setErrorsThem] = useState({ ten: "", kiHieu: "" });
+  const [errorsSua, setErrorsSua] = useState({ ten: "", kiHieu: "" });
 
-  const groupLoaiSanPhams = (data: LoaiSanPham[]): GroupedLoaiSanPham[] => {
-    const grouped = new Map<string, GroupedLoaiSanPham>();
-
+  const getKiHieuOptions = (data: LoaiSanPham[]): KiHieuOption[] => {
+    const kiHieuMap = new Map<string, string>();
     data.forEach((lsp) => {
-      const parts = lsp.maLoaiSanPham.split('_');
-      if (parts.length < 2) return; // Skip invalid MaLoaiSanPham format
-      const id = `${parts[0]}_${parts[1]}`; // e.g., "A_00001"
-
-      if (!grouped.has(id)) {
-        grouped.set(id, {
-          id,
-          tenLoaiSanPham: lsp.tenLoaiSanPham,
-          trangThai: lsp.trangThai ?? 1,
-          entries: [],
-        });
+      if (!kiHieuMap.has(lsp.kiHieu)) {
+        kiHieuMap.set(lsp.kiHieu, lsp.tenLoaiSanPham);
       }
-
-      grouped.get(id)!.entries.push(lsp);
     });
-
-    return Array.from(grouped.values()).sort((a, b) => a.tenLoaiSanPham.localeCompare(b.tenLoaiSanPham));
+    return Array.from(kiHieuMap, ([kiHieu, tenLoaiSanPham]) => ({ kiHieu, tenLoaiSanPham }));
   };
 
   const fetchDanhMucCon = useCallback(async () => {
@@ -132,25 +113,23 @@ const AdminSubcategories = () => {
       const targetStatus = activeTab === "active" ? 1 : 0;
       const response = await fetch(`${API_URL}/api/DanhMucCon?trangThai=${targetStatus}`, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
       if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error("Không tìm thấy dữ liệu danh mục con.");
-        } else if (response.status === 500) {
-          throw new Error("Lỗi máy chủ, vui lòng thử lại sau.");
-        }
         const errorText = await response.text();
-        throw new Error(errorText || "Không thể lấy danh sách danh mục con.");
+        throw new Error(
+          response.status === 404
+            ? "Không tìm thấy dữ liệu danh mục con."
+            : response.status === 500
+            ? "Lỗi máy chủ, vui lòng thử lại sau."
+            : errorText || "Không thể lấy danh sách danh mục con."
+        );
       }
 
       const data: DanhMucCon[] = await response.json();
       const sortedData = data.sort((a, b) => b.maDanhMucCon - a.maDanhMucCon);
       setDanhMucCons(sortedData);
-      setFilteredDanhMucCons(sortedData);
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -167,30 +146,27 @@ const AdminSubcategories = () => {
       setLoadingProductTypes(true);
       const response = await fetch(`${API_URL}/api/LoaiSanPham`, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
       if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error("Không tìm thấy dữ liệu loại sản phẩm.");
-        } else if (response.status === 500) {
-          throw new Error("Lỗi máy chủ, vui lòng thử lại sau.");
-        }
         const errorText = await response.text();
-        throw new Error(errorText || "Không thể lấy danh sách loại sản phẩm.");
+        throw new Error(
+          response.status === 404
+            ? "Không tìm thấy dữ liệu loại sản phẩm."
+            : response.status === 500
+            ? "Lỗi máy chủ, vui lòng thử lại sau."
+            : errorText || "Không thể lấy danh sách loại sản phẩm."
+        );
       }
 
       const data: LoaiSanPham[] = await response.json();
       setLoaiSanPhams(data);
-      const groupedData = groupLoaiSanPhams(data);
-      setGroupedLoaiSanPhams(groupedData);
+      const options = getKiHieuOptions(data);
+      setKiHieuOptions(options);
 
-      // Set default maLoaiSanPhamMoi to the first active LoaiSanPham
-      const firstActiveLoaiSanPham = groupedData.find(group => group.trangThai === 1);
-      if (firstActiveLoaiSanPham) {
-        setMaLoaiSanPhamMoi(firstActiveLoaiSanPham.id);
+      if (options.length > 0) {
+        setKiHieuMoi(options[0].kiHieu);
       }
     } catch (error) {
       Swal.fire({
@@ -203,36 +179,28 @@ const AdminSubcategories = () => {
     }
   }, []);
 
-  const locDanhMucCon = useCallback(() => {
-    if (!searchTerm.trim()) {
-      setFilteredDanhMucCons(danhMucCons);
-    } else {
-      const tuKhoa = searchTerm.toLowerCase();
-      const filtered = danhMucCons.filter(
-        (dmc) =>
-          (dmc.tenDanhMucCon?.toLowerCase().includes(tuKhoa) || false) ||
-          (dmc.maLoaiSanPham?.toLowerCase().includes(tuKhoa) || false)
-      );
-      setFilteredDanhMucCons(filtered);
-      setCurrentPage(1);
-    }
-  }, [searchTerm, danhMucCons]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      locDanhMucCon();
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchTerm, locDanhMucCon]);
+  const sortedAndFilteredDanhMucCon = useMemo(() => {
+    return [...danhMucCons]
+      .sort((a, b) => b.maDanhMucCon - a.maDanhMucCon)
+      .filter((dmc) => {
+        const kiHieu = dmc.kiHieu || '';
+        return (
+          (dmc.tenDanhMucCon?.toLowerCase().includes(searchTerm) || false) ||
+          (kiHieu.toLowerCase().includes(searchTerm) || false)
+        ) && (
+          kiHieuFilter === "all" || kiHieu === kiHieuFilter
+        );
+      });
+  }, [danhMucCons, searchTerm, kiHieuFilter]);
 
   useEffect(() => {
     fetchDanhMucCon();
     fetchLoaiSanPham();
-  }, [fetchDanhMucCon, fetchLoaiSanPham]); // Added dependencies
+  }, [fetchDanhMucCon, fetchLoaiSanPham]);
 
   const validateThem = () => {
     let valid = true;
-    const newErrors = { ten: "", maLoaiSanPham: "" };
+    const newErrors = { ten: "", kiHieu: "" };
 
     if (!tenDanhMucConMoi.trim()) {
       newErrors.ten = "Tên danh mục con không được để trống!";
@@ -242,15 +210,9 @@ const AdminSubcategories = () => {
       valid = false;
     }
 
-    if (!maLoaiSanPhamMoi || !groupedLoaiSanPhams.some(group => group.id === maLoaiSanPhamMoi)) {
-      newErrors.maLoaiSanPham = "Vui lòng chọn một loại sản phẩm hợp lệ!";
+    if (!kiHieuMoi) {
+      newErrors.kiHieu = "Vui lòng chọn một ký hiệu hợp lệ!";
       valid = false;
-    } else {
-      const selectedGroup = groupedLoaiSanPhams.find(group => group.id === maLoaiSanPhamMoi);
-      if (selectedGroup && selectedGroup.trangThai !== 1) {
-        newErrors.maLoaiSanPham = "Loại sản phẩm này hiện đang không hoạt động!";
-        valid = false;
-      }
     }
 
     setErrorsThem(newErrors);
@@ -259,7 +221,7 @@ const AdminSubcategories = () => {
 
   const validateSua = () => {
     let valid = true;
-    const newErrors = { ten: "", maLoaiSanPham: "" };
+    const newErrors = { ten: "", kiHieu: "" };
 
     if (!danhMucConDangSua?.tenDanhMucCon?.trim()) {
       newErrors.ten = "Tên danh mục con không được để trống!";
@@ -269,15 +231,9 @@ const AdminSubcategories = () => {
       valid = false;
     }
 
-    if (!danhMucConDangSua?.maLoaiSanPham || !groupedLoaiSanPhams.some(group => group.id === danhMucConDangSua.maLoaiSanPham)) {
-      newErrors.maLoaiSanPham = "Vui lòng chọn một loại sản phẩm hợp lệ!";
+    if (!danhMucConDangSua?.kiHieu) {
+      newErrors.kiHieu = "Vui lòng chọn một ký hiệu hợp lệ!";
       valid = false;
-    } else {
-      const selectedGroup = groupedLoaiSanPhams.find(group => group.id === danhMucConDangSua.maLoaiSanPham);
-      if (activeTab === "active" && selectedGroup && selectedGroup.trangThai !== 1) {
-        newErrors.maLoaiSanPham = "Loại sản phẩm này hiện đang không hoạt động!";
-        valid = false;
-      }
     }
 
     setErrorsSua(newErrors);
@@ -291,30 +247,28 @@ const AdminSubcategories = () => {
       setIsProcessing(true);
       const response = await fetch(`${API_URL}/api/DanhMucCon`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tenDanhMucCon: tenDanhMucConMoi,
-          maLoaiSanPham: maLoaiSanPhamMoi,
+          kiHieu: kiHieuMoi,
           trangThai: 1,
         }),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        if (response.status === 400) {
-          throw new Error(errorText || "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.");
-        } else if (response.status === 500) {
-          throw new Error("Lỗi máy chủ, vui lòng thử lại sau.");
-        }
-        throw new Error(errorText || "Không thể thêm danh mục con.");
+        throw new Error(
+          response.status === 400
+            ? errorText || "Dữ liệu không hợp lệ."
+            : response.status === 500
+            ? "Lỗi máy chủ."
+            : errorText || "Không thể thêm danh mục con."
+        );
       }
 
       setTenDanhMucConMoi("");
-      const firstActiveLoaiSanPham = groupedLoaiSanPhams.find(group => group.trangThai === 1);
-      setMaLoaiSanPhamMoi(firstActiveLoaiSanPham ? firstActiveLoaiSanPham.id : "");
-      setErrorsThem({ ten: "", maLoaiSanPham: "" });
+      setKiHieuMoi(kiHieuOptions[0]?.kiHieu || "");
+      setErrorsThem({ ten: "", kiHieu: "" });
       setMoModalThem(false);
       await fetchDanhMucCon();
       Swal.fire({
@@ -342,32 +296,31 @@ const AdminSubcategories = () => {
       setIsProcessing(true);
       const response = await fetch(`${API_URL}/api/DanhMucCon/${danhMucConDangSua!.maDanhMucCon}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          maDanhMucCon: danhMucConDangSua!.maDanhMucCon,
-          tenDanhMucCon: danhMucConDangSua!.tenDanhMucCon,
-          maLoaiSanPham: danhMucConDangSua!.maLoaiSanPham,
-          trangThai: danhMucConDangSua!.trangThai,
+          maDanhMucCon: danhMucConDangSua.maDanhMucCon,
+          tenDanhMucCon: danhMucConDangSua.tenDanhMucCon,
+          kiHieu: danhMucConDangSua.kiHieu,
+          trangThai: danhMucConDangSua.trangThai,
         }),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        if (response.status === 400) {
-          throw new Error(errorText || "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.");
-        } else if (response.status === 404) {
-          throw new Error(errorText || "Danh mục con không tồn tại.");
-        } else if (response.status === 500) {
-          throw new Error("Lỗi máy chủ, vui lòng thử lại sau.");
-        }
-        throw new Error(errorText || "Không thể cập nhật danh mục con.");
+        throw new Error(
+          response.status === 400
+            ? errorText || "Dữ liệu không hợp lệ."
+            : response.status === 404
+            ? "Danh mục con không tồn tại."
+            : response.status === 500
+            ? "Lỗi máy chủ."
+            : errorText || "Không thể cập nhật danh mục con."
+        );
       }
 
       setMoModalSua(false);
       setDanhMucConDangSua(null);
-      setErrorsSua({ ten: "", maLoaiSanPham: "" });
+      setErrorsSua({ ten: "", kiHieu: "" });
       await fetchDanhMucCon();
       Swal.fire({
         icon: "success",
@@ -394,21 +347,20 @@ const AdminSubcategories = () => {
       setIsProcessing(true);
       const response = await fetch(`${API_URL}/api/DanhMucCon/SoftDelete/${danhMucConCanXoa.maDanhMucCon}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        if (response.status === 400) {
-          throw new Error(errorText || "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.");
-        } else if (response.status === 404) {
-          throw new Error(errorText || "Danh mục con không tồn tại.");
-        } else if (response.status === 500) {
-          throw new Error("Lỗi máy chủ, vui lòng thử lại sau.");
-        }
-        throw new Error(errorText || "Không thể ẩn danh mục con.");
+        throw new Error(
+          response.status === 400
+            ? errorText || "Dữ liệu không hợp lệ."
+            : response.status === 404
+            ? "Danh mục con không tồn tại."
+            : response.status === 500
+            ? "Lỗi máy chủ."
+            : errorText || "Không thể ẩn danh mục con."
+        );
       }
 
       setMoModalXoa(false);
@@ -439,27 +391,21 @@ const AdminSubcategories = () => {
       setIsProcessing(true);
       const response = await fetch(`${API_URL}/api/DanhMucCon/${danhMucConCanKhoiPhuc.maDanhMucCon}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          maDanhMucCon: danhMucConCanKhoiPhuc.maDanhMucCon,
-          tenDanhMucCon: danhMucConCanKhoiPhuc.tenDanhMucCon,
-          maLoaiSanPham: danhMucConCanKhoiPhuc.maLoaiSanPham,
-          trangThai: 1,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...danhMucConCanKhoiPhuc, trangThai: 1 }),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        if (response.status === 400) {
-          throw new Error(errorText || "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.");
-        } else if (response.status === 404) {
-          throw new Error(errorText || "Danh mục con không tồn tại.");
-        } else if (response.status === 500) {
-          throw new Error("Lỗi máy chủ, vui lòng thử lại sau.");
-        }
-        throw new Error(errorText || "Không thể khôi phục danh mục con.");
+        throw new Error(
+          response.status === 400
+            ? errorText || "Dữ liệu không hợp lệ."
+            : response.status === 404
+            ? "Danh mục con không tồn tại."
+            : response.status === 500
+            ? "Lỗi máy chủ."
+            : errorText || "Không thể khôi phục danh mục con."
+        );
       }
 
       setMoModalKhoiPhuc(false);
@@ -494,14 +440,15 @@ const AdminSubcategories = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        if (response.status === 404) {
-          throw new Error(errorText || "Danh mục con không tồn tại.");
-        } else if (response.status === 409) {
-          throw new Error(errorText || "Không thể xóa vì có dữ liệu liên quan.");
-        } else if (response.status === 500) {
-          throw new Error("Lỗi máy chủ, vui lòng thử lại sau.");
-        }
-        throw new Error(errorText || "Không thể xóa vĩnh viễn danh mục con.");
+        throw new Error(
+          response.status === 404
+            ? "Danh mục con không tồn tại."
+            : response.status === 409
+            ? "Không thể xóa vì có dữ liệu liên quan."
+            : response.status === 500
+            ? "Lỗi máy chủ."
+            : errorText || "Không thể xóa vĩnh viễn danh mục con."
+        );
       }
 
       setMoModalXoaVinhVien(false);
@@ -530,17 +477,6 @@ const AdminSubcategories = () => {
     setCurrentPage(1);
   };
 
-  const sortedAndFilteredDanhMucCon = useMemo(() => {
-    const filtered = [...danhMucCons]
-      .sort((a, b) => b.maDanhMucCon - a.maDanhMucCon)
-      .filter(
-        (dmc) =>
-          (dmc.tenDanhMucCon?.toLowerCase().includes(searchTerm) || false) ||
-          (dmc.maLoaiSanPham?.toLowerCase().includes(searchTerm) || false)
-      );
-    return filtered;
-  }, [danhMucCons, searchTerm]);
-
   const totalPages = Math.ceil(sortedAndFilteredDanhMucCon.length / ITEMS_PER_PAGE);
   const paginatedDanhMucCon = sortedAndFilteredDanhMucCon.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -551,25 +487,16 @@ const AdminSubcategories = () => {
     setCurrentPage(page);
   };
 
-  const getTenLoaiSanPham = (maLoaiSanPham: string | undefined): string => {
-    if (!maLoaiSanPham) return "Không xác định";
-    const group = groupedLoaiSanPhams.find(group => group.id === maLoaiSanPham);
-    return group ? group.tenLoaiSanPham : "Không xác định";
-  };
-
-  const getMaLoaiSanPhamFromFullId = (fullMaLoaiSanPham: string | undefined): string | undefined => {
-    if (!fullMaLoaiSanPham) return undefined;
-    const parts = fullMaLoaiSanPham.split('_');
-    if (parts.length < 2) return undefined;
-    return `${parts[0]}_${parts[1]}`; // e.g., "A_00001"
+  const getTenLoaiSanPham = (kiHieu: string | undefined): string => {
+    if (!kiHieu) return "Không xác định";
+    const option = kiHieuOptions.find((opt) => opt.kiHieu === kiHieu);
+    return option ? option.tenLoaiSanPham : "Không xác định";
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-800">
-          Quản Lý Danh Mục Con
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-800">Quản Lý Danh Mục Con</h1>
         {activeTab === "active" && (
           <Button
             className="bg-[#9b87f5] text-white hover:bg-[#8a76e3]"
@@ -603,6 +530,25 @@ const AdminSubcategories = () => {
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
+            <div>
+              <Select
+                value={kiHieuFilter}
+                onValueChange={setKiHieuFilter}
+                disabled={loadingProductTypes}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Lọc theo loại sản phẩm" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tất cả</SelectItem>
+                  {kiHieuOptions.map((option) => (
+                    <SelectItem key={option.kiHieu} value={option.kiHieu}>
+                      {option.tenLoaiSanPham}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {loading || loadingProductTypes ? (
@@ -627,71 +573,54 @@ const AdminSubcategories = () => {
                     </TableHeader>
                     <TableBody>
                       {paginatedDanhMucCon.length > 0 ? (
-                        paginatedDanhMucCon.map((dmc, index) => {
-                          const isLoaiSanPhamKhongXacDinh = getTenLoaiSanPham(dmc.maLoaiSanPham) === "Không xác định";
-                          return (
-                            <TableRow key={dmc.maDanhMucCon} className="hover:bg-muted/50">
-                              <TableCell>{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</TableCell>
-                              <TableCell>{dmc.tenDanhMucCon}</TableCell>
-                              <TableCell>{getTenLoaiSanPham(dmc.maLoaiSanPham)}</TableCell>
-                              <TableCell>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                                      <MoreVertical className="h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem
-                                      onClick={() => {
-                                        setDanhMucConChiTiet(dmc);
-                                        setMoModalChiTiet(true);
-                                      }}
-                                      className="text-green-700"
-                                    >
-                                      <FaEye className="mr-2 h-4 w-4" /> Xem
-                                    </DropdownMenuItem>
-                                    <>
-                                      <DropdownMenuItem
-                                        onClick={() => {
-                                          setDanhMucConDangSua(dmc);
-                                          setMoModalSua(true);
-                                        }}
-                                        className="text-blue-700"
-                                      >
-                                        <FaEdit className="mr-2 h-4 w-4" /> Sửa
-                                      </DropdownMenuItem>
-                                      {isLoaiSanPhamKhongXacDinh ? (
-                                        <DropdownMenuItem
-                                          onClick={() => {
-                                            setDanhMucConCanXoaVinhVien(dmc);
-                                            setMoModalXoaVinhVien(true);
-                                          }}
-                                          className="text-red-700"
-                                        >
-                                          <FaTrash className="mr-2 h-4 w-4" /> Xóa vĩnh viễn
-                                        </DropdownMenuItem>
-                                      ) : (
-                                        <DropdownMenuItem
-                                          onClick={() => {
-                                            setDanhMucConCanXoa(dmc);
-                                            setMoModalXoa(true);
-                                          }}
-                                          className="text-red-700"
-                                        >
-                                          <FaTrashAlt className="mr-2 h-4 w-4" /> Ẩn
-                                        </DropdownMenuItem>
-                                      )}
-                                    </>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })
+                        paginatedDanhMucCon.map((dmc, index) => (
+                          <TableRow key={dmc.maDanhMucCon} className="hover:bg-muted/50">
+                            <TableCell>{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</TableCell>
+                            <TableCell>{dmc.tenDanhMucCon}</TableCell>
+                            <TableCell>{getTenLoaiSanPham(dmc.kiHieu)}</TableCell>
+                            <TableCell>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setDanhMucConChiTiet(dmc);
+                                      setMoModalChiTiet(true);
+                                    }}
+                                    className="text-green-700"
+                                  >
+                                    <FaEye className="mr-2 h-4 w-4" /> Xem
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setDanhMucConDangSua(dmc);
+                                      setMoModalSua(true);
+                                    }}
+                                    className="text-blue-700"
+                                  >
+                                    <FaEdit className="mr-2 h-4 w-4" /> Sửa
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setDanhMucConCanXoa(dmc);
+                                      setMoModalXoa(true);
+                                    }}
+                                    className="text-red-700"
+                                  >
+                                    <FaTrashAlt className="mr-2 h-4 w-4" /> Ẩn
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        ))
                       ) : (
                         <TableRow>
-                          <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
+                          <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
                             Không tìm thấy danh mục con nào.
                           </TableCell>
                         </TableRow>
@@ -709,10 +638,8 @@ const AdminSubcategories = () => {
                     variant="outline"
                     className="flex items-center"
                   >
-                    <ChevronLeft className="h-4 w-4 mr-2" />
-                    Trước
+                    <ChevronLeft className="h-4 w-4 mr-2" /> Trước
                   </Button>
-
                   {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
                     <Button
                       key={page}
@@ -723,15 +650,13 @@ const AdminSubcategories = () => {
                       {page}
                     </Button>
                   ))}
-
                   <Button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
                     variant="outline"
                     className="flex items-center"
                   >
-                    Sau
-                    <ChevronRight className="h-4 w-4 ml-2" />
+                    Sau <ChevronRight className="h-4 w-4 ml-2" />
                   </Button>
                 </div>
               )}
@@ -750,6 +675,25 @@ const AdminSubcategories = () => {
                 className="w-full md:w-[820px] pl-10"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
+            <div>
+              <Select
+                value={kiHieuFilter}
+                onValueChange={setKiHieuFilter}
+                disabled={loadingProductTypes}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Lọc theo loại sản phẩm" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tất cả</SelectItem>
+                  {kiHieuOptions.map((option) => (
+                    <SelectItem key={option.kiHieu} value={option.kiHieu}>
+                      {option.tenLoaiSanPham}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -779,7 +723,7 @@ const AdminSubcategories = () => {
                           <TableRow key={dmc.maDanhMucCon} className="hover:bg-muted/50">
                             <TableCell>{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</TableCell>
                             <TableCell>{dmc.tenDanhMucCon}</TableCell>
-                            <TableCell>{getTenLoaiSanPham(dmc.maLoaiSanPham)}</TableCell>
+                            <TableCell>{getTenLoaiSanPham(dmc.kiHieu)}</TableCell>
                             <TableCell>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -822,7 +766,7 @@ const AdminSubcategories = () => {
                         ))
                       ) : (
                         <TableRow>
-                          <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
+                          <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
                             Không có danh mục con nào để khôi phục.
                           </TableCell>
                         </TableRow>
@@ -840,10 +784,8 @@ const AdminSubcategories = () => {
                     variant="outline"
                     className="flex items-center"
                   >
-                    <ChevronLeft className="h-4 w-4 mr-2" />
-                    Trước
+                    <ChevronLeft className="h-4 w-4 mr-2" /> Trước
                   </Button>
-
                   {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
                     <Button
                       key={page}
@@ -854,15 +796,13 @@ const AdminSubcategories = () => {
                       {page}
                     </Button>
                   ))}
-
                   <Button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
                     variant="outline"
                     className="flex items-center"
                   >
-                    Sau
-                    <ChevronRight className="h-4 w-4 ml-2" />
+                    Sau <ChevronRight className="h-4 w-4 ml-2" />
                   </Button>
                 </div>
               )}
@@ -872,7 +812,7 @@ const AdminSubcategories = () => {
       </Tabs>
 
       <Dialog open={moModalThem} onOpenChange={setMoModalThem}>
-        <DialogContent className="max-w-4xl w-full">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Thêm Danh Mục Con</DialogTitle>
             <DialogDescription>Nhập thông tin danh mục con mới.</DialogDescription>
@@ -895,10 +835,10 @@ const AdminSubcategories = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Loại Sản Phẩm</label>
               <Select
-                value={maLoaiSanPhamMoi}
+                value={kiHieuMoi}
                 onValueChange={(value) => {
-                  setMaLoaiSanPhamMoi(value);
-                  setErrorsThem((prev) => ({ ...prev, maLoaiSanPham: "" }));
+                  setKiHieuMoi(value);
+                  setErrorsThem((prev) => ({ ...prev, kiHieu: "" }));
                 }}
                 disabled={isProcessing || loadingProductTypes}
               >
@@ -906,32 +846,38 @@ const AdminSubcategories = () => {
                   <SelectValue placeholder="Chọn loại sản phẩm" />
                 </SelectTrigger>
                 <SelectContent>
-                  {groupedLoaiSanPhams
-                    .filter(group => group.trangThai === 1)
-                    .map((group) => (
-                      <SelectItem key={group.id} value={group.id}>
-                        {group.tenLoaiSanPham}
-                      </SelectItem>
-                    ))}
+                  {kiHieuOptions.map((option) => (
+                    <SelectItem key={option.kiHieu} value={option.kiHieu}>
+                      {option.tenLoaiSanPham}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
-              {errorsThem.maLoaiSanPham && <p className="text-red-500 text-sm mt-1">{errorsThem.maLoaiSanPham}</p>}
+              {errorsThem.kiHieu && <p className="text-red-500 text-sm mt-1">{errorsThem.kiHieu}</p>}
             </div>
           </div>
           <DialogFooter className="flex justify-end space-x-2 mt-4">
-            <Button variant="ghost" onClick={() => setMoModalThem(false)} disabled={isProcessing || loadingProductTypes} className="flex items-center gap-2 bg-[#e7e4f5]">
+            <Button
+              variant="ghost"
+              onClick={() => setMoModalThem(false)}
+              disabled={isProcessing || loadingProductTypes}
+              className="flex items-center gap-2 bg-[#e7e4f5]"
+            >
               <X className="h-4 w-4" /> Hủy
             </Button>
-            <Button onClick={themDanhMucCon} disabled={isProcessing || loadingProductTypes} className="bg-[#9b87f5] text-white hover:bg-[#8a76e3] flex items-center gap-2">
-              {isProcessing ? "Đang xử lý..." : "Thêm"}
-              <Plus className="h-4 w-4" />
+            <Button
+              onClick={themDanhMucCon}
+              disabled={isProcessing || loadingProductTypes}
+              className="bg-[#9b87f5] text-white hover:bg-[#8a76e3] flex items-center gap-2"
+            >
+              {isProcessing ? "Đang xử lý..." : "Thêm"} <Plus className="h-4 w-4" />
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={moModalSua} onOpenChange={setMoModalSua}>
-        <DialogContent className="max-w-4xl w-full">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Sửa Danh Mục Con</DialogTitle>
             <DialogDescription>Cập nhật thông tin danh mục con.</DialogDescription>
@@ -954,43 +900,46 @@ const AdminSubcategories = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Loại Sản Phẩm</label>
               <Select
-                value={danhMucConDangSua?.maLoaiSanPham}
-                onValueChange={(value) => {
-                  setDanhMucConDangSua({ ...danhMucConDangSua!, maLoaiSanPham: value });
-                  setErrorsSua((prev) => ({ ...prev, maLoaiSanPham: "" }));
-                }}
-                disabled={isProcessing || loadingProductTypes}
+                value={danhMucConDangSua?.kiHieu}
+                onValueChange={() => {}}
+                disabled={true}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Chọn loại sản phẩm" />
                 </SelectTrigger>
                 <SelectContent>
-                  {groupedLoaiSanPhams
-                    .filter(group => activeTab === "active" ? group.trangThai === 1 : true)
-                    .map((group) => (
-                      <SelectItem key={group.id} value={group.id}>
-                        {group.tenLoaiSanPham} {group.trangThai !== 1 ? "(Không hoạt động)" : ""}
-                      </SelectItem>
-                    ))}
+                  {kiHieuOptions.map((option) => (
+                    <SelectItem key={option.kiHieu} value={option.kiHieu}>
+                      {option.tenLoaiSanPham}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
-              {errorsSua.maLoaiSanPham && <p className="text-red-500 text-sm mt-1">{errorsSua.maLoaiSanPham}</p>}
+              {errorsSua.kiHieu && <p className="text-red-500 text-sm mt-1">{errorsSua.kiHieu}</p>}
             </div>
           </div>
           <DialogFooter className="flex justify-end space-x-2 mt-4">
-            <Button variant="ghost" onClick={() => setMoModalSua(false)} disabled={isProcessing || loadingProductTypes} className="flex items-center gap-2 bg-[#e7e4f5]">
+            <Button
+              variant="ghost"
+              onClick={() => setMoModalSua(false)}
+              disabled={isProcessing || loadingProductTypes}
+              className="flex items-center gap-2 bg-[#e7e4f5]"
+            >
               <X className="h-4 w-4" /> Hủy
             </Button>
-            <Button onClick={suaDanhMucCon} disabled={isProcessing || loadingProductTypes} className="bg-[#9b87f5] text-white hover:bg-[#8a76e3] flex items-center gap-2">
-              {isProcessing ? "Đang xử lý..." : "Lưu"}
-              <FaEdit className="h-4 w-4" />
+            <Button
+              onClick={suaDanhMucCon}
+              disabled={isProcessing || loadingProductTypes}
+              className="bg-[#9b87f5] text-white hover:bg-[#8a76e3] flex items-center gap-2"
+            >
+              {isProcessing ? "Đang xử lý..." : "Lưu"} <FaEdit className="h-4 w-4" />
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={moModalChiTiet} onOpenChange={setMoModalChiTiet}>
-        <DialogContent className="max-w-4xl w-full">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Chi Tiết Danh Mục Con</DialogTitle>
             <DialogDescription>Thông tin chi tiết của danh mục con.</DialogDescription>
@@ -1003,16 +952,17 @@ const AdminSubcategories = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Loại Sản Phẩm</label>
-                <Input value={getTenLoaiSanPham(danhMucConChiTiet.maLoaiSanPham)} disabled />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Trạng Thái</label>
-                <Input value={danhMucConChiTiet.trangThai === 1 ? "Hoạt động" : "Không hoạt động"} disabled />
+                <Input value={getTenLoaiSanPham(danhMucConChiTiet.kiHieu)} disabled />
               </div>
             </div>
           )}
           <DialogFooter className="flex justify-end space-x-2 mt-4">
-            <Button variant="ghost" onClick={() => setMoModalChiTiet(false)} disabled={isProcessing} className="flex items-center gap-2 bg-[#e7e4f5]">
+            <Button
+              variant="ghost"
+              onClick={() => setMoModalChiTiet(false)}
+              disabled={isProcessing}
+              className="flex items-center gap-2 bg-[#e7e4f5]"
+            >
               <X className="h-4 w-4" /> Đóng
             </Button>
           </DialogFooter>
@@ -1020,60 +970,78 @@ const AdminSubcategories = () => {
       </Dialog>
 
       <Dialog open={moModalXoa} onOpenChange={setMoModalXoa}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Xác nhận ẩn danh mục con</DialogTitle>
-            <DialogDescription>
-              Bạn có chắc chắn muốn ẩn danh mục con này không? Bạn có thể khôi phục lại sau.
-            </DialogDescription>
+            <DialogDescription>Bạn có chắc chắn muốn ẩn danh mục con này không? Bạn có thể khôi phục lại sau.</DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end space-x-2 mt-4">
-            <Button variant="ghost" onClick={() => setMoModalXoa(false)} disabled={isProcessing} className="flex items-center gap-2 bg-[#e7e4f5]">
+            <Button
+              variant="ghost"
+              onClick={() => setMoModalXoa(false)}
+              disabled={isProcessing}
+              className="flex items-center gap-2 bg-[#e7e4f5]"
+            >
               <X className="h-4 w-4" /> Hủy
             </Button>
-            <Button onClick={anDanhMucCon} disabled={isProcessing} className="bg-[#9b87f5] text-white hover:bg-[#8a76e3] flex items-center gap-2">
-              {isProcessing ? "Đang xử lý..." : "Ẩn"}
-              <FaTrashAlt className="h-4 w-4" />
+            <Button
+              onClick={anDanhMucCon}
+              disabled={isProcessing}
+              className="bg-[#9b87f5] text-white hover:bg-[#8a76e3] flex items-center gap-2"
+            >
+              {isProcessing ? "Đang xử lý..." : "Ẩn"} <FaTrashAlt className="h-4 w-4" />
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={moModalKhoiPhuc} onOpenChange={setMoModalKhoiPhuc}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Xác nhận khôi phục danh mục con</DialogTitle>
-            <DialogDescription>
-              Bạn có chắc chắn muốn khôi phục danh mục con này không?
-            </DialogDescription>
+            <DialogDescription>Bạn có chắc chắn muốn khôi phục danh mục con này không?</DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end space-x-2 mt-4">
-            <Button variant="ghost" onClick={() => setMoModalKhoiPhuc(false)} disabled={isProcessing} className="flex items-center gap-2 bg-[#e7e4f5]">
+            <Button
+              variant="ghost"
+              onClick={() => setMoModalKhoiPhuc(false)}
+              disabled={isProcessing}
+              className="flex items-center gap-2 bg-[#e7e4f5]"
+            >
               <X className="h-4 w-4" /> Hủy
             </Button>
-            <Button onClick={khoiPhucDanhMucCon} disabled={isProcessing} className="bg-[#9b87f5] text-white hover:bg-[#8a76e3] flex items-center gap-2">
-              {isProcessing ? "Đang xử lý..." : "Khôi phục"}
-              <FaUndo className="h-4 w-4" />
+            <Button
+              onClick={khoiPhucDanhMucCon}
+              disabled={isProcessing}
+              className="bg-[#9b87f5] text-white hover:bg-[#8a76e3] flex items-center gap-2"
+            >
+              {isProcessing ? "Đang xử lý..." : "Khôi phục"} <FaUndo className="h-4 w-4" />
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={moModalXoaVinhVien} onOpenChange={setMoModalXoaVinhVien}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Xác nhận xóa vĩnh viễn danh mục con</DialogTitle>
-            <DialogDescription>
-              Bạn có chắc chắn muốn xóa vĩnh viễn danh mục con này không? Hành động này không thể hoàn tác.
-            </DialogDescription>
+            <DialogDescription>Bạn có chắc chắn muốn xóa vĩnh viễn danh mục con này không? Hành động này không thể hoàn tác.</DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end space-x-2 mt-4">
-            <Button variant="ghost" onClick={() => setMoModalXoaVinhVien(false)} disabled={isProcessing} className="flex items-center gap-2 bg-[#e7e4f5]">
+            <Button
+              variant="ghost"
+              onClick={() => setMoModalXoaVinhVien(false)}
+              disabled={isProcessing}
+              className="flex items-center gap-2 bg-[#e7e4f5]"
+            >
               <X className="h-4 w-4" /> Hủy
             </Button>
-            <Button onClick={xoaVinhVienDanhMucCon} disabled={isProcessing} className="bg-red-500 text-white hover:bg-red-600 flex items-center gap-2">
-              {isProcessing ? "Đang xử lý..." : "Xóa vĩnh viễn"}
-              <FaTrash className="h-4 w-4" />
+            <Button
+              onClick={xoaVinhVienDanhMucCon}
+              disabled={isProcessing}
+              className="bg-red-500 text-white hover:bg-red-600 flex items-center gap-2"
+            >
+              {isProcessing ? "Đang xử lý..." : "Xóa vĩnh viễn"} <FaTrash className="h-4 w-4" />
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,5 +1,5 @@
-
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
 	darkMode: ["class"],
@@ -13,10 +13,10 @@ export default {
 	theme: {
 		container: {
 			center: true,
-			padding: '2rem',
+			padding: "2rem",
 			screens: {
-				'2xl': '1400px'
-			}
+				"2xl": "1400px",
+			},
 		},
 		extend: {
 			colors: {
@@ -59,7 +59,7 @@ export default {
 					200: '#e5dbfe',
 					300: '#d3c2fd',
 					400: '#b89cfb',
-					500: '#9b87f5', /* Pantone 16-3115 Crocus */
+					500: '#9b87f5',
 					600: '#8673db',
 					700: '#7260c7',
 					800: '#5d4da0',
@@ -103,7 +103,7 @@ export default {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
 			}
-		}
+		},
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [tailwindcssAnimate],
 } satisfies Config;

@@ -167,7 +167,6 @@ function toast({ ...props }: Toast) {
   }
 }
 
-// Enhanced toast methods with better mobile support
 toast.success = (content: string) => {
   return toast({
     variant: "default",

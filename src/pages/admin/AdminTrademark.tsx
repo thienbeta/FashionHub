@@ -321,7 +321,7 @@ const AdminTrademark = () => {
         } else if (response.status === 500) {
           throw new Error("Lỗi máy chủ, vui lòng thử lại sau");
         }
-        throw new Error(errorText || "Không thể ẩn thương hiệu");
+        throw new Error(errorText || "Không thể xóa thương hiệu");
       }
       setMoModalXoa(false);
       setTrademarkCanXoa(null);
@@ -330,7 +330,7 @@ const AdminTrademark = () => {
       Swal.fire({
         icon: "success",
         title: "Thành công",
-        text: "Ẩn thương hiệu thành công!",
+        text: "Xóa thương hiệu thành công!",
         timer: 3000,
         showConfirmButton: false,
       });
@@ -338,7 +338,7 @@ const AdminTrademark = () => {
       Swal.fire({
         icon: "error",
         title: "Lỗi",
-        text: "Lỗi khi ẩn thương hiệu: " + (error as Error).message,
+        text: "Lỗi khi xóa thương hiệu: " + (error as Error).message,
       });
     } finally {
       setIsProcessing(false);
@@ -548,7 +548,7 @@ const AdminTrademark = () => {
                                     }}
                                     className="text-red-700"
                                   >
-                                    <FaTrashAlt className="mr-2 h-4 w-4" /> Ẩn
+                                    <FaTrashAlt className="mr-2 h-4 w-4" /> Xóa
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -610,7 +610,7 @@ const AdminTrademark = () => {
             <div className="relative">
               <Input
                 type="search"
-                placeholder="Tìm kiếm thương hiệu đã ẩn..."
+                placeholder="Tìm kiếm thương hiệu đã xóa..."
                 value={searchTerm}
                 onChange={handleSearch}
                 className="w-full md:w-[820px] pl-10"
@@ -627,7 +627,7 @@ const AdminTrademark = () => {
             <>
               <Card>
                 <CardHeader>
-                  <CardTitle>Danh Sách Thương Hiệu Đã Ẩn</CardTitle>
+                  <CardTitle>Danh Sách Thương Hiệu Đã Xóa</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Table>
@@ -963,9 +963,9 @@ const AdminTrademark = () => {
       <Dialog open={moModalXoa} onOpenChange={setMoModalXoa}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Xác Nhận Ẩn</DialogTitle>
+            <DialogTitle>Xác Nhận Xóa</DialogTitle>
             <DialogDescription>
-              Bạn có chắc chắn muốn ẩn thương hiệu "{trademarkCanXoa?.tenThuongHieu}" không?
+              Bạn có chắc chắn muốn xóa thương hiệu "{trademarkCanXoa?.tenThuongHieu}" không?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end space-x-2">
@@ -973,7 +973,7 @@ const AdminTrademark = () => {
               <X className="h-4 w-4" /> Hủy
             </Button>
             <Button onClick={anTrademark} disabled={isProcessing} className="bg-red-500 text-white hover:bg-red-600 flex items-center gap-2">
-              {isProcessing ? "Đang xử lý..." : "Ẩn"}
+              {isProcessing ? "Đang xử lý..." : "Xóa"}
               <FaTrashAlt className="h-4 w-4" />
             </Button>
           </DialogFooter>

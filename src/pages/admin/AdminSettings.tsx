@@ -1,5 +1,5 @@
 
-import { SettingsPage } from "@/components/admin/SettingsPage";
+import { SettingsPage } from "@/pages/admin/SettingsPage";
 
 export default function AdminSettings() {
   return (

@@ -3,7 +3,6 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ComboFilters } from "@/components/filters/ComboFilters";
 import { toast } from "@/hooks/use-toast";
 
 // Mock combos data
@@ -167,23 +166,6 @@ const CombosList = () => {
         Each combo offers a complete look at a special bundled price.
       </p>
 
-      {/* Filters */}
-      <div className="mb-8">
-        <ComboFilters 
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          minItems={minItems}
-          setMinItems={setMinItems}
-          priceRange={priceRange}
-          setPriceRange={setPriceRange}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          occasionType={occasionType}
-          setOccasionType={setOccasionType}
-          resetFilters={resetFilters}
-          applyFilters={applyFilters}
-        />
-      </div>
 
       {filteredCombos.length === 0 ? (
         <div className="text-center py-8">

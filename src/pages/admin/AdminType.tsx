@@ -41,7 +41,7 @@ import Swal from "sweetalert2";
 
 // Interface cho dữ liệu LoaiSanPham từ backend
 interface LoaiSanPham {
-  maLoaiSanPham: string;
+  maLoaiSanPham: number; // Thay đổi từ string sang number
   tenLoaiSanPham: string;
   kiHieu: string;
   kichThuoc?: string;
@@ -51,7 +51,6 @@ interface LoaiSanPham {
 
 // Interface cho dữ liệu LoaiSanPham được nhóm lại
 interface GroupedLoaiSanPham {
-  id: string;
   tenLoaiSanPham: string;
   kiHieu: string;
   hinhAnh?: string;
@@ -115,14 +114,10 @@ const AdminType = () => {
 
     data.forEach((lsp) => {
       if (lsp.trangThai !== targetStatus) return;
-      const parts = lsp.maLoaiSanPham.split('_');
-      if (parts.length !== 3) return;
-      const id = parts[1];
-      const key = `${lsp.kiHieu}_${id}`;
+      const key = `${lsp.tenLoaiSanPham}_${lsp.kiHieu}`;
 
       if (!grouped.has(key)) {
         grouped.set(key, {
-          id,
           tenLoaiSanPham: lsp.tenLoaiSanPham,
           kiHieu: lsp.kiHieu,
           hinhAnh: lsp.hinhAnh,
@@ -133,7 +128,7 @@ const AdminType = () => {
       grouped.get(key)!.entries.push(lsp);
     });
 
-    return Array.from(grouped.values()).sort((a, b) => b.id.localeCompare(a.id));
+    return Array.from(grouped.values()).sort((a, b) => a.tenLoaiSanPham.localeCompare(b.tenLoaiSanPham));
   };
 
   const fetchLoaiSanPham = useCallback(async () => {
@@ -375,24 +370,6 @@ const AdminType = () => {
     return valid;
   };
 
-  const generateMaLoaiSanPham = (kiHieu: string, kichThuoc: string): string => {
-    let maxId = 0;
-    loaiSanPhams.forEach(lsp => {
-      const parts = lsp.maLoaiSanPham.split('_');
-      if (parts.length === 3) {
-        const idPart = parts[1];
-        const idNum = parseInt(idPart, 10);
-        if (!isNaN(idNum) && idNum > maxId) {
-          maxId = idNum;
-        }
-      }
-    });
-
-    const newId = maxId + 1;
-    const paddedId = newId.toString().padStart(5, '0');
-    return `${kiHieu.toUpperCase()}_${paddedId}_${kichThuoc.toUpperCase()}`;
-  };
-
   const themLoaiSanPham = async () => {
     if (!validateThem()) return;
 
@@ -403,14 +380,12 @@ const AdminType = () => {
       const trimmedSizes = kichThuocMoi.map(size => size.trim()).filter(size => size);
 
       for (const kichThuoc of trimmedSizes) {
-        const maLoaiSanPham = generateMaLoaiSanPham(kiHieuUpper, kichThuoc);
         const response = await fetch(`${API_URL}/api/LoaiSanPham`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            maLoaiSanPham,
             tenLoaiSanPham: tenLoaiSanPhamMoi,
             kiHieu: kiHieuUpper,
             kichThuoc: kichThuoc.toUpperCase(),
@@ -497,14 +472,12 @@ const AdminType = () => {
 
       const trimmedSizes = kichThuocMoi.map(size => size.trim()).filter(size => size);
       for (const kichThuoc of trimmedSizes) {
-        const maLoaiSanPham = `${kiHieuUpper}_${loaiSanPhamDangSua!.id}_${kichThuoc.toUpperCase()}`;
         const response = await fetch(`${API_URL}/api/LoaiSanPham`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            maLoaiSanPham,
             tenLoaiSanPham: loaiSanPhamDangSua!.tenLoaiSanPham,
             kiHieu: kiHieuUpper,
             kichThuoc: kichThuoc.toUpperCase(),
@@ -518,7 +491,7 @@ const AdminType = () => {
           if (response.status === 400) {
             throw new Error(errorText || "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.");
           } else if (response.status === 409) {
-            throw new Error(errorText || `Loại sản phẩm với mã ${maLoaiSanPham} đã tồn tại.`);
+            throw new Error(errorText || `Loại sản phẩm với kích thước ${kichThuoc} đã tồn tại.`);
           } else if (response.status === 500) {
             throw new Error("Lỗi máy chủ, vui lòng thử lại sau.");
           }
@@ -860,7 +833,7 @@ const AdminType = () => {
 
   const sortedAndFilteredLoaiSanPham = useMemo(() => {
     const filtered = [...groupedLoaiSanPhams]
-      .sort((a, b) => b.id.localeCompare(a.id))
+      .sort((a, b) => a.tenLoaiSanPham.localeCompare(b.tenLoaiSanPham))
       .filter(
         (group) =>
           (group.tenLoaiSanPham?.toLowerCase().includes(searchTerm) || false) ||
@@ -881,18 +854,18 @@ const AdminType = () => {
 
   return (
     <div className="space-y-6">
-<div className="flex items-center justify-between">
-  <h1 className="text-3xl font-bold tracking-tight text-gray-800">
-    Quản Lý Loại Sản Phẩm
-  </h1>
-  <Button
-    className="bg-[#9b87f5] text-white hover:bg-[#8a76e3]"
-    onClick={() => setMoModalThem(true)}
-    disabled={loading || isProcessing}
-  >
-    <FaPlus className="mr-2 h-4 w-4" /> Thêm loại sản phẩm
-  </Button>
-</div>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-800">
+          Quản Lý Loại Sản Phẩm
+        </h1>
+        <Button
+          className="bg-[#9b87f5] text-white hover:bg-[#8a76e3]"
+          onClick={() => setMoModalThem(true)}
+          disabled={loading || isProcessing}
+        >
+          <FaPlus className="mr-2 h-4 w-4" /> Thêm loại sản phẩm
+        </Button>
+      </div>
 
       <Tabs defaultValue="active" className="w-full" onValueChange={(value) => setActiveTab(value as "active" | "inactive")}>
         <TabsList className="grid w-full md:w-auto grid-cols-2 gap-1">
@@ -944,7 +917,7 @@ const AdminType = () => {
                     <TableBody>
                       {paginatedLoaiSanPham.length > 0 ? (
                         paginatedLoaiSanPham.map((group, index) => (
-                          <TableRow key={`${group.kiHieu}_${group.id}`} className="hover:bg-muted/50">
+                          <TableRow key={`${group.kiHieu}_${group.tenLoaiSanPham}`} className="hover:bg-muted/50">
                             <TableCell>{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</TableCell>
                             <TableCell>
                               {group.hinhAnh ? (
@@ -1093,7 +1066,7 @@ const AdminType = () => {
                     <TableBody>
                       {paginatedLoaiSanPham.length > 0 ? (
                         paginatedLoaiSanPham.map((group, index) => (
-                          <TableRow key={`${group.kiHieu}_${group.id}`} className="hover:bg-muted/50">
+                          <TableRow key={`${group.kiHieu}_${group.tenLoaiSanPham}`} className="hover:bg-muted/50">
                             <TableCell>{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</TableCell>
                             <TableCell>
                               {group.hinhAnh ? (
@@ -1200,396 +1173,395 @@ const AdminType = () => {
         </TabsContent>
       </Tabs>
 
-<Dialog open={moModalThem} onOpenChange={setMoModalThem}>
-  <DialogContent className="max-w-4xl w-full">
-    <DialogHeader>
-      <DialogTitle>Thêm Loại Sản Phẩm</DialogTitle>
-      <DialogDescription>Nhập thông tin loại sản phẩm mới.</DialogDescription>
-    </DialogHeader>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {/* Cột 1 (Bên trái): Tên Loại Sản Phẩm, Ký Hiệu, Hình Ảnh */}
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Tên Loại Sản Phẩm</label>
-          <Input
-            value={tenLoaiSanPhamMoi}
-            onChange={(e) => {
-              setTenLoaiSanPhamMoi(e.target.value);
-              setErrorsThem((prev) => ({ ...prev, ten: "" }));
-            }}
-            placeholder="Tên loại sản phẩm"
-            maxLength={100}
-            disabled={isProcessing}
-          />
-          {errorsThem.ten && <p className="text-red-500 text-sm mt-1">{errorsThem.ten}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Ký Hiệu</label>
-          <Input
-            value={kiHieuMoi}
-            onChange={(e) => {
-              setKiHieuMoi(e.target.value);
-              setErrorsThem((prev) => ({ ...prev, kiHieu: "" }));
-            }}
-            placeholder="Ký hiệu"
-            maxLength={1}
-            disabled={isProcessing}
-          />
-          {errorsThem.kiHieu && <p className="text-red-500 text-sm mt-1">{errorsThem.kiHieu}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Hình Ảnh</label>
-          <div
-            className={`border-2 border-dashed rounded-lg p-4 text-center ${
-              isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
-            }`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            {hinhAnhMoi ? (
-              <div className="relative">
-                <img
-                  src={hinhAnhMoi}
-                  alt="Preview"
-                  className="h-32 w-64 mx-auto object-cover rounded"
-                />
-                <button
-                  onClick={() => setHinhAnhMoi("")}
-                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                  disabled={isProcessing}
-                >
-                  ✕
-                </button>
-              </div>
-            ) : (
-              <div>
-                <Upload className="h-16 w-8 mx-auto text-gray-400" />
-                <p className="mt-2 text-sm text-gray-600">
-                  Kéo và thả hình ảnh vào đây hoặc nhấp để chọn (Tối đa 2MB)
-                </p>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  id="fileInputThem"
-                  onChange={handleFileInputChange}
-                  disabled={isProcessing}
-                />
-                <label htmlFor="fileInputThem" className="cursor-pointer text-blue-500 hover:underline">
-                  Chọn tệp
-                </label>
-              </div>
-            )}
-          </div>
-          {errorsThem.hinhAnh && <p className="text-red-500 text-sm mt-1">{errorsThem.hinhAnh}</p>}
-        </div>
-      </div>
-
-      {/* Cột 2 (Bên phải): Kích Thước với scrollbar */}
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Kích Thước</label>
-          <div className="max-h-80 overflow-y-auto border border-gray-200 rounded-md p-2">
-            {kichThuocMoi.map((size, index) => (
-              <div key={index} className="flex items-center gap-2 mb-2">
-                <Input
-                  value={size}
-                  onChange={(e) => {
-                    updateKichThuocField(index, e.target.value);
-                    setErrorsThem((prev) => ({ ...prev, kichThuoc: "" }));
-                  }}
-                  placeholder="Kích thước (ví dụ: S, M, XL)"
-                  maxLength={3}
-                  disabled={isProcessing}
-                />
-                {kichThuocMoi.length > 1 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => removeKichThuocField(index)}
-                    disabled={isProcessing}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={addKichThuocField}
-              className="mt-2 w-full"
-              disabled={isProcessing}
-            >
-              <Plus className="h-4 w-4 mr-2" /> Thêm Kích Thước
-            </Button>
-            {errorsThem.kichThuoc && <p className="text-red-500 text-sm mt-1">{errorsThem.kichThuoc}</p>}
-          </div>
-        </div>
-      </div>
-    </div>
-    <DialogFooter className="flex justify-end space-x-2 mt-4">
-      <Button variant="ghost" onClick={() => setMoModalThem(false)} disabled={isProcessing} className="flex items-center gap-2 bg-[#e7e4f5]">
-        <X className="h-4 w-4" /> Hủy
-      </Button>
-      <Button onClick={themLoaiSanPham} disabled={isProcessing} className="bg-[#9b87f5] text-white hover:bg-[#8a76e3] flex items-center gap-2">
-        {isProcessing ? "Đang xử lý..." : "Thêm"}
-        <Plus className="h-4 w-4" />
-      </Button>
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
-
-<Dialog open={moModalSua} onOpenChange={setMoModalSua}>
-  <DialogContent className="max-w-4xl w-full">
-    <DialogHeader>
-      <DialogTitle>Sửa Loại Sản Phẩm</DialogTitle>
-    </DialogHeader>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {/* Cột 1: Tên, Ký Hiệu, Kích Thước Hiện Tại */}
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Tên loại sản phẩm</label>
-          <Input
-            value={loaiSanPhamDangSua?.tenLoaiSanPham || ""}
-            onChange={(e) => {
-              setLoaiSanPhamDangSua({ ...loaiSanPhamDangSua!, tenLoaiSanPham: e.target.value });
-              setErrorsSua((prev) => ({ ...prev, ten: "" }));
-            }}
-            placeholder="Tên loại sản phẩm"
-            maxLength={100}
-            disabled={isProcessing}
-          />
-          {errorsSua.ten && <p className="text-red-500 text-sm mt-1">{errorsSua.ten}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Kí hiệu</label>
-          <Input
-          
-            value={loaiSanPhamDangSua?.kiHieu || ""}
-            onChange={() => {}} // Disabled, so no-op
-            placeholder="Ký hiệu"
-            maxLength={1}
-            disabled={true}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Kích Thước Hiện Tại</label>
-          <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md p-2">
-            {loaiSanPhamDangSua?.entries
-              .filter(entry => entry.trangThai === 1)
-              .map((entry, index) => (
-                <div key={index} className="flex items-center gap-2 mb-2">
-                  <Input
-                    value={entry.kichThuoc || ""}
-                    onChange={() => {}} // Disabled, so no-op
-                    placeholder="Kích thước"
-                    maxLength={3}
-                    disabled={true}
-                  />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => anKichThuoc(entry)}
-                    disabled={isProcessing}
-                  >
-                    <EyeOff className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            {loaiSanPhamDangSua?.entries.filter(entry => entry.trangThai === 1).length === 0 && (
-              <p className="text-gray-500 text-sm">Không có kích thước hoạt động.</p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Cột 2: Thêm Kích Thước Mới, Hình Ảnh */}
-      <div className="space-y-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Hình Ảnh</label>
-            <div>
-            <div
-                className={`border-2 border-dashed rounded-lg p-2 text-center ${
-                isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
-                }`}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-            >
-                {loaiSanPhamDangSua?.hinhAnh ? (
-                <div className="relative">
-                    <img
-                    src={formatBase64Image(loaiSanPhamDangSua.hinhAnh)}
-                    alt="Preview"
-                    className="h-24 w-32 mx-auto object-cover rounded"
-                    />
-                    <button
-                    onClick={() => setLoaiSanPhamDangSua({ ...loaiSanPhamDangSua!, hinhAnh: "" })}
-                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                    disabled={isProcessing}
-                    >
-                    ✕
-                    </button>
-                </div>
-                ) : (
-                <div>
-                    <Upload className="h-8 w-8 mx-auto text-gray-400" />
-                    <p className="mt-2 text-sm text-gray-600">
-                    Kéo và thả hình ảnh vào đây hoặc nhấp để chọn (Tối đa 2MB)
-                    </p>
-                    <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    id="fileInputSua"
-                    onChange={handleFileInputChange}
-                    disabled={isProcessing}
-                    />
-                    <label htmlFor="fileInputSua" className="cursor-pointer text-blue-500 hover:underline">
-                    Chọn tệp
-                    </label>
-                </div>
-                )}
-            </div>
-            {errorsSua.hinhAnh && <p className="text-red-500 text-sm mt-1">{errorsSua.hinhAnh}</p>}
-            </div>
-                <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Thêm Kích Thước Mới</label>
-          <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md p-2">
-            {kichThuocMoi.map((size, index) => (
-              <div key={index} className="flex items-center gap-2 mb-2">
-                <Input
-                  value={size}
-                  onChange={(e) => {
-                    updateKichThuocField(index, e.target.value);
-                    setErrorsSua((prev) => ({ ...prev, kichThuoc: "" }));
-                  }}
-                  placeholder="Kích thước (ví dụ: S, M, XL)"
-                  maxLength={3}
-                  disabled={isProcessing}
-                />
-                {kichThuocMoi.length > 1 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => removeKichThuocField(index)}
-                    disabled={isProcessing}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={addKichThuocField}
-              className="mt-2 w-full"
-              disabled={isProcessing}
-            >
-              <Plus className="h-4 w-4 mr-2" /> Thêm Kích Thước
-            </Button>
-            {errorsSua.kichThuoc && <p className="text-red-500 text-sm mt-1">{errorsSua.kichThuoc}</p>}
-          </div>
-        </div>
-      </div>
-    </div>
-    <DialogFooter className="flex justify-end space-x-2 mt-4">
-      <Button variant="ghost" onClick={() => setMoModalSua(false)} disabled={isProcessing} className="flex items-center gap-2 bg-[#e7e4f5]">
-        <X className="h-4 w-4" /> Hủy
-      </Button>
-      <Button onClick={suaLoaiSanPham} disabled={isProcessing} className="bg-[#9b87f5] text-white hover:bg-[#8a76e3] flex items-center gap-2">
-        {isProcessing ? "Đang xử lý..." : "Lưu"}
-        <FaEdit className="h-4 w-4" />
-      </Button>
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
-
-    <Dialog open={moModalChiTiet} onOpenChange={setMoModalChiTiet}>
-    <DialogContent className="max-w-4xl w-full">
-        <DialogHeader>
-        <DialogTitle>Chi Tiết Loại Sản Phẩm</DialogTitle>
-        </DialogHeader>
-        {loaiSanPhamChiTiet && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Cột 1 (Bên trái): Hình Ảnh, Tên Loại Sản Phẩm, Ký Hiệu */}
+      <Dialog open={moModalThem} onOpenChange={setMoModalThem}>
+        <DialogContent className="max-w-4xl w-full">
+          <DialogHeader>
+            <DialogTitle>Thêm Loại Sản Phẩm</DialogTitle>
+            <DialogDescription>Nhập thông tin loại sản phẩm mới.</DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Cột 1 (Bên trái): Tên Loại Sản Phẩm, Ký Hiệu, Hình Ảnh */}
             <div className="space-y-4">
-            <div>
-                <label className="block text-sm font-medium text-gray-700">Tên Loại Sản Phẩm</label>
-                <Input value={loaiSanPhamChiTiet.tenLoaiSanPham} disabled />
-            </div>
-            <div>
-                <label className="block text-sm font-medium text-gray-700">Ký Hiệu</label>
-                <Input value={loaiSanPhamChiTiet.kiHieu} disabled />
-            </div>
-                        <div>
-                <label className="block text-sm font-medium text-gray-700">Hình Ảnh</label>
-                {loaiSanPhamChiTiet.hinhAnh ? (
-                <img
-                    src={formatBase64Image(loaiSanPhamChiTiet.hinhAnh)}
-                    alt={loaiSanPhamChiTiet.tenLoaiSanPham}
-                    className="h-40 w-80 object-cover rounded"
-                    onError={(e) => (e.currentTarget.src = "/placeholder-image.jpg")}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tên Loại Sản Phẩm</label>
+                <Input
+                  value={tenLoaiSanPhamMoi}
+                  onChange={(e) => {
+                    setTenLoaiSanPhamMoi(e.target.value);
+                    setErrorsThem((prev) => ({ ...prev, ten: "" }));
+                  }}
+                  placeholder="Tên loại sản phẩm"
+                  maxLength={100}
+                  disabled={isProcessing}
                 />
-                ) : (
-                <p>Không có hình ảnh</p>
-                )}
-            </div>
+                {errorsThem.ten && <p className="text-red-500 text-sm mt-1">{errorsThem.ten}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ký Hiệu</label>
+                <Input
+                  value={kiHieuMoi}
+                  onChange={(e) => {
+                    setKiHieuMoi(e.target.value);
+                    setErrorsThem((prev) => ({ ...prev, kiHieu: "" }));
+                  }}
+                  placeholder="Ký hiệu"
+                  maxLength={1}
+                  disabled={isProcessing}
+                />
+                {errorsThem.kiHieu && <p className="text-red-500 text-sm mt-1">{errorsThem.kiHieu}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Hình Ảnh</label>
+                <div
+                  className={`border-2 border-dashed rounded-lg p-4 text-center ${
+                    isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  {hinhAnhMoi ? (
+                    <div className="relative">
+                      <img
+                        src={hinhAnhMoi}
+                        alt="Preview"
+                        className="h-32 w-64 mx-auto object-cover rounded"
+                      />
+                      <button
+                        onClick={() => setHinhAnhMoi("")}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                        disabled={isProcessing}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <Upload className="h-16 w-8 mx-auto text-gray-400" />
+                      <p className="mt-2 text-sm text-gray-600">
+                        Kéo và thả hình ảnh vào đây hoặc nhấp để chọn (Tối đa 2MB)
+                      </p>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        id="fileInputThem"
+                        onChange={handleFileInputChange}
+                        disabled={isProcessing}
+                      />
+                      <label htmlFor="fileInputThem" className="cursor-pointer text-blue-500 hover:underline">
+                        Chọn tệp
+                      </label>
+                    </div>
+                  )}
+                </div>
+                {errorsThem.hinhAnh && <p className="text-red-500 text-sm mt-1">{errorsThem.hinhAnh}</p>}
+              </div>
             </div>
 
             {/* Cột 2 (Bên phải): Kích Thước với scrollbar */}
             <div className="space-y-4">
-            <div>
-                <label className="block text-sm font-medium text-gray-700">Kích Thước</label>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kích Thước</label>
                 <div className="max-h-80 overflow-y-auto border border-gray-200 rounded-md p-2">
-                {loaiSanPhamChiTiet.entries.map((entry, index) => (
+                  {kichThuocMoi.map((size, index) => (
                     <div key={index} className="flex items-center gap-2 mb-2">
-                    <Input
-                        value={entry.kichThuoc || "Không có"}
-                        disabled
-                        className="mb-2"
-                    />
-                    {activeTab === "inactive" && (
-                        <>
+                      <Input
+                        value={size}
+                        onChange={(e) => {
+                          updateKichThuocField(index, e.target.value);
+                          setErrorsThem((prev) => ({ ...prev, kichThuoc: "" }));
+                        }}
+                        placeholder="Kích thước (ví dụ: S, M, XL)"
+                        maxLength={3}
+                        disabled={isProcessing}
+                      />
+                      {kichThuocMoi.length > 1 && (
                         <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setKichThuocCanKhoiPhuc(entry)}
-                            disabled={isProcessing}
-                            className="text-green-700"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeKichThuocField(index)}
+                          disabled={isProcessing}
                         >
-                            <FaUndo className="h-4 w-4" />
+                          <X className="h-4 w-4" />
                         </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setKichThuocCanXoaVinhVien(entry)}
-                            disabled={isProcessing}
-                            className="text-red-700"
-                        >
-                            <FaTrash className="h-4 w-4" />
-                        </Button>
-                        </>
-                    )}
+                      )}
                     </div>
-                ))}
-                {loaiSanPhamChiTiet.entries.length === 0 && (
-                    <p className="text-gray-500 text-sm">Không có kích thước hoạt động.</p>
-                )}
+                  ))}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={addKichThuocField}
+                    className="mt-2 w-full"
+                    disabled={isProcessing}
+                  >
+                    <Plus className="h-4 w-4 mr-2" /> Thêm Kích Thước
+                  </Button>
+                  {errorsThem.kichThuoc && <p className="text-red-500 text-sm mt-1">{errorsThem.kichThuoc}</p>}
                 </div>
+              </div>
             </div>
+          </div>
+          <DialogFooter className="flex justify-end space-x-2 mt-4">
+            <Button variant="ghost" onClick={() => setMoModalThem(false)} disabled={isProcessing} className="flex items-center gap-2 bg-[#e7e4f5]">
+              <X className="h-4 w-4" /> Hủy
+            </Button>
+            <Button onClick={themLoaiSanPham} disabled={isProcessing} className="bg-[#9b87f5] text-white hover:bg-[#8a76e3] flex items-center gap-2">
+              {isProcessing ? "Đang xử lý..." : "Thêm"}
+              <Plus className="h-4 w-4" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={moModalSua} onOpenChange={setMoModalSua}>
+        <DialogContent className="max-w-4xl w-full">
+          <DialogHeader>
+            <DialogTitle>Sửa Loại Sản Phẩm</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Cột 1: Tên, Ký Hiệu, Kích Thước Hiện Tại */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tên loại sản phẩm</label>
+                <Input
+                  value={loaiSanPhamDangSua?.tenLoaiSanPham || ""}
+                  onChange={(e) => {
+                    setLoaiSanPhamDangSua({ ...loaiSanPhamDangSua!, tenLoaiSanPham: e.target.value });
+                    setErrorsSua((prev) => ({ ...prev, ten: "" }));
+                  }}
+                  placeholder="Tên loại sản phẩm"
+                  maxLength={100}
+                  disabled={isProcessing}
+                />
+                {errorsSua.ten && <p className="text-red-500 text-sm mt-1">{errorsSua.ten}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kí hiệu</label>
+                <Input
+                  value={loaiSanPhamDangSua?.kiHieu || ""}
+                  onChange={() => {}} // Disabled, so no-op
+                  placeholder="Ký hiệu"
+                  maxLength={1}
+                  disabled={true}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kích Thước Hiện Tại</label>
+                <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md p-2">
+                  {loaiSanPhamDangSua?.entries
+                    .filter(entry => entry.trangThai === 1)
+                    .map((entry, index) => (
+                      <div key={index} className="flex items-center gap-2 mb-2">
+                        <Input
+                          value={entry.kichThuoc || ""}
+                          onChange={() => {}} // Disabled, so no-op
+                          placeholder="Kích thước"
+                          maxLength={3}
+                          disabled={true}
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => anKichThuoc(entry)}
+                          disabled={isProcessing}
+                        >
+                          <EyeOff className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  {loaiSanPhamDangSua?.entries.filter(entry => entry.trangThai === 1).length === 0 && (
+                    <p className="text-gray-500 text-sm">Không có kích thước hoạt động.</p>
+                  )}
+                </div>
+              </div>
             </div>
-        </div>
-        )}
-        <DialogFooter className="flex justify-end space-x-2 mt-4">
-        <Button variant="ghost" onClick={() => setMoModalChiTiet(false)} disabled={isProcessing} className="flex items-center gap-2 bg-[#e7e4f5]">
-            <X className="h-4 w-4" /> Đóng
-        </Button>
-        </DialogFooter>
-    </DialogContent>
-    </Dialog>
+
+            {/* Cột 2: Thêm Kích Thước Mới, Hình Ảnh */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Hình Ảnh</label>
+                <div
+                  className={`border-2 border-dashed rounded-lg p-2 text-center ${
+                    isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  {loaiSanPhamDangSua?.hinhAnh ? (
+                    <div className="relative">
+                      <img
+                        src={formatBase64Image(loaiSanPhamDangSua.hinhAnh)}
+                        alt="Preview"
+                        className="h-24 w-32 mx-auto object-cover rounded"
+                      />
+                      <button
+                        onClick={() => setLoaiSanPhamDangSua({ ...loaiSanPhamDangSua!, hinhAnh: "" })}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                        disabled={isProcessing}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <Upload className="h-8 w-8 mx-auto text-gray-400" />
+                      <p className="mt-2 text-sm text-gray-600">
+                        Kéo và thả hình ảnh vào đây hoặc nhấp để chọn (Tối đa 2MB)
+                      </p>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        id="fileInputSua"
+                        onChange={handleFileInputChange}
+                        disabled={isProcessing}
+                      />
+                      <label htmlFor="fileInputSua" className="cursor-pointer text-blue-500 hover:underline">
+                        Chọn tệp
+                      </label>
+                    </div>
+                  )}
+                </div>
+                {errorsSua.hinhAnh && <p className="text-red-500 text-sm mt-1">{errorsSua.hinhAnh}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Thêm Kích Thước Mới</label>
+                <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md p-2">
+                  {kichThuocMoi.map((size, index) => (
+                    <div key={index} className="flex items-center gap-2 mb-2">
+                      <Input
+                        value={size}
+                        onChange={(e) => {
+                          updateKichThuocField(index, e.target.value);
+                          setErrorsSua((prev) => ({ ...prev, kichThuoc: "" }));
+                        }}
+                        placeholder="Kích thước (ví dụ: S, M, XL)"
+                        maxLength={3}
+                        disabled={isProcessing}
+                      />
+                      {kichThuocMoi.length > 1 && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeKichThuocField(index)}
+                          disabled={isProcessing}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={addKichThuocField}
+                    className="mt-2 w-full"
+                    disabled={isProcessing}
+                  >
+                    <Plus className="h-4 w-4 mr-2" /> Thêm Kích Thước
+                  </Button>
+                  {errorsSua.kichThuoc && <p className="text-red-500 text-sm mt-1">{errorsSua.kichThuoc}</p>}
+                </div>
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="flex justify-end space-x-2 mt-4">
+            <Button variant="ghost" onClick={() => setMoModalSua(false)} disabled={isProcessing} className="flex items-center gap-2 bg-[#e7e4f5]">
+              <X className="h-4 w-4" /> Hủy
+            </Button>
+            <Button onClick={suaLoaiSanPham} disabled={isProcessing} className="bg-[#9b87f5] text-white hover:bg-[#8a76e3] flex items-center gap-2">
+              {isProcessing ? "Đang xử lý..." : "Lưu"}
+              <FaEdit className="h-4 w-4" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={moModalChiTiet} onOpenChange={setMoModalChiTiet}>
+        <DialogContent className="max-w-4xl w-full">
+          <DialogHeader>
+            <DialogTitle>Chi Tiết Loại Sản Phẩm</DialogTitle>
+          </DialogHeader>
+          {loaiSanPhamChiTiet && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Cột 1 (Bên trái): Hình Ảnh, Tên Loại Sản Phẩm, Ký Hiệu */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Tên Loại Sản Phẩm</label>
+                  <Input value={loaiSanPhamChiTiet.tenLoaiSanPham} disabled />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Ký Hiệu</label>
+                  <Input value={loaiSanPhamChiTiet.kiHieu} disabled />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Hình Ảnh</label>
+                  {loaiSanPhamChiTiet.hinhAnh ? (
+                    <img
+                      src={formatBase64Image(loaiSanPhamChiTiet.hinhAnh)}
+                      alt={loaiSanPhamChiTiet.tenLoaiSanPham}
+                      className="h-40 w-80 object-cover rounded"
+                      onError={(e) => (e.currentTarget.src = "/placeholder-image.jpg")}
+                    />
+                  ) : (
+                    <p>Không có hình ảnh</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Cột 2 (Bên phải): Kích Thước với scrollbar */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Kích Thước</label>
+                  <div className="max-h-80 overflow-y-auto border border-gray-200 rounded-md p-2">
+                    {loaiSanPhamChiTiet.entries.map((entry, index) => (
+                      <div key={index} className="flex items-center gap-2 mb-2">
+                        <Input
+                          value={entry.kichThuoc || "Không có"}
+                          disabled
+                          className="mb-2"
+                        />
+                        {activeTab === "inactive" && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setKichThuocCanKhoiPhuc(entry)}
+                              disabled={isProcessing}
+                              className="text-green-700"
+                            >
+                              <FaUndo className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setKichThuocCanXoaVinhVien(entry)}
+                              disabled={isProcessing}
+                              className="text-red-700"
+                            >
+                              <FaTrash className="h-4 w-4" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                    {loaiSanPhamChiTiet.entries.length === 0 && (
+                      <p className="text-gray-500 text-sm">Không có kích thước hoạt động.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="flex justify-end space-x-2 mt-4">
+            <Button variant="ghost" onClick={() => setMoModalChiTiet(false)} disabled={isProcessing} className="flex items-center gap-2 bg-[#e7e4f5]">
+              <X className="h-4 w-4" /> Đóng
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={moModalXoa} onOpenChange={setMoModalXoa}>
         <DialogContent>

@@ -17,7 +17,6 @@ import {
   supportItems 
 } from "./sidebar/sidebarItems";
 import { cn } from "@/lib/utils";
-import { successToast } from "@/utils/notifications";
 
 interface AppSidebarProps {
   role: "staff" | "admin";
@@ -45,7 +44,7 @@ export const AppSidebar = ({ role }: AppSidebarProps) => {
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
-    successToast(collapsed ? "Sidebar expanded" : "Sidebar collapsed");
+
   };
 
   const sidebarWidth = () => {

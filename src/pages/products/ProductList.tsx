@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ProductFilters } from "@/components/filters/ProductFilters";
 import { toast } from "@/hooks/use-toast";
 
 // Mock product data
@@ -229,31 +228,6 @@ const ProductList = () => {
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-6">Our Products</h1>
 
-      {/* Filters */}
-      <div className="mb-8">
-        <ProductFilters 
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          selectedColor={selectedColor}
-          setSelectedColor={setSelectedColor}
-          selectedSize={selectedSize}
-          setSelectedSize={setSelectedSize}
-          selectedBrand={selectedBrand}
-          setSelectedBrand={setSelectedBrand}
-          selectedType={selectedType}
-          setSelectedType={setSelectedType}
-          priceRange={priceRange}
-          setPriceRange={setPriceRange}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          uniqueColors={uniqueColors}
-          uniqueSizes={uniqueSizes}
-          minPrice={minPrice}
-          maxPrice={maxPrice}
-          resetFilters={resetFilters}
-          applyFilters={applyFilters}
-        />
-      </div>
 
       {filteredProducts.length === 0 ? (
         <div className="text-center py-8">

@@ -18,25 +18,15 @@ import BlogDetail from "./pages/blogs/BlogDetail";
 import FavoritesList from "./pages/favorites/FavoritesList";
 import Contact from "./pages/contact/Contact";
 import About from "./pages/about/About";
-import Login from "./pages/auth/Login";
-import Register from "./pages/auth/Register";
-import ForgotPassword from "./pages/auth/ForgotPassword";
+import { LoginForm } from "./pages/auth/Login";
+import { RegisterForm }from "./pages/auth/Register";
+import { ForgotPasswordForm } from "./pages/auth/ForgotPassword";
 import Profile from "./pages/user/Profile";
 import Cart from "./pages/user/Cart";
 import Checkout from "./pages/user/Checkout";
 import Orders from "./pages/user/Orders";
 import ViewProfile from "./pages/user/ViewProfile";
 import Messages from "./pages/user/Messages";
-import StaffDashboard from "./pages/staff/StaffDashboard";
-import StaffProducts from "./pages/staff/StaffProducts";
-import StaffOrders from "./pages/staff/StaffOrders";
-import StaffInventory from "./pages/staff/StaffInventory";
-import InventoryForm from "./pages/staff/InventoryForm";
-import PurchaseOrdersForm from "./pages/staff/PurchaseOrdersForm";
-import ProductsForm from "./pages/staff/ProductsForm";
-import ShippingForm from "./pages/staff/ShippingForm";
-import OrdersForm from "./pages/staff/OrdersForm";
-import InvoiceForm from "./pages/staff/InvoiceForm";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminStaff from "./pages/admin/AdminStaff";
@@ -46,7 +36,7 @@ import AdminContact from "./pages/admin/AdminContact";
 import AdminType from "./pages/admin/AdminType";
 import AdminSubcategories from "./pages/admin/AdminSubcategories";
 import AdminTrademark from "./pages/admin/AdminTrademark";
-import AdminBlogs from "./pages/admin/BlogAdmin/AdminBlogs";
+import AdminBlogs from "./pages/admin/AdminBlogs";
 
 const queryClient = new QueryClient();
 
@@ -67,9 +57,9 @@ const App = () => (
               <Route path="favorites" element={<FavoritesList />} />
               <Route path="contact" element={<Contact />} />
               <Route path="about" element={<About />} />
-              <Route path="auth/login" element={<Login />} />
-              <Route path="auth/register" element={<Register />} />
-              <Route path="auth/forgot-password" element={<ForgotPassword />} />
+              <Route path="auth/login" element={<LoginForm />} />
+              <Route path="auth/register" element={<RegisterForm />} />
+              <Route path="auth/forgot-password" element={<ForgotPasswordForm />} />
               <Route path="user/profile" element={<Profile />} />
               <Route path="user/cart" element={<Cart />} />
               <Route path="user/checkout" element={<Checkout />} />
@@ -78,35 +68,11 @@ const App = () => (
               <Route path="user/profile/:userId" element={<ViewProfile />} />
             </Route>
 
-            <Route path="/staff" element={<AdminLayout role="staff" />}>
-              <Route index element={<StaffDashboard />} />
-              <Route path="products" element={<StaffProducts />} />
-              <Route path="orders" element={<StaffOrders />} />
-              <Route path="inventory" element={<StaffInventory />} />
-              <Route path="inventory/form" element={<InventoryForm />} />
-              <Route path="purchase-orders/form" element={<PurchaseOrdersForm />} />
-              <Route path="products/form" element={<ProductsForm />} />
-              <Route path="shipping/form" element={<ShippingForm />} />
-              <Route path="orders/form" element={<OrdersForm />} />
-              <Route path="invoice/form" element={<InvoiceForm />} />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-
             <Route path="/admin" element={<AdminLayout role="admin" />}>
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="staff" element={<AdminStaff />} />
               <Route path="settings" element={<AdminSettings />} />
-              <Route path="products" element={<StaffProducts />} />
-              <Route path="orders" element={<StaffOrders />} />
-              <Route path="inventory" element={<StaffInventory />} />
-              <Route path="invoices" element={<AdminInvoices />} />
-              <Route path="inventory/form" element={<InventoryForm />} />
-              <Route path="purchase-orders/form" element={<PurchaseOrdersForm />} />
-              <Route path="products/form" element={<ProductsForm />} />
-              <Route path="shipping/form" element={<ShippingForm />} />
-              <Route path="orders/form" element={<OrdersForm />} />
-              <Route path="invoice/form" element={<InvoiceForm />} />
               <Route path="contact" element={<AdminContact />} />
               <Route path="type" element={<AdminType />} />
               <Route path="subcategories" element={<AdminSubcategories />} />

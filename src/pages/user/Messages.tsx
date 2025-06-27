@@ -1,6 +1,6 @@
 
 import React from "react";
-import { MessagesInbox } from "@/components/user/MessagesInbox";
+import { MessagesInbox } from "@/components/user/messages/MessagesInbox";
 import { Card } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 
