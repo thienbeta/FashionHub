@@ -1,7 +1,7 @@
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/pages/ui/table";
+import { Input } from "@/pages/ui/input";
+import { Button } from "@/pages/ui/button";
 import { Plus, User } from "lucide-react";
 
 const AdminStaff = () => {

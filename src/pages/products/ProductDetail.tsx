@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/pages/ui/button";
 import { 
   Card, 
   CardContent,
@@ -8,12 +8,12 @@ import {
   CardTitle,
   CardDescription,
   CardFooter
-} from "@/components/ui/card";
+} from "@/pages/ui/card";
 import { 
   Heart,
   ShoppingCart
 } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/pages/ui/tabs";
 
 // Mock product data
 const products = [

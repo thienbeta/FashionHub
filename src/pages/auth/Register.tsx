@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, User, Lock, Send } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/pages/ui/button";
+import { Input } from "@/pages/ui/input";
+import { Label } from "@/pages/ui/label";
 import { UserPlus } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/pages/ui/card";
 
-export const RegisterForm = () => {
+export const Register = () => {
   // Quản lý trạng thái của form
   const [formData, setFormData] = useState({
     fullName: "",

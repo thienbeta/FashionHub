@@ -1,5 +1,5 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/pages/ui/card";
 import { BarChart, Package, ShoppingCart, Users } from "lucide-react";
 
 const AdminDashboard = () => {

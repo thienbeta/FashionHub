@@ -1,9 +1,9 @@
 
 import React, { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/pages/ui/table";
+import { Input } from "@/pages/ui/input";
+import { Button } from "@/pages/ui/button";
+import { Badge } from "@/pages/ui/badge";
 import { 
   Plus, 
   Search, 
@@ -21,14 +21,14 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/pages/ui/select";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription
-} from "@/components/ui/card";
+} from "@/pages/ui/card";
 
 type Invoice = {
   id: string;

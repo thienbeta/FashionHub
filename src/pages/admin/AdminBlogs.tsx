@@ -5,10 +5,10 @@ import {
   DialogTitle,
   DialogHeader,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@/pages/ui/dialog";
+import { Button } from "@/pages/ui/button";
+import { Input } from "@/pages/ui/input";
+import { Label } from "@/pages/ui/label";
 import {
   Table,
   TableHeader,
@@ -16,14 +16,14 @@ import {
   TableHead,
   TableBody,
   TableCell,
-} from "@/components/ui/table";
+} from "@/pages/ui/table";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+} from "@/pages/ui/dropdown-menu";
+import { Card, CardContent, CardHeader, CardTitle } from "@/pages/ui/card";
 import Swal from "sweetalert2";
 import {
   MoreVertical,
@@ -48,7 +48,7 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
-} from "@/components/ui/tabs";
+} from "@/pages/ui/tabs";
 import { Bar, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,

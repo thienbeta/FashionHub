@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Eye, EyeOff, KeyRound, CheckCircle, Lock, Mail, Key, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/pages/ui/button";
+import { Input } from "@/pages/ui/input";
+import { Label } from "@/pages/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/pages/ui/card";
 
 type ForgotPasswordStep = "email" | "otp" | "newPassword";
 
-export const ForgotPasswordForm = () => {
+export const ForgotPassword = () => {
   const [step, setStep] = useState<ForgotPasswordStep>("email");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
