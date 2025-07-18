@@ -7,7 +7,6 @@ import { CommentForm } from "./CommentForm";
 import { CommentList } from "./CommentList";
 import { BlogHeader } from "./BlogHeader";
 import { BlogContent } from "./BlogContent";
-import { RelatedItemsSection } from "./RelatedItemsSection";
 import { useBreakpoint } from "@/hooks/use-mobile";
 
 interface BlogPost {
@@ -169,7 +168,6 @@ export const BlogDetail = ({ blogId }: BlogDetailComponentProps) => {
 
       <BlogHeader blog={blog} onLike={handleLike} onShare={handleShare} onCommentClick={scrollToComments} liked={liked} />
       <BlogContent image={blog.image} title={blog.title} content={blog.content} />
-      <RelatedItemsSection category={blog.category} relatedProducts={blog.relatedProducts} relatedCombos={blog.relatedCombos} />
       <Separator className="my-6 sm:my-8" />
       <div id="comments-section" className="scroll-mt-16">
         <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Bình luận ({blog.comments})</h2>

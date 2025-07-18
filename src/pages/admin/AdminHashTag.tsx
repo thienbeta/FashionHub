@@ -39,9 +39,9 @@ enum TrangThai {
   Khoa = 1
 }
 
-interface ThuongHieu {
-  maThuongHieu: number;
-  tenThuongHieu: string;
+interface Hashtag {
+  maHashtag: number;
+  tenHashtag: string;
   moTa: string;
   hinhAnh: string;
   ngayTao: string;
@@ -51,9 +51,9 @@ interface ThuongHieu {
 const ITEMS_PER_PAGE = 10;
 const API_URL = import.meta.env.VITE_API_URL;
 
-const AdminTrademark = () => {
-  const [thuongHieuList, setThuongHieuList] = useState<ThuongHieu[]>([]);
-  const [filteredThuongHieuList, setFilteredThuongHieuList] = useState<ThuongHieu[]>([]);
+const AdminHashTag = () => {
+  const [hashtagList, setHashtagList] = useState<Hashtag[]>([]);
+  const [filteredHashtagList, setFilteredHashtagList] = useState<Hashtag[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<"all" | "0" | "1">("all");
   const [loading, setLoading] = useState<boolean>(true);
@@ -63,11 +63,11 @@ const AdminTrademark = () => {
   const [moModalXoa, setMoModalXoa] = useState(false);
   const [moModalChiTiet, setMoModalChiTiet] = useState(false);
   const [moModalTrangThai, setMoModalTrangThai] = useState(false);
-  const [thuongHieuCanXoa, setThuongHieuCanXoa] = useState<ThuongHieu | null>(null);
-  const [thuongHieuChiTiet, setThuongHieuChiTiet] = useState<ThuongHieu | null>(null);
-  const [thuongHieuDangSua, setThuongHieuDangSua] = useState<ThuongHieu | null>(null);
-  const [thuongHieuCanDoiTrangThai, setThuongHieuCanDoiTrangThai] = useState<{ thuongHieu: ThuongHieu; newStatus: number } | null>(null);
-  const [tenThuongHieuMoi, setTenThuongHieuMoi] = useState("");
+  const [hashtagCanXoa, setHashtagCanXoa] = useState<Hashtag | null>(null);
+  const [hashtagChiTiet, setHashtagChiTiet] = useState<Hashtag | null>(null);
+  const [hashtagDangSua, setHashtagDangSua] = useState<Hashtag | null>(null);
+  const [hashtagCanDoiTrangThai, setHashtagCanDoiTrangThai] = useState<{ hashtag: Hashtag; newStatus: number } | null>(null);
+  const [tenHashtagMoi, setTenHashtagMoi] = useState("");
   const [moTaMoi, setMoTaMoi] = useState("");
   const [hinhAnhMoi, setHinhAnhMoi] = useState<File | null>(null);
   const [hinhAnhPreview, setHinhAnhPreview] = useState<string>("");
@@ -77,10 +77,10 @@ const AdminTrademark = () => {
   const [errorsSua, setErrorsSua] = useState({ ten: "", moTa: "", hinhAnh: "" });
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
-  const fetchThuongHieu = useCallback(async () => {
+  const fetchHashtag = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/ThuongHieu/all`, {
+      const response = await fetch(`${API_URL}/api/Hashtag/all`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -88,20 +88,20 @@ const AdminTrademark = () => {
       });
 
       if (!response.ok) {
-        if (response.status === 404) throw new Error("Không tìm thấy dữ liệu thương hiệu.");
+        if (response.status === 404) throw new Error("Không tìm thấy dữ liệu hashtag.");
         if (response.status === 500) throw new Error("Lỗi máy chủ, vui lòng thử lại sau.");
-        throw new Error("Không thể lấy danh sách thương hiệu.");
+        throw new Error("Không thể lấy danh sách hashtag.");
       }
 
-      const data: ThuongHieu[] = await response.json();
+      const data: Hashtag[] = await response.json();
       data.sort((a, b) => new Date(b.ngayTao).getTime() - new Date(a.ngayTao).getTime());
-      setThuongHieuList(data);
+      setHashtagList(data);
     } catch (error) {
       setError((error as Error).message);
       Swal.fire({
         icon: "error",
         title: "Lỗi",
-        text: `Lỗi khi tải danh sách thương hiệu: ${(error as Error).message}`,
+        text: `Lỗi khi tải danh sách hashtag: ${(error as Error).message}`,
         timer: 1000,
         timerProgressBar: true,
         showConfirmButton: false,
@@ -113,41 +113,41 @@ const AdminTrademark = () => {
   }, []);
 
   useEffect(() => {
-    fetchThuongHieu();
-  }, [fetchThuongHieu]);
+    fetchHashtag();
+  }, [fetchHashtag]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      let filtered = thuongHieuList.filter(
-        th =>
-          th.tenThuongHieu.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          th.moTa?.toLowerCase().includes(searchTerm.toLowerCase())
+      let filtered = hashtagList.filter(
+        h =>
+          h.tenHashtag.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          h.moTa?.toLowerCase().includes(searchTerm.toLowerCase())
       );
 
       if (statusFilter !== "all") {
-        filtered = filtered.filter(th => th.trangThai === parseInt(statusFilter));
+        filtered = filtered.filter(h => h.trangThai === parseInt(statusFilter));
       }
 
-      setFilteredThuongHieuList(filtered);
+      setFilteredHashtagList(filtered);
       setCurrentPage(1);
     }, 300);
     return () => clearTimeout(timer);
-  }, [searchTerm, thuongHieuList, statusFilter]);
+  }, [searchTerm, hashtagList, statusFilter]);
 
   const exportToExcel = () => {
-    const data = filteredThuongHieuList.map((thuongHieu, index) => ({
+    const data = filteredHashtagList.map((hashtag, index) => ({
       STT: (currentPage - 1) * ITEMS_PER_PAGE + index + 1,
-      "Mã Thương Hiệu": thuongHieu.maThuongHieu,
-      "Tên Thương Hiệu": thuongHieu.tenThuongHieu,
-      "Mô Tả": thuongHieu.moTa || "Không có",
-      "Trạng Thái": thuongHieu.trangThai === 0 ? "Hoạt động" : "Khóa",
-      "Ngày Tạo": new Date(thuongHieu.ngayTao).toLocaleDateString("vi-VN"),
+      "Mã Hashtag": hashtag.maHashtag,
+      "Tên Hashtag": hashtag.tenHashtag,
+      "Mô Tả": hashtag.moTa || "Không có",
+      "Trạng Thái": hashtag.trangThai === 0 ? "Hoạt động" : "Khóa",
+      "Ngày Tạo": new Date(hashtag.ngayTao).toLocaleDateString("vi-VN"),
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Danh sách thương hiệu");
-    XLSX.writeFile(workbook, "DanhSachThuongHieu.xlsx");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Danh sách hashtag");
+    XLSX.writeFile(workbook, "DanhSachHashtag.xlsx");
   };
 
   const handleFile = (file: File) => {
@@ -203,14 +203,14 @@ const AdminTrademark = () => {
     let valid = true;
     const newErrors = { ten: "", moTa: "", hinhAnh: "" };
 
-    if (!tenThuongHieuMoi.trim()) {
-      newErrors.ten = "Tên thương hiệu không được để trống!";
+    if (!tenHashtagMoi.trim()) {
+      newErrors.ten = "Tên hashtag không được để trống!";
       valid = false;
-    } else if (tenThuongHieuMoi.length > 20) {
-      newErrors.ten = "Tên thương hiệu không được dài quá 20 ký tự!";
+    } else if (tenHashtagMoi.length > 20) {
+      newErrors.ten = "Tên hashtag không được dài quá 20 ký tự!";
       valid = false;
-    } else if (thuongHieuList.some(th => th.tenThuongHieu.toLowerCase() === tenThuongHieuMoi.trim().toLowerCase())) {
-      newErrors.ten = "Tên thương hiệu đã tồn tại!";
+    } else if (hashtagList.some(h => h.tenHashtag.toLowerCase() === tenHashtagMoi.trim().toLowerCase())) {
+      newErrors.ten = "Tên hashtag đã tồn tại!";
       valid = false;
     }
 
@@ -238,33 +238,33 @@ const AdminTrademark = () => {
     let valid = true;
     const newErrors = { ten: "", moTa: "", hinhAnh: "" };
 
-    if (!thuongHieuDangSua?.tenThuongHieu.trim()) {
-      newErrors.ten = "Tên thương hiệu không được để trống!";
+    if (!hashtagDangSua?.tenHashtag.trim()) {
+      newErrors.ten = "Tên hashtag không được để trống!";
       valid = false;
-    } else if (thuongHieuDangSua.tenThuongHieu.length > 20) {
-      newErrors.ten = "Tên thương hiệu không được dài quá 20 ký tự!";
+    } else if (hashtagDangSua.tenHashtag.length > 20) {
+      newErrors.ten = "Tên hashtag không được dài quá 20 ký tự!";
       valid = false;
     } else if (
-      thuongHieuList.some(
-        th => th.maThuongHieu !== thuongHieuDangSua.maThuongHieu && th.tenThuongHieu.toLowerCase() === thuongHieuDangSua.tenThuongHieu.trim().toLowerCase()
+      hashtagList.some(
+        h => h.maHashtag !== hashtagDangSua.maHashtag && h.tenHashtag.toLowerCase() === hashtagDangSua.tenHashtag.trim().toLowerCase()
       )
     ) {
-      newErrors.ten = "Tên thương hiệu đã tồn tại!";
+      newErrors.ten = "Tên hashtag đã tồn tại!";
       valid = false;
     }
 
-    if (!thuongHieuDangSua?.moTa?.trim()) {
+    if (!hashtagDangSua?.moTa?.trim()) {
       newErrors.moTa = "Mô tả không được để trống!";
       valid = false;
-    } else if (thuongHieuDangSua.moTa.length < 5) {
+    } else if (hashtagDangSua.moTa.length < 5) {
       newErrors.moTa = "Mô tả phải ít nhất 5 ký tự!";
       valid = false;
-    } else if (thuongHieuDangSua.moTa.length > 50) {
+    } else if (hashtagDangSua.moTa.length > 50) {
       newErrors.moTa = "Mô tả không được dài quá 50 ký tự!";
       valid = false;
     }
 
-    if (!thuongHieuDangSua?.hinhAnh && !hinhAnhMoi) {
+    if (!hashtagDangSua?.hinhAnh && !hinhAnhMoi) {
       newErrors.hinhAnh = "Hình ảnh không được để trống!";
       valid = false;
     }
@@ -273,39 +273,39 @@ const AdminTrademark = () => {
     return valid;
   };
 
-  const themThuongHieu = async () => {
+  const themHashtag = async () => {
     if (!validateThem()) return;
 
     setIsProcessing(true);
     try {
       const formData = new FormData();
-      formData.append("TenThuongHieu", tenThuongHieuMoi.trim());
+      formData.append("TenHashtag", tenHashtagMoi.trim());
       formData.append("MoTa", moTaMoi.trim());
       if (hinhAnhMoi) formData.append("file", hinhAnhMoi);
 
-      const response = await fetch(`${API_URL}/api/ThuongHieu/create`, {
+      const response = await fetch(`${API_URL}/api/Hashtag/create`, {
         method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        if (response.status === 400) throw new Error(errorText || "Tên thương hiệu đã tồn tại.");
+        if (response.status === 400) throw new Error(errorText || "Tên hashtag đã tồn tại.");
         if (response.status === 500) throw new Error("Lỗi máy chủ, vui lòng thử lại sau.");
-        throw new Error(errorText || "Không thể thêm thương hiệu.");
+        throw new Error(errorText || "Không thể thêm hashtag.");
       }
 
-      setTenThuongHieuMoi("");
+      setTenHashtagMoi("");
       setMoTaMoi("");
       setHinhAnhMoi(null);
       setHinhAnhPreview("");
       setErrorsThem({ ten: "", moTa: "", hinhAnh: "" });
       setMoModalThem(false);
-      await fetchThuongHieu();
+      await fetchHashtag();
       Swal.fire({
         icon: "success",
         title: "Thành công",
-        text: "Thêm thương hiệu thành công!",
+        text: "Thêm hashtag thành công!",
         timer: 2000,
         timerProgressBar: true,
         showConfirmButton: false,
@@ -315,7 +315,7 @@ const AdminTrademark = () => {
       Swal.fire({
         icon: "error",
         title: "Lỗi",
-        text: `Lỗi khi thêm thương hiệu: ${(error as Error).message}`,
+        text: `Lỗi khi thêm hashtag: ${(error as Error).message}`,
         timer: 1000,
         timerProgressBar: true,
         showConfirmButton: false,
@@ -326,41 +326,41 @@ const AdminTrademark = () => {
     }
   };
 
-  const suaThuongHieu = async () => {
+  const suaHashtag = async () => {
     if (!validateSua()) return;
 
     setIsProcessing(true);
     try {
       const formData = new FormData();
-      formData.append("MaThuongHieu", thuongHieuDangSua!.maThuongHieu.toString());
-      formData.append("TenThuongHieu", thuongHieuDangSua!.tenThuongHieu.trim());
-      formData.append("MoTa", thuongHieuDangSua!.moTa?.trim() || "");
-      formData.append("TrangThai", thuongHieuDangSua!.trangThai.toString());
+      formData.append("MaHashtag", hashtagDangSua!.maHashtag.toString());
+      formData.append("TenHashtag", hashtagDangSua!.tenHashtag.trim());
+      formData.append("MoTa", hashtagDangSua!.moTa?.trim() || "");
+      formData.append("TrangThai", hashtagDangSua!.trangThai.toString());
       if (hinhAnhMoi) formData.append("file", hinhAnhMoi);
 
-      const response = await fetch(`${API_URL}/api/ThuongHieu/update`, {
+      const response = await fetch(`${API_URL}/api/Hashtag/update`, {
         method: "PUT",
         body: formData,
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        if (response.status === 400) throw new Error(errorText || "Tên thương hiệu đã tồn tại.");
-        if (response.status === 404) throw new Error(errorText || "Không tìm thấy thương hiệu.");
+        if (response.status === 400) throw new Error(errorText || "Tên hashtag đã tồn tại.");
+        if (response.status === 404) throw new Error(errorText || "Không tìm thấy hashtag.");
         if (response.status === 500) throw new Error("Lỗi máy chủ, vui lòng thử lại sau.");
-        throw new Error(errorText || "Không thể cập nhật thương hiệu.");
+        throw new Error(errorText || "Không thể cập nhật hashtag.");
       }
 
       setMoModalSua(false);
-      setThuongHieuDangSua(null);
+      setHashtagDangSua(null);
       setHinhAnhMoi(null);
       setHinhAnhPreview("");
       setErrorsSua({ ten: "", moTa: "", hinhAnh: "" });
-      await fetchThuongHieu();
+      await fetchHashtag();
       Swal.fire({
         icon: "success",
         title: "Thành công",
-        text: "Cập nhật thương hiệu thành công!",
+        text: "Cập nhật hashtag thành công!",
         timer: 2000,
         timerProgressBar: true,
         showConfirmButton: false,
@@ -370,7 +370,7 @@ const AdminTrademark = () => {
       Swal.fire({
         icon: "error",
         title: "Lỗi",
-        text: `Lỗi khi cập nhật thương hiệu: ${(error as Error).message}`,
+        text: `Lỗi khi cập nhật hashtag: ${(error as Error).message}`,
         timer: 1000,
         timerProgressBar: true,
         showConfirmButton: false,
@@ -381,30 +381,30 @@ const AdminTrademark = () => {
     }
   };
 
-  const xoaThuongHieu = async () => {
-    if (!thuongHieuCanXoa) return;
+  const xoaHashtag = async () => {
+    if (!hashtagCanXoa) return;
 
     setIsProcessing(true);
     try {
-      const response = await fetch(`${API_URL}/api/ThuongHieu/delete/${thuongHieuCanXoa.maThuongHieu}`, {
+      const response = await fetch(`${API_URL}/api/Hashtag/delete/${hashtagCanXoa.maHashtag}`, {
         method: "DELETE",
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        if (response.status === 404) throw new Error(errorText || "Không tìm thấy thương hiệu.");
+        if (response.status === 404) throw new Error(errorText || "Không tìm thấy hashtag.");
         if (response.status === 500) throw new Error("Lỗi máy chủ, vui lòng thử lại sau.");
-        throw new Error(errorText || "Không thể xóa thương hiệu.");
+        throw new Error(errorText || "Không thể xóa hashtag.");
       }
 
       setMoModalXoa(false);
-      setThuongHieuCanXoa(null);
+      setHashtagCanXoa(null);
       setCurrentPage(1);
-      await fetchThuongHieu();
+      await fetchHashtag();
       Swal.fire({
         icon: "success",
         title: "Thành công",
-        text: "Đã xóa thương hiệu vĩnh viễn!",
+        text: "Đã xóa hashtag vĩnh viễn!",
         timer: 2000,
         timerProgressBar: true,
         showConfirmButton: false,
@@ -414,7 +414,7 @@ const AdminTrademark = () => {
       Swal.fire({
         icon: "error",
         title: "Lỗi",
-        text: `Lỗi khi xóa thương hiệu: ${(error as Error).message}`,
+        text: `Lỗi khi xóa hashtag: ${(error as Error).message}`,
         timer: 1000,
         timerProgressBar: true,
         showConfirmButton: false,
@@ -425,24 +425,24 @@ const AdminTrademark = () => {
     }
   };
 
-  const openConfirmStatusModal = (thuongHieu: ThuongHieu, newStatus: number) => {
-    setThuongHieuCanDoiTrangThai({ thuongHieu, newStatus });
+  const openConfirmStatusModal = (hashtag: Hashtag, newStatus: number) => {
+    setHashtagCanDoiTrangThai({ hashtag, newStatus });
     setMoModalTrangThai(true);
   };
 
   const changeStatus = async () => {
-    if (!thuongHieuCanDoiTrangThai) return;
+    if (!hashtagCanDoiTrangThai) return;
 
     setIsProcessing(true);
     try {
-      const { thuongHieu, newStatus } = thuongHieuCanDoiTrangThai;
+      const { hashtag, newStatus } = hashtagCanDoiTrangThai;
       const formData = new FormData();
-      formData.append("MaThuongHieu", thuongHieu.maThuongHieu.toString());
-      formData.append("TenThuongHieu", thuongHieu.tenThuongHieu);
-      formData.append("MoTa", thuongHieu.moTa || "");
+      formData.append("MaHashtag", hashtag.maHashtag.toString());
+      formData.append("TenHashtag", hashtag.tenHashtag);
+      formData.append("MoTa", hashtag.moTa || "");
       formData.append("TrangThai", newStatus.toString());
 
-      const response = await fetch(`${API_URL}/api/ThuongHieu/update`, {
+      const response = await fetch(`${API_URL}/api/Hashtag/update`, {
         method: "PUT",
         body: formData,
       });
@@ -450,18 +450,18 @@ const AdminTrademark = () => {
       if (!response.ok) {
         const errorText = await response.text();
         if (response.status === 400) throw new Error(errorText || "Dữ liệu không hợp lệ.");
-        if (response.status === 404) throw new Error(errorText || "Không tìm thấy thương hiệu.");
+        if (response.status === 404) throw new Error(errorText || "Không tìm thấy hashtag.");
         if (response.status === 500) throw new Error("Lỗi máy chủ, vui lòng thử lại sau.");
         throw new Error(errorText || "Không thể cập nhật trạng thái.");
       }
 
       setMoModalTrangThai(false);
-      setThuongHieuCanDoiTrangThai(null);
-      await fetchThuongHieu();
+      setHashtagCanDoiTrangThai(null);
+      await fetchHashtag();
       Swal.fire({
         icon: "success",
         title: "Thành công",
-        text: `Đã ${newStatus === 1 ? "kích hoạt" : "khóa"} thương hiệu!`,
+        text: `Đã ${newStatus === 1 ? "kích hoạt" : "khóa"} hashtag!`,
         timer: 2000,
         timerProgressBar: true,
         showConfirmButton: false,
@@ -490,8 +490,8 @@ const AdminTrademark = () => {
     setStatusFilter(e.target.value as "all" | "0" | "1");
   };
 
-  const totalPages = Math.ceil(filteredThuongHieuList.length / ITEMS_PER_PAGE);
-  const paginatedThuongHieuList = filteredThuongHieuList.slice(
+  const totalPages = Math.ceil(filteredHashtagList.length / ITEMS_PER_PAGE);
+  const paginatedHashtagList = filteredHashtagList.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
@@ -500,14 +500,14 @@ const AdminTrademark = () => {
     <div className="space-y-4 p-2 sm:p-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-800 mb-2 sm:mb-0">
-          Quản Lý Thương Hiệu
+          Quản Lý Hashtag
         </h1>
         <Button
           className="w-full sm:w-auto bg-[#9b87f5] text-white hover:bg-[#8a76e3] text-sm sm:text-base py-1 sm:py-2 px-2 sm:px-4"
           onClick={() => setMoModalThem(true)}
           disabled={loading || isProcessing}
         >
-          <FaPlus className="mr-1 sm:mr-2 h-3 sm:h-4 w-3 sm:w-4" /> Thêm thương hiệu
+          <FaPlus className="mr-1 sm:mr-2 h-3 sm:h-4 w-3 sm:w-4" /> Thêm hashtag
         </Button>
       </div>
 
@@ -544,7 +544,7 @@ const AdminTrademark = () => {
         <Button
           className="w-full sm:w-auto bg-[#9b87f5] text-white hover:bg-[#8a76e3] text-sm sm:text-base py-1 sm:py-2 px-2 sm:px-4"
           onClick={exportToExcel}
-          disabled={loading || isProcessing || filteredThuongHieuList.length === 0}
+          disabled={loading || isProcessing || filteredHashtagList.length === 0}
         >
           <Download className="mr-1 sm:mr-2 h-3 sm:h-4 w-3 sm:w-4" /> Xuất Excel
         </Button>
@@ -560,7 +560,7 @@ const AdminTrademark = () => {
         <>
           <Card className="overflow-x-auto">
             <CardHeader>
-              <CardTitle className="text-lg sm:text-xl md:text-2xl">Danh sách thương hiệu</CardTitle>
+              <CardTitle className="text-lg sm:text-xl md:text-2xl">Danh sách hashtag</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
@@ -568,27 +568,27 @@ const AdminTrademark = () => {
                   <TableRow>
                     <TableHead className="w-[5%] sm:w-auto">STT</TableHead>
                     <TableHead className="w-[10%] sm:w-auto">Hình Ảnh</TableHead>
-                    <TableHead className="w-[15%] sm:w-auto">Tên Thương Hiệu</TableHead>
+                    <TableHead className="w-[15%] sm:w-auto">Tên Hashtag</TableHead>
                     <TableHead className="hidden sm:table-cell w-[20%]">Mô Tả</TableHead>
                     <TableHead className="w-[10%] sm:w-auto">Trạng Thái</TableHead>
                     <TableHead className="w-[10%] sm:w-auto">Hành Động</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedThuongHieuList.length > 0 ? (
-                    paginatedThuongHieuList.map((thuongHieu, index) => (
-                      <TableRow key={thuongHieu.maThuongHieu} className="hover:bg-muted/50">
+                  {paginatedHashtagList.length > 0 ? (
+                    paginatedHashtagList.map((hashtag, index) => (
+                      <TableRow key={hashtag.maHashtag} className="hover:bg-muted/50">
                         <TableCell className="text-xs sm:text-sm">
                           {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
                         </TableCell>
                         <TableCell className="text-xs sm:text-sm">
-                          {thuongHieu.hinhAnh ? (
+                          {hashtag.hinhAnh ? (
                             <img
-                              src={`${API_URL}${thuongHieu.hinhAnh}`}
-                              alt={thuongHieu.tenThuongHieu}
+                              src={`${API_URL}${hashtag.hinhAnh}`}
+                              alt={hashtag.tenHashtag}
                               className="h-8 sm:h-12 w-8 sm:w-12 object-cover rounded cursor-pointer"
                               onClick={() => {
-                                setThuongHieuChiTiet(thuongHieu);
+                                setHashtagChiTiet(hashtag);
                                 setMoModalChiTiet(true);
                               }}
                               onError={(e) => (e.currentTarget.src = "/placeholder-image.jpg")}
@@ -597,30 +597,30 @@ const AdminTrademark = () => {
                             "Không có hình"
                           )}
                         </TableCell>
-                        <TableCell className="text-xs sm:text-sm">{thuongHieu.tenThuongHieu}</TableCell>
+                        <TableCell className="text-xs sm:text-sm">{hashtag.tenHashtag}</TableCell>
                         <TableCell className="hidden sm:table-cell text-xs sm:text-sm">
-                          {thuongHieu.moTa || "Không có"}
+                          {hashtag.moTa || "Không có"}
                         </TableCell>
                         <TableCell className="text-xs sm:text-sm">
                           <label className="relative inline-block w-[40px] sm:w-[60px] h-[24px] sm:h-[34px]">
                             <input
                               type="checkbox"
                               className="opacity-0 w-0 h-0"
-                              checked={thuongHieu.trangThai === 1}
-                              onChange={(e) => openConfirmStatusModal(thuongHieu, e.target.checked ? 1 : 0)}
+                              checked={hashtag.trangThai === 1}
+                              onChange={(e) => openConfirmStatusModal(hashtag, e.target.checked ? 1 : 0)}
                               disabled={isProcessing}
                             />
                             <span
                               className={`absolute cursor-pointer inset-0 rounded-full transition-all duration-300 ease-in-out
                                   before:absolute before:h-[20px] sm:before:h-[30px] before:w-[20px] sm:before:w-[30px] before:left-[2px] before:bottom-[2px]
                                   before:bg-white before:rounded-full before:shadow-md before:transition-all before:duration-300 before:ease-in-out
-                                  ${thuongHieu.trangThai === 1
+                                  ${hashtag.trangThai === 1
                                   ? "bg-[#9b87f5] before:translate-x-[16px] sm:before:translate-x-[26px]"
                                   : "bg-gray-400"
                                 } hover:scale-110 shadow-sm hover:shadow-md`}
                             ></span>
                             <span className="sr-only">
-                              {thuongHieu.trangThai === 1 ? "Hoạt động" : "Khóa"}
+                              {hashtag.trangThai === 1 ? "Hoạt động" : "Khóa"}
                             </span>
                           </label>
                         </TableCell>
@@ -634,7 +634,7 @@ const AdminTrademark = () => {
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
                                 onClick={() => {
-                                  setThuongHieuChiTiet(thuongHieu);
+                                  setHashtagChiTiet(hashtag);
                                   setMoModalChiTiet(true);
                                 }}
                                 className="text-green-700 text-xs sm:text-sm"
@@ -643,8 +643,8 @@ const AdminTrademark = () => {
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => {
-                                  setThuongHieuDangSua(thuongHieu);
-                                  setHinhAnhPreview(thuongHieu.hinhAnh ? `${API_URL}${thuongHieu.hinhAnh}` : "");
+                                  setHashtagDangSua(hashtag);
+                                  setHinhAnhPreview(hashtag.hinhAnh ? `${API_URL}${hashtag.hinhAnh}` : "");
                                   setMoModalSua(true);
                                 }}
                                 className="text-blue-700 text-xs sm:text-sm"
@@ -653,7 +653,7 @@ const AdminTrademark = () => {
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => {
-                                  setThuongHieuCanXoa(thuongHieu);
+                                  setHashtagCanXoa(hashtag);
                                   setMoModalXoa(true);
                                 }}
                                 className="text-red-700 text-xs sm:text-sm"
@@ -668,7 +668,7 @@ const AdminTrademark = () => {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-2 sm:py-4 text-xs sm:text-sm text-muted-foreground">
-                        Không tìm thấy thương hiệu nào.
+                        Không tìm thấy hashtag nào.
                       </TableCell>
                     </TableRow>
                   )}
@@ -713,19 +713,19 @@ const AdminTrademark = () => {
       <Dialog open={moModalThem} onOpenChange={setMoModalThem}>
         <DialogContent className="w-full max-w-4xl">
           <DialogHeader>
-            <DialogTitle className="text-lg sm:text-xl">Thêm Thương Hiệu</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">Thêm Hashtag</DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2 sm:space-y-4">
               <div>
-                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">Tên Thương Hiệu</label>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">Tên Hashtag</label>
                 <Input
-                  value={tenThuongHieuMoi}
+                  value={tenHashtagMoi}
                   onChange={(e) => {
-                    setTenThuongHieuMoi(e.target.value);
+                    setTenHashtagMoi(e.target.value);
                     setErrorsThem(prev => ({ ...prev, ten: "" }));
                   }}
-                  placeholder="Tên thương hiệu"
+                  placeholder="Tên hashtag"
                   maxLength={20}
                   className="text-sm sm:text-base text-black"
                   disabled={isProcessing}
@@ -805,7 +805,7 @@ const AdminTrademark = () => {
               <X className="h-3 sm:h-4 w-3 sm:w-4 mr-1 sm:mr-2" /> Hủy
             </Button>
             <Button
-              onClick={themThuongHieu}
+              onClick={themHashtag}
               disabled={isProcessing}
               className="bg-[#9b87f5] text-white hover:bg-[#8a76e3] text-sm sm:text-base py-1 sm:py-2 px-2 sm:px-4"
             >
@@ -818,16 +818,16 @@ const AdminTrademark = () => {
       <Dialog open={moModalSua} onOpenChange={setMoModalSua}>
         <DialogContent className="w-full max-w-4xl">
           <DialogHeader>
-            <DialogTitle className="text-lg sm:text-xl">Sửa Thương Hiệu</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">Sửa Hashtag</DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2 sm:space-y-4">
               <div>
-                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">Tên Thương Hiệu</label>
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">Tên Hashtag</label>
                 <Input
-                  value={thuongHieuDangSua?.tenThuongHieu || ""}
-                  onChange={(e) => setThuongHieuDangSua(prev => ({ ...prev!, tenThuongHieu: e.target.value }))}
-                  placeholder="Tên thương hiệu"
+                  value={hashtagDangSua?.tenHashtag || ""}
+                  onChange={(e) => setHashtagDangSua(prev => ({ ...prev!, tenHashtag: e.target.value }))}
+                  placeholder="Tên hashtag"
                   maxLength={20}
                   className="text-sm sm:text-base text-black"
                   disabled={isProcessing}
@@ -837,8 +837,8 @@ const AdminTrademark = () => {
               <div>
                 <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">Mô Tả</label>
                 <Input
-                  value={thuongHieuDangSua?.moTa || ""}
-                  onChange={(e) => setThuongHieuDangSua(prev => ({ ...prev!, moTa: e.target.value }))}
+                  value={hashtagDangSua?.moTa || ""}
+                  onChange={(e) => setHashtagDangSua(prev => ({ ...prev!, moTa: e.target.value }))}
                   placeholder="Mô tả"
                   maxLength={50}
                   className="text-sm sm:text-base text-black"
@@ -904,7 +904,7 @@ const AdminTrademark = () => {
               <X className="h-3 sm:h-4 w-3 sm:w-4 mr-1 sm:mr-2" /> Hủy
             </Button>
             <Button
-              onClick={suaThuongHieu}
+              onClick={suaHashtag}
               disabled={isProcessing}
               className="bg-[#9b87f5] text-white hover:bg-[#8a76e3] text-sm sm:text-base py-1 sm:py-2 px-2 sm:px-4"
             >
@@ -917,22 +917,22 @@ const AdminTrademark = () => {
       <Dialog open={moModalChiTiet} onOpenChange={setMoModalChiTiet}>
         <DialogContent className="w-full max-w-4xl">
           <DialogHeader>
-            <DialogTitle className="text-lg sm:text-xl">Chi Tiết Thương Hiệu</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">Chi Tiết Hashtag</DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2 sm:space-y-4">
               <div>
-                <label className="block text-sm sm:text-base font-medium text-gray-700">Tên Thương Hiệu</label>
-                <Input value={thuongHieuChiTiet?.tenThuongHieu || ""} disabled className="text-sm sm:text-base text-black" />
+                <label className="block text-sm sm:text-base font-medium text-gray-700">Tên Hashtag</label>
+                <Input value={hashtagChiTiet?.tenHashtag || ""} disabled className="text-sm sm:text-base text-black" />
               </div>
               <div>
                 <label className="block text-sm sm:text-base font-medium text-gray-700">Mô Tả</label>
-                <Input value={thuongHieuChiTiet?.moTa || "Không có"} disabled className="text-sm sm:text-base text-black" />
+                <Input value={hashtagChiTiet?.moTa || "Không có"} disabled className="text-sm sm:text-base text-black" />
               </div>
               <div>
                 <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">Ngày Tạo</label>
                 <Input
-                  value={thuongHieuChiTiet ? new Date(thuongHieuChiTiet.ngayTao).toLocaleDateString("vi-VN") : ""}
+                  value={hashtagChiTiet ? new Date(hashtagChiTiet.ngayTao).toLocaleDateString("vi-VN") : ""}
                   disabled
                   className="text-sm sm:text-base text-black"
                 />
@@ -940,11 +940,11 @@ const AdminTrademark = () => {
             </div>
             <div>
               <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">Hình Ảnh</label>
-              {thuongHieuChiTiet?.hinhAnh ? (
+              {hashtagChiTiet?.hinhAnh ? (
                 <div className="border-2 border-dashed rounded-lg p-2 sm:p-4 text-center border-gray-300 mx-auto w-64 sm:w-[25rem]">
                   <img
-                    src={`${API_URL}${thuongHieuChiTiet.hinhAnh}`}
-                    alt={thuongHieuChiTiet.tenThuongHieu}
+                    src={`${API_URL}${hashtagChiTiet.hinhAnh}`}
+                    alt={hashtagChiTiet.tenHashtag}
                     className="h-40 sm:h-64 w-64 sm:w-[25rem] object-cover rounded"
                     onError={(e) => (e.currentTarget.src = "/placeholder-image.jpg")}
                   />
@@ -970,9 +970,9 @@ const AdminTrademark = () => {
       <Dialog open={moModalXoa} onOpenChange={setMoModalXoa}>
         <DialogContent className="w-full max-w-md sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-lg sm:text-xl">Xác nhận xóa thương hiệu</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">Xác nhận xóa hashtag</DialogTitle>
             <DialogDescription className="text-sm sm:text-base">
-              Bạn có chắc chắn muốn xóa thương hiệu: <strong>{thuongHieuCanXoa?.tenThuongHieu}</strong> này không?
+              Bạn có chắc chắn muốn xóa hashtag: <strong>{hashtagCanXoa?.tenHashtag}</strong> này không?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end space-x-2 mt-2 sm:mt-4">
@@ -985,7 +985,7 @@ const AdminTrademark = () => {
               <X className="h-3 sm:h-4 w-3 sm:w-4 mr-1 sm:mr-2" /> Hủy
             </Button>
             <Button
-              onClick={xoaThuongHieu}
+              onClick={xoaHashtag}
               disabled={isProcessing}
               className="bg-red-500 text-white hover:bg-red-600 text-sm sm:text-base py-1 sm:py-2 px-2 sm:px-4"
             >
@@ -1000,7 +1000,7 @@ const AdminTrademark = () => {
           <DialogHeader>
             <DialogTitle className="text-lg sm:text-xl">Xác nhận thay đổi trạng thái</DialogTitle>
             <DialogDescription className="text-sm sm:text-base">
-              Bạn có chắc chắn muốn {thuongHieuCanDoiTrangThai?.newStatus === 1 ? "kích hoạt" : "khóa"} thương hiệu này không?
+              Bạn có chắc chắn muốn {hashtagCanDoiTrangThai?.newStatus === 1 ? "kích hoạt" : "khóa"} hashtag này không?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end space-x-2 mt-2 sm:mt-4">
@@ -1026,4 +1026,4 @@ const AdminTrademark = () => {
   );
 };
 
-export default AdminTrademark;
+export default AdminHashTag;

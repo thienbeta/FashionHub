@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/pages/ui/card";
@@ -18,6 +17,8 @@ import {
   User,
   Send,
   RefreshCw,
+  X,
+  Upload,
 } from "lucide-react";
 import ReCAPTCHA from "react-google-recaptcha";
 import Swal from "sweetalert2";
@@ -28,11 +29,17 @@ const MySwal = withReactContent(Swal);
 const API_URL = import.meta.env.VITE_API_URL;
 const APP_TITLE = import.meta.env.VITE_TITLE;
 
+interface SelectedFile {
+  file: File;
+  preview?: string;
+}
+
 const Contact = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -41,19 +48,62 @@ const Contact = () => {
     email: "",
     phone: "",
     message: "",
+    files: "",
     captcha: "",
   });
 
   const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleRecaptchaChange = (token: string | null) => {
     setCaptchaToken(token);
     setErrors((prev) => ({ ...prev, captcha: "" }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const newFiles: SelectedFile[] = Array.from(files).map((file) => ({
+      file,
+      preview: file.type.startsWith("image/") ? URL.createObjectURL(file) : undefined,
+    }));
+
+    // Limit to 5 files
+    if (selectedFiles.length + newFiles.length > 5) {
+      setErrors((prev) => ({ ...prev, files: "Bạn chỉ có thể tải lên tối đa 5 tệp" }));
+      return;
+    }
+
+    setSelectedFiles((prev) => [...prev, ...newFiles]);
+    setErrors((prev) => ({ ...prev, files: "" }));
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles((prev) => {
+      const updatedFiles = [...prev];
+      const fileToRemove = updatedFiles[index];
+      if (fileToRemove.preview) {
+        URL.revokeObjectURL(fileToRemove.preview);
+      }
+      updatedFiles.splice(index, 1);
+      return updatedFiles;
+    });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const validateForm = () => {
     let isValid = true;
-    const newErrors = { name: "", email: "", phone: "", message: "", captcha: "" };
+    const newErrors = {
+      name: "",
+      email: "",
+      phone: "",
+      message: "",
+      files: "",
+      captcha: "",
+    };
 
     if (name.length < 5) {
       newErrors.name = "Tên phải có ít nhất 5 ký tự";
@@ -105,24 +155,24 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      const payload = {
-        HoTen: name,
-        Email: email,
-        Sdt: phone,
-        NoiDung: message,
-        TrangThai: "0",
-        ReCaptchaToken: captchaToken,
-      };
+      const formData = new FormData();
+      formData.append("HoTen", name);
+      formData.append("Email", email);
+      formData.append("Sdt", phone);
+      formData.append("NoiDung", message);
+      formData.append("TrangThai", "0"); // Set default TrangThai to 0
+      selectedFiles.forEach((selectedFile) => {
+        formData.append("MediaFiles", selectedFile.file);
+      });
 
       const response = await fetch(`${API_URL}/api/LienHe`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: formData,
       });
 
       if (!response.ok) {
         const errorMessage = await response.text();
-        throw new Error(errorMessage);
+        throw new Error(errorMessage || "Lỗi khi gửi tin nhắn");
       }
 
       setIsSubmitting(false);
@@ -131,9 +181,13 @@ const Contact = () => {
       setEmail("");
       setPhone("");
       setMessage("");
+      setSelectedFiles([]);
       setCaptchaToken(null);
-      setErrors({ name: "", email: "", phone: "", message: "", captcha: "" });
+      setErrors({ name: "", email: "", phone: "", message: "", files: "", captcha: "" });
       recaptchaRef.current?.reset();
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
 
       MySwal.fire({
         icon: "success",
@@ -334,12 +388,70 @@ const Contact = () => {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       rows={5}
-                      className={`w-full rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10 ${errors.message ? "border-red-500" : "border-input"
-                        }`}
+                      className={`w-full rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10 ${errors.message ? "border-red-500" : "border-input"}`}
                       required
                     ></textarea>
                   </div>
                   {errors.message && <p className="text-red-500 text-sm">{errors.message}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="files">Tệp đính kèm (tối đa 5 tệp)</Label>
+                  <div className="relative">
+                    <Button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 flex items-center justify-center"
+                    >
+                      <Upload className="mr-2 h-4 w-4" /> Chọn tệp
+                    </Button>
+                    <Input
+                      id="files"
+                      type="file"
+                      multiple
+                      accept="image/*,.pdf,.xlsx,.xls,.csv,.txt,.zip,.rar,.doc,.docx,.ppt,.pptx"
+                      onChange={handleFileChange}
+                      ref={fileInputRef}
+                      className="hidden"
+                    />
+                  </div>
+                  {errors.files && <p className="text-red-500 text-sm">{errors.files}</p>}
+                  {selectedFiles.length > 0 && (
+                    <div className="mt-2">
+                      <ul className="space-y-2">
+                        {selectedFiles.map((file, index) => (
+                          <li
+                            key={index}
+                            className="flex items-center justify-between bg-gray-100 p-2 rounded-md"
+                          >
+                            <div className="flex items-center space-x-2">
+                              {file.preview ? (
+                                <img
+                                  src={file.preview}
+                                  alt={file.file.name}
+                                  className="w-12 h-12 object-cover rounded"
+                                />
+                              ) : (
+                                <div className="w-12 h-12 bg-gray-200 flex items-center justify-center rounded">
+                                  <span className="text-xs text-gray-600">File</span>
+                                </div>
+                              )}
+                              <span className="text-sm truncate max-w-xs">
+                                {file.file.name}
+                              </span>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeFile(index)}
+                            >
+                              <X className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <ReCAPTCHA

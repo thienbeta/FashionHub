@@ -75,7 +75,7 @@ const UserLayout = () => {
         <div className="container mx-auto px-4 flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
             <Link to="/" className="flex items-center gap-2">
-              <img src="/logo.gif" alt="DearMoment" className="h-32 w-auto max-w-[150px]" />
+              <img src="/logo.png" alt="Fashion" className="h-16 w-auto max-w-[150px]" />
             </Link>
           </div>
           <nav className="hidden md:block">
@@ -228,8 +228,8 @@ const UserLayout = () => {
             <div>
               <Link to="/" className="flex items-center gap-2">
                 <img
-                  src="/logo.gif"
-                  alt="DearMoment"
+                  src="/logo.png"
+                  alt="Fshion"
                   className="h-32 w-auto transform -translate-y-7"
                 />
               </Link>

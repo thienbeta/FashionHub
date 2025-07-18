@@ -33,7 +33,6 @@ const adminItems: SidebarItemType[] = [
   { title: "Đơn hàng", icon: ShoppingCart, path: "/admin/orders", badge: "5", color: "text-orange-600" },
   { title: "Sản phẩm", icon: Package, path: "/admin/products", color: "text-green-600" },
   { title: "Người dùng", icon: Users, path: "/admin/users", color: "text-red-600" },
-  { title: "Nhân viên", icon: Users, path: "/admin/staff", color: "text-red-600" },
   { title: "Phân tích", icon: BarChart, path: "/admin/analytics", color: "text-cyan-600" },
   { title: "Hóa đơn", icon: FileText, path: "/admin/invoices", color: "text-gray-600" },
   { title: "Kho hàng", icon: Archive, path: "/admin/inventory", color: "text-purple-600" },
@@ -44,7 +43,6 @@ const adminManagementItems: SidebarItemType[] = [
   { title: "Thanh toán", icon: CreditCard, path: "/admin/payments", color: "text-yellow-600" },
   { title: "Tiếp thị", icon: Megaphone, path: "/admin/marketing", color: "text-pink-600" },
   { title: "Tin nhắn", icon: MessageSquare, path: "/admin/messages", color: "text-blue-600" },
-  { title: "Trò chuyện", icon: MessageSquare, path: "/admin/chat", color: "text-teal-600" },
   { title: "Lịch", icon: Calendar, path: "/admin/calendar", color: "text-green-600" },
   { title: "Báo cáo", icon: BarChart, path: "/admin/reports", color: "text-cyan-600" },
 ];
@@ -52,15 +50,17 @@ const adminManagementItems: SidebarItemType[] = [
 const supportItems: SidebarItemType[] = [
   { title: "Cài đặt", icon: Settings, path: "/admin/settings", color: "text-gray-600" },
   { title: "Liên hệ", icon: HelpCircle, path: "/admin/contact", color: "text-blue-600" },
-  { title: "Yêu thích", icon: Heart, path: "/admin/favorites", color: "text-red-600" },
   { title: "Trang web", icon: Globe, path: "/admin/website", color: "text-green-600" },
   { title: "Bảo mật", icon: Shield, path: "/admin/security", color: "text-purple-600" },
+
 ];
 
 const categoryItems: SidebarItemType[] = [
-  { title: "Loại sản phẩm", icon: Tag, path: "/admin/type", color: "text-pink-600" },
-  { title: "Danh mục con", icon: ClipboardList, path: "/admin/subcategories", color: "text-teal-600" },
-  { title: "Thương hiệu", icon: CreditCard, path: "/admin/trademark", color: "text-pink-600" },
+  { title: "Loại", icon: Tag, path: "/admin/type", color: "text-pink-600" },
+  { title: "Màu", icon: ClipboardList, path: "/admin/color", color: "text-teal-600" },
+  { title: "HashTag", icon: FileText, path: "/admin/hashtag", color: "text-gray-600" },
+  { title: "Kích Thước", icon: Heart, path: "/admin/size", color: "text-gray-600" },
+  { title: "Thương Hiệu", icon: CreditCard, path: "/admin/trademark", color: "text-pink-600" },
 ];
 
 // ---------- SidebarHeader ----------
@@ -92,7 +92,7 @@ const SidebarHeader = ({
         <Link to="/admin" className="flex items-center gap-2">
           {showText && (
             <div className="flex flex-col h-10 items-center justify-center">
-              <img src="/logo.gif" alt="DearMoment" className="h-32 w-auto max-w-[300px]" />
+              <img src="/logo.png" alt="Fashion" className="h-16 w-auto max-w-[300px]" />
             </div>
           )}
         </Link>

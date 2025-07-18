@@ -10,21 +10,15 @@ import {
 } from "@/pages/ui/table";
 import { Input } from "@/pages/ui/input";
 import { Button } from "@/pages/ui/button";
-import { Badge } from "@/pages/ui/badge";
 import {
-  Plus,
   Search,
   Filter,
-  Download,
-  ArrowUpDown,
   Eye,
-  Printer,
   Mail,
   Trash,
   MoreVertical,
   CheckCircle,
   XCircle,
-  AlertCircle,
   Loader2,
   ChevronLeft,
   ChevronRight,
@@ -44,7 +38,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/pages/ui/card";
 import {
   Dialog,
@@ -92,14 +85,24 @@ ChartJS.register(
 
 const ITEMS_PER_PAGE = 10;
 
+interface Media {
+  maMedia: number;
+  duongDan: string;
+  loaiMedia: string;
+  altMedia?: string;
+  ngayTao: string;
+}
+
 interface LienHe {
   maLienHe: number;
-  hoTen: string;
-  email: string;
-  sdt: string;
-  noiDung: string;
-  trangThai: number;
-  ngayTao: string;
+  hoTen?: string;
+  email?: string;
+  sdt?: string;
+  noiDung?: string;
+  daXem: boolean;
+  ngayTao?: string;
+  trangThai?: number;
+  medias: Media[];
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -113,34 +116,24 @@ const AdminContact = () => {
   const [selectedContact, setSelectedContact] = useState<LienHe | null>(null);
   const [supportModalOpen, setSupportModalOpen] = useState<boolean>(false);
   const [supportMessage, setSupportMessage] = useState<string>("");
+  const [attachments, setAttachments] = useState<File[]>([]);
   const [deleteContact, setDeleteContact] = useState<LienHe | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isSending, setIsSending] = useState<boolean>(false);
-  const [isLoadingAI, setIsLoadingAI] = useState<boolean>(false);
-  const [aiError, setAiError] = useState<string>("");
   const [selectedLienHeIds, setSelectedLienHeIds] = useState<number[]>([]);
-  const [phanLoaiData, setPhanLoaiData] = useState<{ [key: string]: number }>({
-    tích_cực: 0,
-    tiêu_cực: 0,
-    bình_thường: 0,
-  });
-  const [phanLoaiTheoNgay, setPhanLoaiTheoNgay] = useState<{
-    [date: string]: { tích_cực: number; tiêu_cực: number; bình_thường: number };
-  }>({});
   const [statusLoading, setStatusLoading] = useState<{ [key: number]: boolean }>({});
   const [confirmStatusChange, setConfirmStatusChange] = useState<{ contact: LienHe; newStatus: string } | null>(null);
   const hubConnection = useRef<HubConnection | null>(null);
 
   useEffect(() => {
     fetchLienHe();
-    fetchPhanLoaiGopY();
 
     const connection = new HubConnectionBuilder()
       .withUrl(`${API_URL}/lienHeHub`)
       .configureLogging(LogLevel.Information)
       .build();
 
-    connection.on("ReceiveLienHeAdded", (newLienHe: LienHe) => {
+    connection.on("NhanLienHeMoi", (newLienHe: LienHe) => {
       setLienHeList((prev) => [...prev, newLienHe].sort((a, b) => b.maLienHe - a.maLienHe));
     });
 
@@ -191,54 +184,15 @@ const AdminContact = () => {
     }
   };
 
-  const fetchPhanLoaiGopY = async () => {
-    setLoading(true);
+  const markAsViewed = async (maLienHe: number) => {
     try {
-      const response = await fetch(`${API_URL}/api/LienHe`);
-      if (!response.ok) throw new Error("Lỗi khi tải danh sách liên hệ");
-      const lienHeList = await response.json();
-
-      const phanLoai = { tích_cực: 0, tiêu_cực: 0, bình_thường: 0 };
-      const phanLoaiTheoNgayTemp: {
-        [date: string]: { tích_cực: number; tiêu_cực: number; bình_thường: number };
-      } = {};
-
-      for (const lienHe of lienHeList) {
-        const res = await fetch(
-          `${API_URL}/api/Gemini/PhanLoaiGopY?noiDung=${encodeURIComponent(lienHe.noiDung)}`
-        );
-        const data = await res.json();
-        if (data.responseCode === 201) {
-          const type = data.result;
-          const date = new Date(lienHe.ngayTao).toISOString().split("T")[0];
-
-          if (!phanLoaiTheoNgayTemp[date]) {
-            phanLoaiTheoNgayTemp[date] = { tích_cực: 0, tiêu_cực: 0, bình_thường: 0 };
-          }
-
-          if (type.includes("tích cực")) {
-            phanLoai.tích_cực++;
-            phanLoaiTheoNgayTemp[date].tích_cực++;
-          } else if (type.includes("tiêu cực")) {
-            phanLoai.tiêu_cực++;
-            phanLoaiTheoNgayTemp[date].tiêu_cực++;
-          } else {
-            phanLoai.bình_thường++;
-            phanLoaiTheoNgayTemp[date].bình_thường++;
-          }
-        }
-      }
-      setPhanLoaiData(phanLoai);
-      setPhanLoaiTheoNgay(phanLoaiTheoNgayTemp);
-    } catch (err) {
-      setError((err as Error).message);
-      Swal.fire({
-        icon: "error",
-        title: "Lỗi",
-        text: "Lỗi khi tải dữ liệu thống kê: " + (err as Error).message,
+      const response = await fetch(`${API_URL}/api/LienHe/${maLienHe}/daxem`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
       });
-    } finally {
-      setLoading(false);
+      if (!response.ok) throw new Error("Lỗi khi đánh dấu đã xem");
+    } catch (err) {
+      console.error("Error marking as viewed:", (err as Error).message);
     }
   };
 
@@ -247,9 +201,9 @@ const AdminContact = () => {
       .sort((a, b) => b.maLienHe - a.maLienHe)
       .filter(
         (l) =>
-          l.hoTen?.toLowerCase().includes(searchTerm) ||
-          l.email?.toLowerCase().includes(searchTerm) ||
-          l.sdt?.toLowerCase().includes(searchTerm)
+          (l.hoTen?.toLowerCase().includes(searchTerm) ||
+           l.email?.toLowerCase().includes(searchTerm) ||
+           l.sdt?.toLowerCase().includes(searchTerm)) ?? false
       );
     if (statusFilter !== "all") {
       filtered = filtered.filter((l) => String(l.trangThai) === statusFilter);
@@ -290,21 +244,18 @@ const AdminContact = () => {
     const { contact, newStatus } = confirmStatusChange;
     setStatusLoading((prev) => ({ ...prev, [contact.maLienHe]: true }));
     try {
-      const response = await fetch(`${API_URL}/api/LienHe/${contact.maLienHe}`, {
+      const response = await fetch(`${API_URL}/api/LienHe/${contact.maLienHe}/trangthai`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...contact, trangThai: Number(newStatus) }),
+        body: JSON.stringify({ trangThai: Number(newStatus) }),
       });
       if (!response.ok) throw new Error("Lỗi khi cập nhật trạng thái");
-
       Swal.fire({
         icon: "success",
         title: "Thành công",
         text: "Cập nhật trạng thái thành công!",
         timer: 3000,
         showConfirmButton: false,
-      }).then(() => {
-        fetchLienHe();
       });
     } catch (err) {
       setError((err as Error).message);
@@ -347,7 +298,7 @@ const AdminContact = () => {
       return;
     }
     try {
-      const response = await fetch(`${API_URL}/api/LienHe/DeleteMultiple`, {
+      const response = await fetch(`${API_URL}/api/LienHe/xoa-nhieu`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(selectedLienHeIds),
@@ -373,18 +324,22 @@ const AdminContact = () => {
     }
   };
 
-  const openSupportModal = (contact: LienHe) => {
+  const openSupportModal = async (contact: LienHe) => {
     setSelectedContact(contact);
     setSupportModalOpen(true);
     setSupportMessage("");
+    setAttachments([]);
+    if (!contact.daXem) {
+      await markAsViewed(contact.maLienHe);
+    }
   };
 
   const closeSupportModal = () => {
     setSupportModalOpen(false);
     setSelectedContact(null);
     setSupportMessage("");
+    setAttachments([]);
     setError("");
-    setAiError("");
   };
 
   const handleSendSupport = async () => {
@@ -394,30 +349,26 @@ const AdminContact = () => {
     }
     setIsSending(true);
     try {
-      const payload = {
-        toEmail: selectedContact?.email,
-        message: supportMessage,
-        hoTen: selectedContact?.hoTen,
-        sdt: selectedContact?.sdt,
-      };
-      const response = await fetch(`${API_URL}/api/LienHe/SupportEmail`, {
+      const formData = new FormData();
+      formData.append("toEmail", selectedContact?.email || "");
+      formData.append("message", supportMessage);
+      formData.append("hoTen", selectedContact?.hoTen || "");
+      formData.append("sdt", selectedContact?.sdt || "");
+      attachments.forEach((file) => formData.append("attachments", file));
+
+      const response = await fetch(`${API_URL}/api/LienHe/send-support-email`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: formData,
       });
       if (!response.ok) throw new Error("Lỗi khi gửi email hỗ trợ");
 
-      // Update contact status to "Đã xử lý" (trangThai = 1) after successful send
-      if (selectedContact) {
-        const updateResponse = await fetch(`${API_URL}/api/LienHe/${selectedContact.maLienHe}`, {
+      if (selectedContact && selectedContact.trangThai !== 1) {
+        const updateResponse = await fetch(`${API_URL}/api/LienHe/${selectedContact.maLienHe}/trangthai`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...selectedContact, trangThai: 1 }),
+          body: JSON.stringify({ trangThai: 1 }),
         });
         if (!updateResponse.ok) throw new Error("Lỗi khi cập nhật trạng thái");
-
-        // Refresh the contact list to reflect the updated status
-        fetchLienHe();
       }
 
       Swal.fire({
@@ -440,94 +391,19 @@ const AdminContact = () => {
     }
   };
 
-  const handleGetAIResponse = async () => {
-    if (!selectedContact) return;
-    setIsLoadingAI(true);
-    setAiError("");
-    try {
-      const response = await fetch(
-        `${API_URL}/api/Gemini/TraLoi?question=${encodeURIComponent(selectedContact.noiDung)}`
-      );
-      if (!response.ok) throw new Error("Lỗi khi gọi API Gemini AI");
-      const data = await response.json();
-      if (data.responseCode === 201) {
-        setSupportMessage(data.result);
-      } else {
-        throw new Error(data.errorMessage || "Không thể nhận phản hồi từ AI");
-      }
-    } catch (err) {
-      setAiError((err as Error).message);
-    } finally {
-      setIsLoadingAI(false);
+  const handleAttachmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files).slice(0, 5 - attachments.length);
+      setAttachments((prev) => [...prev, ...newFiles]);
     }
+  };
+
+  const removeAttachment = (index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-  };
-
-  const phanLoaiChartData = {
-    labels: ["Tích cực", "Tiêu cực", "Bình thường"],
-    datasets: [
-      {
-        label: "Số lượng góp ý",
-        data: [phanLoaiData.tích_cực, phanLoaiData.tiêu_cực, phanLoaiData.bình_thường],
-        backgroundColor: ["#4CAF50", "#F44336", "#9E9E9E"],
-      },
-    ],
-  };
-
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: { position: "top" as const },
-      title: { display: true, text: "Phân loại góp ý" },
-    },
-  };
-
-  const tangGiamChartData = {
-    labels: Object.keys(phanLoaiTheoNgay).sort(),
-    datasets: [
-      {
-        label: "Tích cực",
-        data: Object.keys(phanLoaiTheoNgay)
-          .sort()
-          .map((date) => phanLoaiTheoNgay[date].tích_cực),
-        borderColor: "#4CAF50",
-        backgroundColor: "#4CAF50",
-        fill: false,
-      },
-      {
-        label: "Tiêu cực",
-        data: Object.keys(phanLoaiTheoNgay)
-          .sort()
-          .map((date) => phanLoaiTheoNgay[date].tiêu_cực),
-        borderColor: "#F44336",
-        backgroundColor: "#F44336",
-        fill: false,
-      },
-      {
-        label: "Bình thường",
-        data: Object.keys(phanLoaiTheoNgay)
-          .sort()
-          .map((date) => phanLoaiTheoNgay[date].bình_thường),
-        borderColor: "#9E9E9E",
-        backgroundColor: "#9E9E9E",
-        fill: false,
-      },
-    ],
-  };
-
-  const tangGiamChartOptions = {
-    responsive: true,
-    plugins: {
-      legend: { position: "top" as const },
-      title: { display: true, text: "Tăng giảm góp ý theo thời gian" },
-    },
-    scales: {
-      x: { title: { display: true, text: "Ngày" } },
-      y: { title: { display: true, text: "Số lượng góp ý" }, beginAtZero: true },
-    },
   };
 
   const totalLienHeChartData = {
@@ -552,7 +428,7 @@ const AdminContact = () => {
   const totalLienHeTangGiamData = useMemo(() => {
     const countsByDate: { [date: string]: number } = {};
     lienHeList.forEach((lienHe) => {
-      const date = new Date(lienHe.ngayTao).toISOString().split("T")[0];
+      const date = new Date(lienHe.ngayTao!).toISOString().split("T")[0];
       countsByDate[date] = (countsByDate[date] || 0) + 1;
     });
 
@@ -655,6 +531,7 @@ const AdminContact = () => {
                         <TableHead>Số Điện Thoại</TableHead>
                         <TableHead>Nội Dung</TableHead>
                         <TableHead>Ngày Tạo</TableHead>
+                        <TableHead>Đã Xem</TableHead>
                         <TableHead>Trạng Thái</TableHead>
                         <TableHead>Hành Động</TableHead>
                         <TableHead>
@@ -672,13 +549,14 @@ const AdminContact = () => {
                           <TableCell>
                             {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
                           </TableCell>
-                          <TableCell>{lienHe.hoTen}</TableCell>
-                          <TableCell>{lienHe.email}</TableCell>
-                          <TableCell>{lienHe.sdt}</TableCell>
-                          <TableCell>{lienHe.noiDung}</TableCell>
+                          <TableCell>{lienHe.hoTen || "Không có"}</TableCell>
+                          <TableCell>{lienHe.email || "Không có"}</TableCell>
+                          <TableCell>{lienHe.sdt || "Không có"}</TableCell>
+                          <TableCell>{lienHe.noiDung || "Không có"}</TableCell>
                           <TableCell>
-                            {new Date(lienHe.ngayTao).toLocaleString()}
+                            {lienHe.ngayTao ? new Date(lienHe.ngayTao).toLocaleString() : "Không có"}
                           </TableCell>
+                          <TableCell>{lienHe.daXem ? "Đã xem" : "Chưa xem"}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2 relative">
                               {statusLoading[lienHe.maLienHe] && (
@@ -754,29 +632,25 @@ const AdminContact = () => {
                     variant="outline"
                     className="flex items-center"
                   >
-                    <ChevronLeft className="h-4 w-4 mr-2" />
-                    Trước
+                    <ChevronLeft className="h-4 w-4 mr-2" /> Trước
                   </Button>
-
                   {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
                     <Button
                       key={page}
                       onClick={() => handlePageChange(page)}
                       variant={currentPage === page ? "default" : "outline"}
-                      className={currentPage === page ? "bg-purple-400 text-white hover:bg-purple-300" : ""}
+                      className={currentPage === page ? "bg-[#9b87f5] text-white hover:bg-[#8a76e3]" : ""}
                     >
                       {page}
                     </Button>
                   ))}
-
                   <Button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
                     variant="outline"
                     className="flex items-center"
                   >
-                    Sau
-                    <ChevronRight className="h-4 w-4 ml-2" />
+                    Sau <ChevronRight className="h-4 w-4 ml-2" />
                   </Button>
                 </div>
               )}
@@ -786,35 +660,6 @@ const AdminContact = () => {
 
         <TabsContent value="appearance">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Thống kê phân loại góp ý</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <p>Đang tải dữ liệu thống kê...</p>
-                ) : error ? (
-                  <p className="text-red-500">{error}</p>
-                ) : (
-                  <Bar data={phanLoaiChartData} options={chartOptions} />
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Tăng giảm góp ý theo thời gian</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <p>Đang tải dữ liệu thống kê...</p>
-                ) : error ? (
-                  <p className="text-red-500">{error}</p>
-                ) : (
-                  <Line data={tangGiamChartData} options={tangGiamChartOptions} />
-                )}
-              </CardContent>
-            </Card>
             <Card>
               <CardHeader>
                 <CardTitle>Tổng số lượng liên hệ</CardTitle>
@@ -829,7 +674,6 @@ const AdminContact = () => {
                 )}
               </CardContent>
             </Card>
-
             <Card>
               <CardHeader>
                 <CardTitle>Tăng giảm tổng số lượng liên hệ theo thời gian</CardTitle>
@@ -855,26 +699,40 @@ const AdminContact = () => {
               <DialogTitle>Chi tiết liên hệ & Gửi hỗ trợ</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <p>
-                <strong>Họ Tên:</strong> {selectedContact.hoTen}
-              </p>
-              <p>
-                <strong>Email:</strong> {selectedContact.email}
-              </p>
-              <p>
-                <strong>Số điện thoại:</strong> {selectedContact.sdt}
-              </p>
-              <p>
-                <strong>Nội dung:</strong> {selectedContact.noiDung}
-              </p>
-              <p>
-                <strong>Ngày tạo:</strong>{" "}
-                {new Date(selectedContact.ngayTao).toLocaleString()}
-              </p>
-              <p>
-                <strong>Trạng thái:</strong>{" "}
-                {selectedContact.trangThai === 0 ? "Chưa xử lý" : "Đã xử lý"}
-              </p>
+              <p><strong>Họ Tên:</strong> {selectedContact.hoTen || "Không có"}</p>
+              <p><strong>Email:</strong> {selectedContact.email || "Không có"}</p>
+              <p><strong>Số điện thoại:</strong> {selectedContact.sdt || "Không có"}</p>
+              <p><strong>Nội dung:</strong> {selectedContact.noiDung || "Không có"}</p>
+              <p><strong>Ngày tạo:</strong> {selectedContact.ngayTao ? new Date(selectedContact.ngayTao).toLocaleString() : "Không có"}</p>
+              <p><strong>Trạng thái:</strong> {selectedContact.trangThai === 0 ? "Chưa xử lý" : "Đã xử lý"}</p>
+              <p><strong>Đã xem:</strong> {selectedContact.daXem ? "Đã xem" : "Chưa xem"}</p>
+              {selectedContact.medias.length > 0 && (
+                <div>
+                  <strong>Tệp đính kèm:</strong>
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    {selectedContact.medias.map((media) => (
+                      <div key={media.maMedia} className="flex items-center gap-2">
+                        {media.loaiMedia.startsWith("image/") ? (
+                          <img
+                            src={`${API_URL}${media.duongDan}`}
+                            alt={media.altMedia || "Media"}
+                            className="w-20 h-20 object-cover rounded"
+                          />
+                        ) : (
+                          <a
+                            href={`${API_URL}${media.duongDan}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 underline"
+                          >
+                            {media.duongDan.split("/").pop()}
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <textarea
                 value={supportMessage}
                 onChange={(e) => setSupportMessage(e.target.value)}
@@ -882,23 +740,43 @@ const AdminContact = () => {
                 className="w-full rounded-md border border-gray-300 p-2"
                 rows={5}
               />
-              {aiError && <p className="text-red-500">{aiError}</p>}
+              <div>
+                <label className="block mb-1">Đính kèm tệp (tối đa 5):</label>
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleAttachmentChange}
+                  disabled={attachments.length >= 5}
+                  className="w-full"
+                  accept="image/*,application/pdf"
+                />
+                {attachments.length > 0 && (
+                  <div className="mt-2">
+                    {attachments.map((file, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <span>{file.name}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeAttachment(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
               {error && <p className="text-red-500">{error}</p>}
             </div>
             <DialogFooter className="flex justify-between items-center mt-4">
               <Button variant="ghost" onClick={closeSupportModal} className="flex items-center gap-2 bg-[#e7e4f5]">
                 <X className="h-4 w-4" /> Đóng
               </Button>
-              <Button onClick={handleGetAIResponse} disabled={isLoadingAI} className="bg-[#9b87f5] text-white hover:bg-[#8a76e3]">
-                {isLoadingAI ? "Đang tải..." : "AI hỗ trợ"}
-                <AlertCircle className="ml-2 h-4 w-4" />
+              <Button onClick={handleSendSupport} disabled={isSending} className="bg-[#9b87f5] text-white hover:bg-[#8a76e3]">
+                {isSending ? "Đang gửi..." : "Gửi hỗ trợ"}
+                <Mail className="ml-2 h-4 w-4" />
               </Button>
-              <div className="flex space-x-2">
-                <Button onClick={handleSendSupport} disabled={isSending} className="bg-[#9b87f5] text-white hover:bg-[#8a76e3]">
-                  {isSending ? "Đang gửi..." : "Gửi hỗ trợ"}
-                  <Mail className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -912,13 +790,9 @@ const AdminContact = () => {
             </DialogHeader>
             <div className="space-y-4">
               {selectedLienHeIds.length > 0 ? (
-                <p>
-                  Bạn có chắc chắn muốn xóa {selectedLienHeIds.length} liên hệ đã chọn không?
-                </p>
+                <p>Bạn có chắc chắn muốn xóa {selectedLienHeIds.length} liên hệ đã chọn không?</p>
               ) : (
-                <p>
-                  Bạn có chắc chắn muốn xóa liên hệ của <strong>{deleteContact.hoTen}</strong> không?
-                </p>
+                <p>Bạn có chắc chắn muốn xóa liên hệ của <strong>{deleteContact.hoTen || "Không có"}</strong> không?</p>
               )}
             </div>
             <DialogFooter className="flex justify-end space-x-2 mt-4">
@@ -940,9 +814,7 @@ const AdminContact = () => {
               <DialogTitle>Xác nhận thay đổi trạng thái</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <p>
-                Bạn có chắc chắn muốn thay đổi trạng thái của liên hệ <strong>{confirmStatusChange.contact.hoTen}</strong> không?
-              </p>
+              <p>Bạn có chắc chắn muốn thay đổi trạng thái của liên hệ <strong>{confirmStatusChange.contact.hoTen || "Không có"}</strong> không?</p>
             </div>
             <DialogFooter className="flex justify-end space-x-2 mt-4">
               <Button variant="ghost" onClick={closeConfirmStatusChange} className="flex items-center gap-2 bg-[#e7e4f5]">
