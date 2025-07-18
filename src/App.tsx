@@ -5,16 +5,15 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppShell } from "@/pages/layout/AppShell";
 import AdminLayout from "@/pages/layout/AdminLayout";
-import UserLayout from "@/pages/layout/UserLayout";
-
+import UserLayout from "@/pages/layout/UserLayout"
 import Index from "./pages/user/Index";
-import NotFound from "./pages/products/NotFound";
+import NotFound from "./pages/sections/NotFound";
 import ProductList from "./pages/products/ProductList";
 import ProductDetail from "./pages/products/ProductDetail";
 import BlogList from "./pages/blogs/BlogList";
 import BlogDetail from "./pages/blogs/BlogDetail";
 import FavoritesList from "./pages/products/FavoritesList";
-import Contact from "./pages/sections/Contact";
+import Contact from "./pages/user/Contact";
 import About from "./pages/sections/About";
 import { Login } from "./pages/auth/Login";
 import { Register }from "./pages/auth/Register";
@@ -27,12 +26,13 @@ import ViewProfile from "./pages/user/ViewProfile";
 import { Messages } from "./pages/user/Messages";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
-import AdminStaff from "./pages/admin/AdminStaff";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminInvoices from "./pages/admin/AdminInvoices";
 import AdminContact from "./pages/admin/AdminContact";
 import AdminType from "./pages/admin/AdminType";
-import AdminSubcategories from "./pages/admin/AdminSubcategories";
+import AdminColor from "./pages/admin/AdminColor";
+import AdminSize from "./pages/admin/AdminSize";
+import AdminHashTag from "./pages/admin/AdminHashTag";
 import AdminTrademark from "./pages/admin/AdminTrademark";
 import AdminBlogs from "./pages/admin/AdminBlogs";
 
@@ -61,18 +61,18 @@ const App = () => (
               <Route path="user/checkout" element={<Checkout />} />
               <Route path="user/orders" element={<Orders />} />
               <Route path="messages" element={<Messages />} />
-
               <Route path="profile/:userId" element={<ViewProfile />} />
             </Route>
 
             <Route path="/admin" element={<AdminLayout role="admin" />}>
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
-              <Route path="staff" element={<AdminStaff />} />
               <Route path="settings" element={<AdminSettings />} />
               <Route path="contact" element={<AdminContact />} />
               <Route path="type" element={<AdminType />} />
-              <Route path="subcategories" element={<AdminSubcategories />} />
+              <Route path="color" element={<AdminColor />} />
+              <Route path="size" element={<AdminSize />} />
+              <Route path="hashtag" element={<AdminHashTag />} />
               <Route path="trademark" element={<AdminTrademark />} />
               <Route path="blogs" element={<AdminBlogs />} />
               <Route path="*" element={<NotFound />} />

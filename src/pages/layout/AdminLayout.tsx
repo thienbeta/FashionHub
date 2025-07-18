@@ -25,7 +25,6 @@ const getPageTitle = (pathname: string): string => {
     contact: "Liên hệ",
     marketing: "Tiếp thị",
     messages: "Tin nhắn",
-    chat: "Trò chuyện",
     calendar: "Lịch",
     reports: "Báo cáo",
     payments: "Thanh toán",
@@ -34,11 +33,10 @@ const getPageTitle = (pathname: string): string => {
     security: "Bảo mật",
     trademark: "Thương hiệu",
     type: "Loại sản phẩm",
-    subcategories: "Danh mục con",
-    purchaseOrders: "Đơn đặt hàng",
-    shipping: "Danh Mục",
-    categories: "Danh mục",
     blogs: "Blog",
+    hashtag: "Hashtag",
+    color: "Màu sắc",
+    size: "Kích thước",
   };
 
   return titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
