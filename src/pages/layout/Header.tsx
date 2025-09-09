@@ -11,86 +11,95 @@ type HeaderProps = {
 
 const Header = ({ title }: HeaderProps) => {
   const navigate = useNavigate();
-  
+ 
   const handleLogout = () => {
     localStorage.removeItem("adminLoggedIn");
     localStorage.removeItem("adminEmail");
-
     toast.success("Đăng xuất thành công");
-
     navigate("/auth/login");
   };
-  
+ 
   return (
-    <header className="h-16 border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 bg-white/80 backdrop-blur-sm z-20">
-      <h1 className="text-xl font-semibold">{title}</h1>
-      
+    <header className="h-16 border-b border-purple-200/50 flex items-center justify-between px-6 sticky top-0 bg-gradient-to-r from-purple-600/95 via-purple-500/95 to-red-500/95 backdrop-blur-lg z-20 shadow-lg shadow-purple-500/25">
+      <h1 className="text-xl font-bold text-white drop-shadow-md bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent">
+        {title}
+      </h1>
+     
       <div className="flex items-center gap-4">
+        {/* Search Input */}
         <div className="relative max-w-xs w-72 hidden md:block">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-          <Input 
-            type="search" 
-            placeholder="Tìm kiếm..." 
-            className="pl-8 bg-gray-100 border-0 focus-visible:ring-1 focus-visible:ring-crocus-500" 
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-purple-400" />
+          <Input
+            type="search"
+            placeholder="Tìm kiếm..."
+            className="pl-10 bg-white/20 border border-white/30 text-white placeholder:text-purple-200 focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:border-white/50 backdrop-blur-sm shadow-md rounded-lg transition-all duration-200 hover:bg-white/25"
           />
         </div>
+
+        {/* Notification Button */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="rounded-full bg-white/20 hover:bg-white/30 text-white border border-white/30 shadow-md transition-all duration-200 hover:shadow-lg hover:scale-105"
+            >
               <Bell className="h-5 w-5" />
-              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-crocus-500 text-[10px] text-white">
-                3
-              </span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
-            <DropdownMenuLabel>Thông báo</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <div className="max-h-80 overflow-y-auto">
-              {[1, 2, 3].map(i => (
-                <DropdownMenuItem key={i} className="cursor-pointer py-3">
-                  <div className="flex gap-4">
-                    <div className="h-9 w-9 rounded-full bg-crocus-50 flex items-center justify-center shrink-0">
-                      <Bell className="h-4 w-4 text-crocus-500" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">Đơn hàng mới #{1000 + i}</p>
-                      <p className="text-gray-500 text-xs mt-1">Khách hàng đã đặt một đơn hàng trị giá $199</p>
-                      <p className="text-xs text-gray-500 mt-1">10 phút trước</p>
-                    </div>
-                  </div>
-                </DropdownMenuItem>
-              ))}
-            </div>
+          <DropdownMenuContent align="end" className="w-80 bg-white shadow-xl border-purple-200/50 rounded-xl">
+            <DropdownMenuLabel className="text-purple-600 font-semibold">
+              Thông báo
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-purple-100" />
+            <DropdownMenuItem className="hover:bg-purple-50 text-gray-600">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium">Không có thông báo mới</p>
+                <p className="text-xs text-gray-500">Bạn đã xem tất cả thông báo</p>
+              </div>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {/* User Profile Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="rounded-full bg-white/20 hover:bg-white/30 text-white border border-white/30 shadow-md transition-all duration-200 hover:shadow-lg hover:scale-105"
+            >
               <User className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-base font-medium">Tài khoản của tôi</p>
-                <p className="text-xs text-gray-500">
+          <DropdownMenuContent align="end" className="w-56 bg-white shadow-xl border-purple-200/50 rounded-xl">
+            <DropdownMenuLabel className="font-normal bg-gradient-to-r from-purple-50 to-red-50 rounded-t-lg">
+              <div className="flex flex-col space-y-1 p-2">
+                <p className="text-base font-semibold text-purple-700">Tài khoản của tôi</p>
+                <p className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded-md font-medium">
                   {localStorage.getItem("adminEmail") || "admin@example.com"}
                 </p>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              <span>Hồ sơ</span>
+            <DropdownMenuSeparator className="bg-purple-100" />
+            
+            <DropdownMenuItem className="hover:bg-purple-50 text-gray-700 transition-colors duration-150">
+              <User className="mr-3 h-4 w-4 text-purple-500" />
+              <span className="font-medium">Hồ sơ</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <SettingsIcon className="mr-2 h-4 w-4" />
-              <span>Cài đặt</span>
+            
+            <DropdownMenuItem className="hover:bg-purple-50 text-gray-700 transition-colors duration-150">
+              <SettingsIcon className="mr-3 h-4 w-4 text-purple-500" />
+              <span className="font-medium">Cài đặt</span>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
+            
+            <DropdownMenuSeparator className="bg-red-100" />
+            
+            <DropdownMenuItem 
+              className="text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors duration-150 font-medium" 
+              onClick={handleLogout}
+            >
+              <LogOut className="mr-3 h-4 w-4" />
               <span>Đăng xuất</span>
             </DropdownMenuItem>
           </DropdownMenuContent>

@@ -1,6 +1,8 @@
+
 import { useState, useRef, useEffect } from "react";
-import { useLocation, Link, Outlet } from "react-router-dom";
+import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import Swal from "sweetalert2";
 import { Button } from "@/pages/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -10,17 +12,19 @@ import {
   LogIn,
   LogOut,
   Heart,
-  MessageCircle,
-  Package,
+  MessageSquare,
   LayoutGrid,
   Mail,
   ShoppingBag,
   UserCircle,
-  MapPin,
+  Package,
   Instagram,
   Twitter,
   Facebook,
-  MessageSquare,
+  MapPin,
+  Bell,
+  Settings as SettingsIcon,
+  Star,
 } from "lucide-react";
 import {
   NavigationMenu,
@@ -35,29 +39,28 @@ import {
   DrawerContent,
   DrawerTrigger,
 } from "@/pages/ui/drawer";
+import Search from "@/pages/user/Search";
+import UserFooter from "@/pages/layout/UserFooter";
 
 const UserLayout = () => {
-  const [userRole, setUserRole] = useState<"guest" | "user" | "staff" | "admin">("guest");
+  const [isLoggedIn, setIsLoggedIn] = useState(!!sessionStorage.getItem("userId"));
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
 
-  const cycleUserRole = () => {
-    if (userRole === "guest") setUserRole("user");
-    else if (userRole === "user") setUserRole("staff");
-    else if (userRole === "staff") setUserRole("admin");
-    else setUserRole("guest");
-  };
-
   const navLinks = [
-    { title: "Trang chủ", path: "/", icon: <LayoutGrid className="h-5 w-5" /> },
-    { title: "Sản phẩm", path: "/products", icon: <ShoppingBag className="h-5 w-5" /> },
-    { title: "Bài viết", path: "/blogs", icon: <MessageCircle className="h-5 w-5" /> },
-    { title: "Liên hệ", path: "/contact", icon: <Mail className="h-5 w-5" /> },
+    { title: "TRANG CHỦ", path: "/", icon: <LayoutGrid className="h-5 w-5" /> },
+    { title: "SẢN PHẨM", path: "/products", icon: <ShoppingBag className="h-5 w-5" /> },
   ];
 
   useEffect(() => {
+    // Check login status on mount
+    setIsLoggedIn(!!sessionStorage.getItem("userId"));
+
+    // Handle click outside for user menu
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false);
@@ -69,238 +72,308 @@ const UserLayout = () => {
     };
   }, []);
 
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      // Clear all session and local storage
+      sessionStorage.clear();
+      localStorage.clear();
+      setIsLoggedIn(false);
+      setIsUserMenuOpen(false);
+      
+      // Show success message
+      await Swal.fire({
+        icon: "success",
+        title: "Đăng xuất thành công",
+        text: "Bạn đã đăng xuất khỏi hệ thống!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      navigate("/auth/login");
+    } catch (err: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: err.message || "Đã có lỗi xảy ra khi đăng xuất",
+      });
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <>
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="container mx-auto px-4 flex h-16 items-center justify-between">
+      {/* Enhanced Header with Purple & Red Theme */}
+      <header className="bg-gradient-to-r from-purple-900 via-purple-700 to-red-600 border-b border-purple-300/30 sticky top-0 z-40 shadow-xl shadow-purple-500/20 backdrop-blur-lg">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
+          {/* Logo Section */}
           <div className="flex items-center gap-2">
-            <Link to="/" className="flex items-center gap-2">
-              <img src="/logo.png" alt="Fashion" className="h-16 w-auto max-w-[150px]" />
-            </Link>
+            <a href="/" className="flex items-center gap-2 group" aria-label="Trang chủ">
+              <div className="bg-white/20 rounded-lg p-2 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 backdrop-blur-sm border border-white/30">
+                <img
+                  src="/logo.png"
+                  alt={import.meta.env.VITE_TITLE}
+                  className="h-8 w-32 object-contain filter brightness-0 invert"
+                />
+              </div>
+            </a>
           </div>
+
+          {/* Desktop Navigation */}
           <nav className="hidden md:block">
             <NavigationMenu>
-              <NavigationMenuList>
+              <NavigationMenuList className="gap-2">
                 {navLinks.map((link) => (
                   <NavigationMenuItem key={link.path}>
-                    <Link to={link.path}>
+                    <a href={link.path}>
                       <NavigationMenuLink
                         className={cn(
-                          navigationMenuTriggerStyle(),
-                          location.pathname === link.path && "bg-accent text-accent-foreground",
-                          "px-4 py-2"
+                          "px-4 sm:px-6 py-3 rounded-lg font-medium text-gray-900 uppercase transition-all duration-200 flex items-center gap-2 hover:bg-white/20 shadow-md hover:shadow-lg backdrop-blur-sm border border-white/20 hover:border-white/40",
+                          location.pathname === link.path && "bg-white/30 text-gray-900 font-semibold border-white/50 shadow-lg"
                         )}
                       >
                         {link.icon}
-                        <span className="ml-2">{link.title}</span>
+                        <span>{link.title}</span>
                       </NavigationMenuLink>
-                    </Link>
+                    </a>
                   </NavigationMenuItem>
                 ))}
               </NavigationMenuList>
             </NavigationMenu>
           </nav>
-          <div className="flex items-center gap-4">
+
+          {/* Right Side Actions */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Search - Desktop */}
+            <div className="hidden lg:block">
+              <Search />
+            </div>
+
+            {/* Search - Mobile/Tablet */}
+            <div className="lg:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full bg-white/20 hover:bg-white/30 text-white border border-white/30 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+                onClick={() => navigate("/search")}
+                aria-label="Tìm kiếm"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </Button>
+            </div>
+
+            {/* Favorites */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full bg-white/20 hover:bg-white/30 text-white border border-white/30 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+              onClick={() => navigate("/favourites")}
+              aria-label="Yêu thích"
+            >
+              <Heart className="h-5 w-5" />
+            </Button>
+
+            {/* Cart */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full bg-white/20 hover:bg-white/30 text-white border border-white/30 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
+              onClick={() => navigate("/")}
+              aria-label="Giỏ hàng"
+            >
+              <ShoppingCart className="h-5 w-5" />
+            </Button>
+
+            {/* Mobile Menu */}
             <Drawer>
               <DrawerTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Mở menu"
+                  className="rounded-full bg-white/20 hover:bg-white/30 text-white border border-white/30 shadow-md hover:shadow-lg transition-all duration-200"
+                >
                   <Menu className="h-5 w-5" />
                 </Button>
               </DrawerTrigger>
-              <DrawerContent>
-                <div className="p-4 pt-0">
-                  <div className="flex flex-col gap-2 py-4">
+              <DrawerContent className="bg-gradient-to-b from-purple-50 to-red-50 border-t-4 border-purple-500 max-h-[80vh]">
+                <div className="p-4 sm:p-6 pt-4 overflow-y-auto">
+                  <div className="flex flex-col gap-3 py-4">
                     {navLinks.map((link) => (
                       <DrawerClose key={link.path} asChild>
-                        <Link
-                          to={link.path}
+                        <a
+                          href={link.path}
                           className={cn(
-                            "flex items-center gap-2 px-4 py-3 rounded-md",
+                            "flex items-center gap-3 px-4 sm:px-6 py-4 rounded-xl text-base font-medium uppercase text-gray-900 transition-all duration-200 shadow-md hover:shadow-lg border",
                             location.pathname === link.path
-                              ? "bg-crocus-100 text-crocus-700 font-medium"
-                              : "text-gray-600"
+                              ? "bg-gradient-to-r from-purple-500 to-red-500 text-white border-purple-400 shadow-lg shadow-purple-500/25"
+                              : "bg-white text-gray-900 hover:bg-gradient-to-r hover:from-purple-50 hover:to-red-50 border-purple-200 hover:border-purple-300"
                           )}
+                          aria-label={link.title}
                         >
                           {link.icon}
                           <span>{link.title}</span>
-                        </Link>
+                        </a>
                       </DrawerClose>
                     ))}
+                    {isLoggedIn && (
+                      <>
+                        <DrawerClose asChild>
+                          <a
+                            href="/profile"
+                            className="flex items-center gap-3 px-4 sm:px-6 py-4 rounded-xl text-base font-medium uppercase text-gray-900 bg-white hover:bg-gradient-to-r hover:from-purple-50 hover:to-red-50 border border-purple-200 hover:border-purple-300 shadow-md hover:shadow-lg"
+                            aria-label="Hồ sơ cá nhân"
+                          >
+                            <UserCircle className="h-5 w-5" />
+                            <span>HỒ SƠ CÁ NHÂN</span>
+                          </a>
+                        </DrawerClose>
+                        <DrawerClose asChild>
+                          <a
+                            href="/favourites"
+                            className="flex items-center gap-3 px-4 sm:px-6 py-4 rounded-xl text-base font-medium uppercase text-gray-900 bg-white hover:bg-gradient-to-r hover:from-purple-50 hover:to-red-50 border border-purple-200 hover:border-purple-300 shadow-md hover:shadow-lg"
+                            aria-label="Yêu thích"
+                          >
+                            <Heart className="h-5 w-5" />
+                            <span>YÊU THÍCH</span>
+                          </a>
+                        </DrawerClose>
+                        <DrawerClose asChild>
+                          <a
+                            href="/"
+                            className="flex items-center gap-3 px-4 sm:px-6 py-4 rounded-xl text-base font-medium uppercase text-gray-900 bg-white hover:bg-gradient-to-r hover:from-purple-50 hover:to-red-50 border border-purple-200 hover:border-purple-300 shadow-md hover:shadow-lg"
+                            aria-label="Giỏ hàng"
+                          >
+                            <ShoppingCart className="h-5 w-5" />
+                            <span>GIỎ HÀNG</span>
+                          </a>
+                        </DrawerClose>
+                        <Button
+                          variant="ghost"
+                          className="flex items-center gap-3 px-4 sm:px-6 py-4 rounded-xl text-base font-medium uppercase text-red-600 hover:bg-red-50 hover:text-red-700 border border-red-200 hover:border-red-300 shadow-md hover:shadow-lg"
+                          onClick={handleLogout}
+                          disabled={isLoggingOut}
+                        >
+                          <LogOut className="h-5 w-5" />
+                          <span>{isLoggingOut ? "ĐANG ĐĂNG XUẤT..." : "ĐĂNG XUẤT"}</span>
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </DrawerContent>
             </Drawer>
-            {userRole === "user" && (
-              <>
-                <Link
-                  to="/favorites"
-                  className={cn(
-                    "relative hover:text-crocus-600 transition-colors",
-                    location.pathname === "/favorites" ? "text-crocus-600" : "text-gray-600"
-                  )}
-                >
-                  <Heart className="h-5 w-5" />
-                </Link>
-                <Link
-                  to="/user/cart"
-                  className={cn(
-                    "relative hover:text-crocus-600 transition-colors",
-                    location.pathname === "/user/cart" ? "text-crocus-600" : "text-gray-600"
-                  )}
-                >
-                  <ShoppingCart className="h-5 w-5" />
-                  <span className="absolute -top-2 -right-2 bg-crocus-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    3
-                  </span>
-                </Link>
-                <Link
-                  to="/user/messages"
-                  className={cn(
-                    "relative hover:text-crocus-600 transition-colors",
-                    location.pathname === "/messages" ? "text-crocus-600" : "text-gray-600"
-                  )}
-                >
-                  <MessageSquare className="h-5 w-5" />
-                </Link>
-              </>
-            )}
-            {userRole === "guest" ? (
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/auth/login">
-                  <LogIn className="h-4 w-4 mr-2" /> Đăng nhập
-                </Link>
-              </Button>
-            ) : (
-              <div className="relative">
+
+            {/* User Authentication */}
+            {isLoggedIn ? (
+              <div className="relative" ref={menuRef}>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  aria-label="Menu người dùng"
+                  disabled={isLoggingOut}
+                  className="rounded-full bg-white/20 hover:bg-white/30 text-white border border-white/30 shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
                 >
                   <User className="h-5 w-5" />
                 </Button>
                 {isUserMenuOpen && (
-                  <div
-                    ref={menuRef}
-                    className="absolute right-0 mt-3 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-50 p-4"
-                  >
-                    <h3 className="font-semibold text-gray-800 mb-2">Thông tin người dùng</h3>
-                    <div className="space-y-2">
-                      <Link
-                        to="/user/profile"
-                        className="flex items-center text-gray-700 hover:text-crocus-600"
-                      >
-                        <UserCircle className="h-5 w-5 mr-2" />
-                        <span>Hồ sơ</span>
-                      </Link>
-                      <Link
-                        to="/user/orders"
-                        className="flex items-center text-gray-700 hover:text-crocus-600"
-                      >
-                        <Package className="h-5 w-5 mr-2" />
-                        <span>Đơn hàng</span>
-                      </Link>
+                  <div className="absolute right-0 mt-3 w-64 sm:w-72 bg-white/95 backdrop-blur-lg border border-purple-200/50 rounded-xl shadow-2xl shadow-purple-500/25 z-50 overflow-hidden">
+                    {/* User Info Header */}
+                    <div className="bg-gradient-to-r from-purple-500 to-red-500 p-4 text-white">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-white/20 rounded-full p-2 shadow-lg">
+                          <UserCircle className="h-6 w-6" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-base uppercase">TÀI KHOẢN CỦA TÔI</h3>
+                          <p className="text-sm text-purple-100">
+                            {sessionStorage.getItem("taiKhoan") || "Người dùng"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Menu Items */}
+                    <div className="p-2">
                       <Button
                         variant="ghost"
-                        size="sm"
-                        className="w-full text-red-600 flex items-center justify-start"
-                        onClick={() => setIsUserMenuOpen(false)}
+                        className="w-full text-left justify-start text-gray-900 uppercase hover:bg-purple-50 hover:text-purple-600 transition-all duration-200 rounded-lg mb-1 font-medium shadow-sm hover:shadow-md"
+                        onClick={() => {
+                          navigate("/profile");
+                          setIsUserMenuOpen(false);
+                        }}
+                        disabled={isLoggingOut}
                       >
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Đăng xuất
+                        <UserCircle className="h-5 w-5 mr-3 text-purple-500" />
+                        <span>HỒ SƠ CÁ NHÂN</span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="w-full text-left justify-start text-gray-900 uppercase hover:bg-purple-50 hover:text-purple-600 transition-all duration-200 rounded-lg mb-1 font-medium shadow-sm hover:shadow-md"
+                        onClick={() => {
+                          navigate("/favourites");
+                          setIsUserMenuOpen(false);
+                        }}
+                        disabled={isLoggingOut}
+                      >
+                        <Heart className="h-5 w-5 mr-3 text-purple-500" />
+                        <span>YÊU THÍCH</span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="w-full text-left justify-start text-gray-900 uppercase hover:bg-purple-50 hover:text-purple-600 transition-all duration-200 rounded-lg mb-1 font-medium shadow-sm hover:shadow-md"
+                        onClick={() => {
+                          navigate("/");
+                          setIsUserMenuOpen(false);
+                        }}
+                        disabled={isLoggingOut}
+                      >
+                        <ShoppingCart className="h-5 w-5 mr-3 text-purple-500" />
+                        <span>GIỎ HÀNG</span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="w-full text-left justify-start text-red-600 uppercase hover:bg-red-50 hover:text-red-700 transition-all duration-200 rounded-lg font-medium shadow-sm hover:shadow-md"
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                      >
+                        <LogOut className="h-5 w-5 mr-3" />
+                        <span>{isLoggingOut ? "ĐANG ĐĂNG XUẤT..." : "ĐĂNG XUẤT"}</span>
                       </Button>
                     </div>
                   </div>
                 )}
               </div>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-gray-900 uppercase border-white/30 bg-white/20 hover:bg-white/30 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 font-medium"
+                onClick={() => navigate("/auth/login")}
+                aria-label="Đăng nhập"
+              >
+                <LogIn className="h-4 w-4 mr-2" />
+                ĐĂNG NHẬP
+              </Button>
             )}
           </div>
         </div>
       </header>
-      <main className="flex-1">
-        <div className="container mx-auto py-6 px-4">
-          <Outlet />
-        </div>
-      </main>
-      <footer className="bg-gray-50 border-t border-gray-200 py-8">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative translate-y-5">
-            <div>
-              <Link to="/" className="flex items-center gap-2">
-                <img
-                  src="/logo.png"
-                  alt="Fshion"
-                  className="h-32 w-auto transform -translate-y-7"
-                />
-              </Link>
-              <p className="text-gray-600 transform -translate-y-10">
-                Mang đến cho bạn những xu hướng thời trang mới nhất 2025.
-              </p>
-            </div>
-            <div className="hidden md:block">
-              <h3 className="font-bold text-lg mb-4 text-crocus-700">Mua sắm</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link to="/" className="text-gray-600 hover:text-crocus-500">
-                    <LayoutGrid className="h-4 w-4 inline mr-2" /> Trang chủ
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/products" className="text-gray-600 hover:text-crocus-500">
-                    <ShoppingBag className="h-4 w-4 inline mr-2" /> Sản phẩm
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div className="hidden md:block">
-              <h3 className="font-bold text-lg mb-4 text-crocus-700">Tài khoản</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link to="/user/profile" className="text-gray-600 hover:text-crocus-500">
-                    <UserCircle className="h-4 w-4 inline mr-2" /> Hồ sơ
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/user/orders" className="text-gray-600 hover:text-crocus-500">
-                    <Package className="h-4 w-4 inline mr-2" /> Đơn hàng
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/user/cart" className="text-gray-600 hover:text-crocus-500">
-                    <ShoppingCart className="h-4 w-4 inline mr-2" /> Giỏ hàng
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold text-lg mb-4 text-crocus-700">Kết nối với chúng tôi</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link to="/contact" className="text-gray-600 hover:text-crocus-500">
-                    <Mail className="h-4 w-4 inline mr-2" /> Liên hệ
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/about" className="text-gray-600 hover:text-crocus-500">
-                    <MapPin className="h-4 w-4 inline mr-2" /> Về chúng tôi
-                  </Link>
-                </li>
-              </ul>
-              <div className="flex space-x-4 mt-4">
-                <a href="#" className="text-gray-600 hover:text-crocus-500">
-                  <Facebook className="h-6 w-6" />
-                </a>
-                <a href="#" className="text-gray-600 hover:text-crocus-500">
-                  <Instagram className="h-6 w-6" />
-                </a>
-                <a href="#" className="text-gray-600 hover:text-crocus-500">
-                  <Twitter className="h-6 w-6" />
-                </a>
-              </div>
-            </div>
+
+      {/* Enhanced Main Content */}
+      <main className="flex-1 bg-gradient-to-br from-purple-50/30 via-white to-red-50/30 min-h-screen">
+        <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg shadow-purple-500/10 border border-purple-100/50 p-4 sm:p-6">
+            <Outlet />
           </div>
         </div>
-      </footer>
+      </main>
+
+      {/* Enhanced Footer */}
+      <UserFooter />
     </>
   );
 };

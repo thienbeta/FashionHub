@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { ShoppingCart } from "lucide-react";
 import { Button } from "@/pages/ui/button";
 
 interface FeaturedProduct {
@@ -8,11 +7,22 @@ interface FeaturedProduct {
 }
 
 interface HeroBannerProps {
-  featuredProducts: FeaturedProduct[];
+  featuredProducts?: FeaturedProduct[]; // 👈 cho phép optional
 }
 
-const HeroBanner: React.FC<HeroBannerProps> = ({ featuredProducts }) => {
-  if (!featuredProducts || featuredProducts.length === 0) return null;
+const HeroBanner: React.FC<HeroBannerProps> = ({ featuredProducts = [] }) => {
+  const placeholderImage = "https://via.placeholder.com/150?text=No+Image";
+
+  // chọn ảnh hiển thị: nếu có sản phẩm thì lấy ảnh đầu tiên, nếu không thì fallback
+  const displayImage =
+    featuredProducts.length > 0
+      ? featuredProducts[0].image || placeholderImage
+      : placeholderImage;
+
+  const displayName =
+    featuredProducts.length > 0
+      ? featuredProducts[0].name
+      : "Sản phẩm mặc định";
 
   return (
     <section className="relative overflow-hidden">
@@ -22,7 +32,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ featuredProducts }) => {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight">
             Khám Phá Bộ Sưu Tập{" "}
             <span className="bg-gradient-to-r from-crocus-500 to-crocus-700 bg-clip-text text-transparent">
-              DearMoment
+              Fashion
             </span>{" "}
             2025
           </h1>
@@ -37,24 +47,14 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ featuredProducts }) => {
             <Button asChild variant="outline">
               <Link to="/products/new">Hàng Mới Về</Link>
             </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="flex gap-2 items-center"
-            >
-              <Link to="/user/cart">
-                <ShoppingCart className="h-4 w-4" />
-                <span>Xem Giỏ Hàng</span>
-              </Link>
-            </Button>
           </div>
         </div>
 
         {/* Right Image */}
         <div className="md:w-1/2 mt-8 md:mt-0">
           <img
-            src={featuredProducts[0].image}
-            alt={featuredProducts[0].name}
+            src={displayImage}
+            alt={displayName}
             className="w-full h-[300px] object-cover rounded-lg"
           />
         </div>

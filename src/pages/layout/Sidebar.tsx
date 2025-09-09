@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ChevronLeft, ChevronRight, LayoutDashboard, Users, Package, ShoppingCart, BarChart, FileText, Archive, Settings, HelpCircle, CreditCard, Megaphone, MessageSquare, Calendar, Globe, Shield, Heart, ClipboardList } from "lucide-react";
-import { TruckIcon as Truck, TagIcon as Tag } from "lucide-react";
+import { ChevronLeft, ChevronRight, LayoutDashboard, Package, Folder, Users, Settings, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useBreakpoint } from "@/hooks/use-mobile";
 import {
@@ -24,43 +23,56 @@ interface SidebarItemType {
   icon: React.ElementType;
   path: string;
   color: string;
-  badge?: string;
+  description?: string;
 }
 
 // ---------- Menu Data ----------
 const adminItems: SidebarItemType[] = [
-  { title: "Bảng điều khiển", icon: LayoutDashboard, path: "/admin", color: "text-blue-600" },
-  { title: "Đơn hàng", icon: ShoppingCart, path: "/admin/orders", badge: "5", color: "text-orange-600" },
-  { title: "Sản phẩm", icon: Package, path: "/admin/products", color: "text-green-600" },
-  { title: "Người dùng", icon: Users, path: "/admin/users", color: "text-red-600" },
-  { title: "Phân tích", icon: BarChart, path: "/admin/analytics", color: "text-cyan-600" },
-  { title: "Hóa đơn", icon: FileText, path: "/admin/invoices", color: "text-gray-600" },
-  { title: "Kho hàng", icon: Archive, path: "/admin/inventory", color: "text-purple-600" },
-  { title: "Blog", icon: Calendar, path: "/admin/blogs", color: "text-red-600" },
-];
-
-const adminManagementItems: SidebarItemType[] = [
-  { title: "Thanh toán", icon: CreditCard, path: "/admin/payments", color: "text-yellow-600" },
-  { title: "Tiếp thị", icon: Megaphone, path: "/admin/marketing", color: "text-pink-600" },
-  { title: "Tin nhắn", icon: MessageSquare, path: "/admin/messages", color: "text-blue-600" },
-  { title: "Lịch", icon: Calendar, path: "/admin/calendar", color: "text-green-600" },
-  { title: "Báo cáo", icon: BarChart, path: "/admin/reports", color: "text-cyan-600" },
+  { 
+    title: "Trang Chủ", 
+    icon: LayoutDashboard, 
+    path: "/admin", 
+    color: "text-red-600",
+    description: "Bảng điều khiển chính"
+  },
+  { 
+    title: "Sản Phẩm", 
+    icon: Package, 
+    path: "/admin/sanpham", 
+    color: "text-red-600",
+    description: "Quản lý sản phẩm"
+  },
+  { 
+    title: "Danh Mục", 
+    icon: Folder, 
+    path: "/admin/danhmuc", 
+    color: "text-purple-600",
+    description: "Phân loại sản phẩm"
+  },
+  { 
+    title: "Người Dùng", 
+    icon: Users, 
+    path: "/admin/nguoidung", 
+    color: "text-red-600",
+    description: "Quản lý tài khoản"
+  },
 ];
 
 const supportItems: SidebarItemType[] = [
-  { title: "Cài đặt", icon: Settings, path: "/admin/settings", color: "text-gray-600" },
-  { title: "Liên hệ", icon: HelpCircle, path: "/admin/contact", color: "text-blue-600" },
-  { title: "Trang web", icon: Globe, path: "/admin/website", color: "text-green-600" },
-  { title: "Bảo mật", icon: Shield, path: "/admin/security", color: "text-purple-600" },
-
-];
-
-const categoryItems: SidebarItemType[] = [
-  { title: "Loại", icon: Tag, path: "/admin/type", color: "text-pink-600" },
-  { title: "Màu", icon: ClipboardList, path: "/admin/color", color: "text-teal-600" },
-  { title: "HashTag", icon: FileText, path: "/admin/hashtag", color: "text-gray-600" },
-  { title: "Kích Thước", icon: Heart, path: "/admin/size", color: "text-gray-600" },
-  { title: "Thương Hiệu", icon: CreditCard, path: "/admin/trademark", color: "text-pink-600" },
+  { 
+    title: "Cài Đặt", 
+    icon: Settings, 
+    path: "/admin/settings", 
+    color: "text-purple-600",
+    description: "Cấu hình hệ thống"
+  },
+  { 
+    title: "Bảo Mật", 
+    icon: Shield, 
+    path: "/admin/profile", 
+    color: "text-red-600",
+    description: "Quản lý bảo mật"
+  },
 ];
 
 // ---------- SidebarHeader ----------
@@ -82,25 +94,36 @@ const SidebarHeader = ({
   const showText = !collapsed || (collapsed && (isMobile || isTablet));
 
   return (
-    <div className={cn("p-3 flex items-center border-b border-gray-200", className)}>
+    <div className={cn(
+      "p-4 flex items-center border-b border-purple-100 bg-gradient-to-r from-purple-50 to-red-50 shadow-sm",
+      className
+    )}>
       <div
         className={cn(
           "flex items-center w-full",
           collapsed && !showText ? "justify-center" : "justify-between"
         )}
       >
-        <Link to="/admin" className="flex items-center gap-2">
-          {showText && (
-            <div className="flex flex-col h-10 items-center justify-center">
-              <img src="/logo.png" alt="Fashion" className="h-16 w-auto max-w-[300px]" />
+        {!collapsed && showText && (
+          <Link to="/admin" className="flex items-center gap-3 group">
+            <div className="h-10 w-10 bg-gradient-to-br from-purple-600 to-red-600 rounded-xl shadow-lg flex items-center justify-center">
+              <LayoutDashboard className="h-6 w-6 text-white" />
             </div>
-          )}
-        </Link>
+            <div className="flex flex-col">
+              <span className="font-bold text-lg bg-gradient-to-r from-purple-600 to-red-600 bg-clip-text text-transparent">
+                Fashion Admin
+              </span>
+              <span className="text-xs text-gray-500 font-medium">
+                Quản trị hệ thống
+              </span>
+            </div>
+          </Link>
+        )}
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleCollapse}
-          className="text-gray-500 hover:text-crocus-600 hover:bg-crocus-50"
+          className="text-gray-600 hover:text-purple-600 hover:bg-purple-100 rounded-lg shadow-sm transition-all duration-200"
         >
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </Button>
@@ -118,9 +141,9 @@ const SidebarItem = ({
   title,
   icon: Icon,
   path,
-  badge,
   collapsed,
   color,
+  description,
 }: SidebarItemProps) => {
   const location = useLocation();
   const isActive = location.pathname === path || location.pathname.startsWith(`${path}/`);
@@ -128,51 +151,30 @@ const SidebarItem = ({
   const isTablet = useBreakpoint("tablet");
   const showText = !collapsed || (collapsed && (isMobile || isTablet));
 
-  const linkContent = (
+  return (
     <Link
       to={path}
       className={cn(
-        "flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer transition-colors",
+        "flex items-center gap-3 px-4 py-2 rounded-lg cursor-pointer transition-all duration-200",
         isActive
-          ? "bg-crocus-100 text-crocus-600 font-medium"
-          : "text-gray-600 hover:bg-crocus-50 hover:text-crocus-600"
+          ? "bg-gradient-to-r from-purple-600 to-red-600 text-white"
+          : "text-gray-700 hover:bg-purple-50 hover:text-purple-700",
+        collapsed && !showText ? "justify-center" : ""
       )}
     >
-      <div className={cn("relative flex items-center justify-center", collapsed && !showText ? "w-full" : "w-auto")}>
-        <Icon className={cn("h-5 w-5", isActive ? "text-crocus-600" : color)} />
-        {badge && collapsed && !showText && (
-          <span className="absolute -top-2 -right-2 bg-crocus-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-            {badge}
-          </span>
-        )}
-      </div>
+      <Icon className={cn("h-5 w-5", isActive ? "text-white" : color)} />
       {showText && (
-        <>
-          <span className="text-sm truncate">{title}</span>
-          {badge && (
-            <span className="ml-auto bg-crocus-100 text-crocus-600 text-xs rounded-full px-2 py-0.5 flex items-center justify-center">
-              {badge}
-            </span>
+        <div className="flex-1 min-w-0 flex flex-col">
+          <span className={cn("text-sm font-medium", isActive ? "text-white" : "text-gray-800")}>
+            {title}
+          </span>
+          {description && !isActive && (
+            <span className="text-xs text-gray-500">{description}</span>
           )}
-        </>
+        </div>
       )}
     </Link>
   );
-
-  if (collapsed && !isMobile && !isTablet) {
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="relative">{linkContent}</div>
-        </TooltipTrigger>
-        <TooltipContent side="right" className="z-50 bg-white border border-gray-100 shadow-md">
-          {title}
-        </TooltipContent>
-      </Tooltip>
-    );
-  }
-
-  return linkContent;
 };
 
 // ---------- SidebarSection ----------
@@ -183,23 +185,16 @@ interface SidebarSectionProps {
 }
 
 const SidebarSection = ({ title, items, collapsed }: SidebarSectionProps) => (
-  <SidebarGroup className={cn("mt-4", collapsed ? "px-1" : "px-2")}>
+  <SidebarGroup className={cn("mt-4", collapsed ? "px-2" : "px-3")}>
     {!collapsed && (
-      <SidebarGroupLabel className="text-gray-500 font-medium px-3 py-2 text-xs uppercase">
+      <SidebarGroupLabel className="text-gray-600 font-bold px-3 py-2 text-xs uppercase tracking-wider">
         {title}
       </SidebarGroupLabel>
     )}
-    <SidebarMenu>
+    <SidebarMenu className="space-y-1 mt-2">
       {items.map((item) => (
-        <SidebarMenuItem
-          key={item.path}
-          className={cn(collapsed ? "px-0 w-full flex justify-center" : "")}
-        >
-          <SidebarMenuButton
-            asChild
-            tooltip={collapsed ? item.title : undefined}
-            className={cn("my-1 transition-all rounded-md", collapsed ? "w-full" : "")}
-          >
+        <SidebarMenuItem key={item.path} className={collapsed ? "px-0 w-full flex justify-center" : ""}>
+          <SidebarMenuButton asChild tooltip={collapsed ? item.title : undefined}>
             <SidebarItem {...item} collapsed={collapsed} />
           </SidebarMenuButton>
         </SidebarMenuItem>
@@ -212,12 +207,16 @@ const SidebarSection = ({ title, items, collapsed }: SidebarSectionProps) => (
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
+  const isMobile = useBreakpoint("mobile");
+  const isTablet = useBreakpoint("tablet");
 
   return (
     <aside
       className={cn(
-        "h-screen bg-white sticky top-0 left-0 z-30 flex flex-col border-r border-gray-200 transition-all duration-300 ease-in-out",
-        isCollapsed ? "w-[70px]" : "w-[240px]"
+        "h-screen sticky top-0 left-0 z-30 flex flex-col transition-all duration-300 ease-in-out",
+        "bg-gradient-to-b from-white via-purple-50/30 to-red-50/30",
+        "border-r border-purple-200/50 shadow-md",
+        isCollapsed || isMobile ? "w-[70px]" : isTablet ? "w-[200px]" : "w-[250px]"
       )}
     >
       <SidebarHeader
@@ -225,12 +224,11 @@ const Sidebar = () => {
         collapsed={isCollapsed}
         toggleCollapse={toggleCollapse}
       />
-      <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
+      
+      <nav className="flex-1 px-3 py-4 overflow-y-auto max-h-[calc(100vh-100px)] scrollbar-thin scrollbar-thumb-purple-300 scrollbar-track-transparent">
         {[
           { label: "Menu Chính", items: adminItems },
-          { label: "Danh mục", items: categoryItems },
-          { label: "Quản lý", items: adminManagementItems },
-          { label: "Hỗ trợ", items: supportItems },
+          { label: "Hỗ Trợ", items: supportItems },
         ].map((section) => (
           <SidebarSection
             key={section.label}
