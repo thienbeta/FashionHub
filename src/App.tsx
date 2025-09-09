@@ -10,31 +10,17 @@ import Index from "./pages/user/Index";
 import NotFound from "./pages/sections/NotFound";
 import ProductList from "./pages/products/ProductList";
 import ProductDetail from "./pages/products/ProductDetail";
-import BlogList from "./pages/blogs/BlogList";
-import BlogDetail from "./pages/blogs/BlogDetail";
-import FavoritesList from "./pages/products/FavoritesList";
-import Contact from "./pages/user/Contact";
 import About from "./pages/sections/About";
 import { Login } from "./pages/auth/Login";
-import { Register }from "./pages/auth/Register";
+import { Register } from "./pages/auth/Register";
 import { ForgotPassword } from "./pages/auth/ForgotPassword";
 import { Profile } from "./pages/user/Profile";
-import { Cart } from "./pages/user/Cart";
-import { Checkout } from "./pages/user/Checkout";
-import Orders from "./pages/user/Orders";
-import ViewProfile from "./pages/user/ViewProfile";
-import { Messages } from "./pages/user/Messages";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminUsers from "./pages/admin/AdminUsers";
-import AdminSettings from "./pages/admin/AdminSettings";
-import AdminInvoices from "./pages/admin/AdminInvoices";
-import AdminContact from "./pages/admin/AdminContact";
-import AdminType from "./pages/admin/AdminType";
-import AdminColor from "./pages/admin/AdminColor";
-import AdminSize from "./pages/admin/AdminSize";
-import AdminHashTag from "./pages/admin/AdminHashTag";
-import AdminTrademark from "./pages/admin/AdminTrademark";
-import AdminBlogs from "./pages/admin/AdminBlogs";
+import AdminDanhMuc from "./pages/admin/AdminDanhMuc";
+import AdminSanPham from "./pages/admin/AdminSanPham";
+import AdminNguoiDung from "./pages/admin/AdminNguoiDung";
+import Favourites from "./pages/products/Favourites";
+import Security from "./pages/sections/Security";
 
 const queryClient = new QueryClient();
 
@@ -48,33 +34,22 @@ const App = () => (
               <Route index element={<Index />} />
               <Route path="products" element={<ProductList />} />
               <Route path="products/:id" element={<ProductDetail />} />
-              <Route path="blogs" element={<BlogList />} />
-              <Route path="blogs/:id" element={<BlogDetail />} />
-              <Route path="favorites" element={<FavoritesList />} />
-              <Route path="contact" element={<Contact />} />
               <Route path="about" element={<About />} />
               <Route path="auth/login" element={<Login />} />
               <Route path="auth/register" element={<Register />} />
               <Route path="auth/forgot-password" element={<ForgotPassword />} />
               <Route path="profile" element={<Profile />} />
-              <Route path="user/cart" element={<Cart />} />
-              <Route path="user/checkout" element={<Checkout />} />
-              <Route path="user/orders" element={<Orders />} />
-              <Route path="messages" element={<Messages />} />
-              <Route path="profile/:userId" element={<ViewProfile />} />
+              <Route path="security" element={<Security />} />
+              <Route path="favourites" element={<Favourites />} />
+              <Route path="*" element={<NotFound />} />
             </Route>
 
             <Route path="/admin" element={<AdminLayout role="admin" />}>
               <Route index element={<AdminDashboard />} />
-              <Route path="users" element={<AdminUsers />} />
-              <Route path="settings" element={<AdminSettings />} />
-              <Route path="contact" element={<AdminContact />} />
-              <Route path="type" element={<AdminType />} />
-              <Route path="color" element={<AdminColor />} />
-              <Route path="size" element={<AdminSize />} />
-              <Route path="hashtag" element={<AdminHashTag />} />
-              <Route path="trademark" element={<AdminTrademark />} />
-              <Route path="blogs" element={<AdminBlogs />} />
+              <Route path="danhmuc" element={<AdminDanhMuc />} />
+              <Route path="sanpham" element={<AdminSanPham />} />
+              <Route path="nguoidung" element={<AdminNguoiDung />} />
+              <Route path="profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
             </Route>
 

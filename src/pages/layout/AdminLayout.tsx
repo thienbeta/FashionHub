@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import { profile } from "console";
 
 interface AdminLayoutProps {
   role: "admin" | "staff";
@@ -13,30 +14,14 @@ const getPageTitle = (pathname: string): string => {
   const page = pathParts[2] || "dashboard";
 
   const titles: Record<string, string> = {
-    dashboard: "Bảng điều khiển",
-    orders: "Đơn hàng",
-    products: "Sản phẩm",
-    inventory: "Kho hàng",
-    users: "Người dùng",
-    staff: "Nhân viên",
+    dashboard: "Trang Chủ",
+    sanpham: "Sản Phẩm",
+    users: "Người Dùng",
     settings: "Cài đặt",
-    invoices: "Hóa đơn",
-    form: "Form",
-    contact: "Liên hệ",
-    marketing: "Tiếp thị",
-    messages: "Tin nhắn",
-    calendar: "Lịch",
-    reports: "Báo cáo",
-    payments: "Thanh toán",
-    favorites: "Yêu thích",
-    website: "Trang web",
-    security: "Bảo mật",
-    trademark: "Thương hiệu",
-    type: "Loại sản phẩm",
-    blogs: "Blog",
-    hashtag: "Hashtag",
-    color: "Màu sắc",
-    size: "Kích thước",
+    security: "Bảo Mật",
+    danhmuc: "Danh Mục",
+    nguoidung: "Người Dùng",
+    profile: "Bảo Mật",
   };
 
   return titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
